@@ -1,0 +1,18 @@
+Package: DegeneratePrimerTools
+Type: Package
+Title: Tools for Designing Degenerate Primers
+Version: 0.1.0
+Authors@R: c(
+    person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
+    person("Ulysses", "Amanciao", , "uamanciode@rockefeller.edu", c("aut"))
+    )
+Description: Assist in designign Degenrate Primers Against A colelciotn of
+    Sequences
+License: GPL3
+LazyData: TRUE
+Imports:
+    msa,
+    shiny,
+    miniUI,
+    ggplot2
+RoxygenNote: 5.0.1

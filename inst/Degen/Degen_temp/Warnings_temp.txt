@@ -1,0 +1,6 @@
+Sequence: t1, 4 bp
+Warning: Sequence (t1, 4 bp) is not in the first reading frame or does not end with a complete codon
+Warning: Codon (A, 4) not changed
+Sequence: t2, 4 bp
+Warning: Sequence (t2, 4 bp) is not in the first reading frame or does not end with a complete codon
+Warning: Codon (C, 4) not changed

@@ -1,0 +1,9 @@
+#NEXUS
+Begin Data;
+  Dimensions ntax=2 nchar=4;
+  Format datatype=dna gap=-;
+  Matrix
+    t1	AARA
+    t2	CCNC
+  ;
+END;
