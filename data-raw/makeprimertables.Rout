@@ -20,9 +20,14 @@ Type 'q()' to quit R.
 > #load the degeneracy tables
 > source("degeneracy_tables.R")
 > 
-> devtools::use_data(degenS)
+> #save them as package data
+> devtools::use_data(degenS,  overwrite = TRUE)
 Saving degenS as degenS.rda to /Users/zachpowers/Documents/git/Software/DegeneratePrimerTools/data
+> devtools::use_data(degenSZ, overwrite = TRUE)
+Saving degenSZ as degenSZ.rda to /Users/zachpowers/Documents/git/Software/DegeneratePrimerTools/data
+> devtools::use_data(degenZ,  overwrite = TRUE)
+Saving degenZ as degenZ.rda to /Users/zachpowers/Documents/git/Software/DegeneratePrimerTools/data
 > 
 > proc.time()
    user  system elapsed 
-  0.195   0.030   0.218 
+  0.188   0.022   0.201 

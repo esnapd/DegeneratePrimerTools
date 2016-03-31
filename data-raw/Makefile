@@ -7,5 +7,5 @@ loaddata: degeneracy_tables.R
 all: loaddata
 
 clean:
-	rm degeneracy_tables.R
+	rm degeneracy_tables.R .RData
 
