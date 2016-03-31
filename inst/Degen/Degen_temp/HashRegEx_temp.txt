@@ -1,4 +1,0 @@
-Sequence: t1, 4 bp
-hash: AAA replaced with AAR at position 1
-Sequence: t2, 4 bp
-hash: CCC replaced with CCN at position 1
