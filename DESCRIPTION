@@ -11,8 +11,9 @@ Description: Assist in designign Degenrate Primers Against A colelciotn of
 License: GPL3
 LazyData: TRUE
 Imports:
-    msa,
-    shiny,
-    miniUI,
-    ggplot2
+    msa (>= 1.3.3),
+    shiny (>= 0.13.),
+    miniUI (>= 0.1.1),
+    ggplot2 (>= 2.0),
+    htmlwidgets (>= 0.6)
 RoxygenNote: 5.0.1
