@@ -8,4 +8,5 @@ all: loaddata
 
 clean:
 	rm degeneracy_tables.R .RData
-
+  rm *.RData
+  rm *.Rout
