@@ -12,7 +12,7 @@ License: GPL3
 LazyData: TRUE
 Imports:
     msa (>= 1.3.3),
-    shiny (>= 0.13.),
+    shiny (>= 0.13),
     miniUI (>= 0.1.1),
     ggplot2 (>= 2.0),
     htmlwidgets (>= 0.6),
