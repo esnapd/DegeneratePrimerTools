@@ -1,7 +1,6 @@
 #' draw a radial phylogenetic tree
 #'
 #' @import htmlwidgets
-#'
 #' @export
 phylogenetictree <- function(tree, colordomain, outerradius = 480,
                              innerradius = 310, width = NULL, height = NULL) {
@@ -27,14 +26,12 @@ phylogenetictree <- function(tree, colordomain, outerradius = 480,
     package = 'phylogenetictree'
   )
 }
-
 #' Widget output function for use in Shiny
 #'
 #' @export
 phylogenetictreeOutput <- function(outputId, width = '100%', height = '400px'){
   shinyWidgetOutput(outputId, 'phylogenetictree', width, height, package = 'phylogenetictree')
 }
-
 #' Widget render function for use in Shiny
 #'
 #' @export

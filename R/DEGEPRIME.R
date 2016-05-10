@@ -16,7 +16,6 @@ trimAlignment <- function(infile, outfile, minoccupancy=0, refsequence = NULL, t
   print(cli)
   system(cli)
 }
-
 #' run the DegePrime.pl script
 #'
 #' @param alignmentfile
@@ -139,6 +138,7 @@ plot_deg <- function(degedf) {
   cutoff <- mean(degedf$coverage) + 2*sd(degedf$coverage)
   degedf$localmaxima <- rollapply(degedf$coverage, 9, function(x) which.max(x)==5, fill=NA)
 
+  #return a plot highlighting the high peaks (if there are any)
   gg <- ggplot(degedf, aes(x=Pos,y=coverage, color=PrimerDeg)) + geom_point()
   gg <- gg + facet_grid(degeneracy~.) + theme_bw()
   gg + geom_text_repel(
@@ -146,7 +146,3 @@ plot_deg <- function(degedf) {
     aes(label = Pos)
   )
 }
-#library(ggrepel)
-#peakfinder(data,xvar = "Pos", yvar="coverage")
-
-

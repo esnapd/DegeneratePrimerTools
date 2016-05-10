@@ -18,3 +18,4 @@ Imports:
     htmlwidgets (>= 0.6),
     ape (>= 3.4)
 RoxygenNote: 5.0.1
+Suggests: testthat

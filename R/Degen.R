@@ -54,11 +54,3 @@ makedegenerateseqs <- function(sequences, method="S") {
     return(map_chr(sequences, function(x){makedegenerateseqs(x, method = method)}))
   }
 }
-makedegenerateseqs("ATGACTCTGGTCG")
-makedegenerateseqs(c("ATGACTCTGGTCG","ACTGTGTGCATGCTGATC"), method="Z")
-# length("ACT")
-# is.character(c("ASC","CASC"))
-# is.character("CASC")
-# makedegenerate("ACT")
-# makedegenerate(c("ACT","TCA"))
-# paste0("'","S","'")
