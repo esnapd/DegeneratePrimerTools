@@ -43,7 +43,6 @@ degePrime <- function(alignmentfile, outfile,  oligolength, maxdegeneracy, minim
   print(cli)
   system(cli)
 }
-
 #' loadDegePrimerDF
 #'
 #' load and verify the output of a DEGEPRIME table
@@ -51,11 +50,37 @@ degePrime <- function(alignmentfile, outfile,  oligolength, maxdegeneracy, minim
 #' @param infile
 #' @export
 loadDegePrimeDF <- function(infile){
-  names = c("")
-  df = read.table(infile)
+  names = c("Pos","TotalSeq","UniqueMers","Entropy", "PrimerDeg", "PrimerMatching", "PrimerSeq")
+  df = read.table(infile, col.names = names)
   return(df)
 }
+#' Run and load degeprime and return the dataframe of results
+#'
+#' @importFrom parallel mclapply
+#' @export
+rundegeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,400,1000),
+                         minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1) {
 
+  # use degeneracy range to determine the nubmer of jobs
+  drange <- seq(degeneracyrange)
+  tempfiles <- lapply(drange, function(x) {tempfile()})
+
+  degendata <- mclapply(drange, function(x){
+    #get per-run data
+    outputfile    <- tempfiles[[x]]
+    maxdegeneracy <-  degeneracyrange[[x]]
+    #calculate degeneracies
+    degePrime(alignmentfile=alignmentfile, outfile=outputfile,
+              oligolength=oligolength, maxdegeneracy = maxdegeneracy,
+              minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
+    #load the file and return a dataframe
+    df <- loadDegePrimeDF(outputfile)
+    df$degeneracy <- maxdegeneracy
+    return(df)
+  }, mc.cores=ncpus)
+
+  return(degendata)
+}
 #' peakfinder
 #'
 #' obtain the peaks from a DEGEPRIME dataframe
