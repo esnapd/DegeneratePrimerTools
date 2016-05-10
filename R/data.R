@@ -33,3 +33,13 @@
 #' using the "SZ" method of Degen.pl
 #'
 "degenSZ"
+
+#' p7 adaptor sequences for paired end illumina barcoding
+#'
+#' These sequences are the Illumina barcodes used for the indexing read
+#' on paired end runs. Intended for the MiSeq instrument.
+#'
+#' @format A two-column data frame containing the full p7 sequence and
+#' the barcode needed for the sample file.
+#'
+"illumina_p7"
