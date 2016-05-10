@@ -50,8 +50,8 @@ degePrime <- function(alignmentfile, outfile,  oligolength, maxdegeneracy, minim
 #' @param infile
 #' @export
 loadDegePrimeDF <- function(infile){
-  names = c("Pos","TotalSeq","UniqueMers","Entropy", "PrimerDeg", "PrimerMatching", "PrimerSeq")
-  df = read.table(infile, col.names = names)
+  #names = c("Pos","TotalSeq","UniqueMers","Entropy", "PrimerDeg", "PrimerMatching", "PrimerSeq")
+  df = read.table(infile, header=TRUE)
   return(df)
 }
 #' Run and load degeprime and return the dataframe of results
@@ -65,7 +65,7 @@ rundegeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,4
   drange <- seq(degeneracyrange)
   tempfiles <- lapply(drange, function(x) {tempfile()})
 
-  degendata <- mclapply(drange, function(x){
+  degendata <- mclapply(drange, function(x) {
     #get per-run data
     outputfile    <- tempfiles[[x]]
     maxdegeneracy <-  degeneracyrange[[x]]
@@ -79,7 +79,13 @@ rundegeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,4
     return(df)
   }, mc.cores=ncpus)
 
-  return(degendata)
+  #aggregate the data
+  aggdata <- Reduce(rbind, degendata)
+
+  #add coverage information
+  aggdata$coverage <- aggdata$PrimerMatching/aggdata$TotalSeq
+
+  return(aggdata)
 }
 #' peakfinder
 #'
@@ -123,4 +129,24 @@ peakfinder <- function(data, xvar, yvar, width=700, height=400){
                                    height = height))
 
 }
+#' Plot the output from rundegeprime
+#'
+#' @import ggplot2
+#' @importFrom zoo rollapply
+#' @importFrom ggrepel geom_text_repel
+#' @export
+plot_deg <- function(degedf) {
+  cutoff <- mean(degedf$coverage) + 2*sd(degedf$coverage)
+  degedf$localmaxima <- rollapply(degedf$coverage, 9, function(x) which.max(x)==5, fill=NA)
+
+  gg <- ggplot(degedf, aes(x=Pos,y=coverage, color=PrimerDeg)) + geom_point()
+  gg <- gg + facet_grid(degeneracy~.) + theme_bw()
+  gg + geom_text_repel(
+    data= subset(degedf, coverage > cutoff & localmaxima == TRUE),
+    aes(label = Pos)
+  )
+}
+#library(ggrepel)
+#peakfinder(data,xvar = "Pos", yvar="coverage")
+
 
