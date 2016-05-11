@@ -35,12 +35,11 @@ HTMLWidgets.widget({
       .append("input")
       .attr("type", "checkbox");
 
-
   var outerRadius = params.outerradius,
       innerRadius = params.innerradius;
 
   var color = d3.scale.category10()
-      .domain(["Bacteria", "Eukaryota", "Archaea"]);
+      .domain(params.colordomain);
 
   var cluster = d3.layout.cluster()
       .size([360, innerRadius])

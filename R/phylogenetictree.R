@@ -2,8 +2,14 @@
 #'
 #' @import htmlwidgets
 #' @export
-phylogenetictree <- function(tree, colordomain, outerradius = 480,
+phylogenetictree <- function(tree,
+                             colordomain = c("Bacteria", "Eukaryota", "Archaea"),
+                             outerradius = 480,
                              innerradius = 310, width = NULL, height = NULL) {
+
+  if (class(tree)=="phylo"){
+    tree <- write.tree(tree)
+  }
 
   if (!is.character(colordomain)) {
     colordomain <- c("")
@@ -23,14 +29,14 @@ phylogenetictree <- function(tree, colordomain, outerradius = 480,
     x = params,
     width = width,
     height = height,
-    package = 'phylogenetictree'
+    package = 'DegeneratePrimerTools'
   )
 }
 #' Widget output function for use in Shiny
 #'
 #' @export
 phylogenetictreeOutput <- function(outputId, width = '100%', height = '400px'){
-  shinyWidgetOutput(outputId, 'phylogenetictree', width, height, package = 'phylogenetictree')
+  shinyWidgetOutput(outputId, 'phylogenetictree', width, height, package = 'DegeneratePrimerTools')
 }
 #' Widget render function for use in Shiny
 #'
