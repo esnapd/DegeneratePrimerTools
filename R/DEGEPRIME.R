@@ -16,6 +16,23 @@ trimAlignment <- function(infile, outfile, minoccupancy=0, refsequence = NULL, t
   print(cli)
   system(cli)
 }
+#' Take An MSA Object and trim it
+#'
+#' use trimaligment.pl to trim an MSA object
+#'
+#' @importFrom Biostrings DNAStringSet writeXStringSet
+#' @export
+trimMSA <- function(msa) {
+  temp1  <- tempfile()
+  temp2 <- tempfile()
+
+  dnaSS  <- as(msa, "DNAStringSet")
+  writeXStringSet(dnaSS, file=temp1)
+  trimAlignment(temp1,temp2)
+
+  trimmed <- readDNAStringSet(temp2)
+  return(trimmed)
+}
 #' run the DegePrime.pl script
 #'
 #' @param alignmentfile
