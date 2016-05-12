@@ -48,68 +48,36 @@ degeprimer <- function(...){
   # Make the name-replaced, splatted list
   splatlist <- sapply(arglist, splat.degeprimer.objects)
 
-  # rm any forbidden chars in index names (e.g. quotes - phylogenetic tree).
-  # Right now, only extra quotes are forbidden.
-  # splatlist = lapply(splatlist, function(x){
-  #   taxa_names(x) <- gsub("\"", "", taxa_names(x), fixed=TRUE)
-  #   taxa_names(x) <- gsub("\'", "", taxa_names(x), fixed=TRUE)
-  #   return(x)
-  # })
-
   ####################
   ## Need to determine whether to
   # (A) instantiate a new raw/uncleaned degeprimer object, or
-  # (B) return a single component, or
-  # (C) to stop with an error because of incorrect argument types.
+  # (B) to stop with an error because of incorrect argument types.
   if( length(splatlist) > length(get.component.classes()) ){
     stop("Too many components provided\n")
   } else if( length(names(splatlist)) > length(unique(names(splatlist))) ){
-    stop("Only one of each component type allowed.\n",
-         "For merging multiple objects of the same type/class, try merge_phyloseq(...)\n")
+    stop("Only one of each component type allowed.")
   }
-  # else if( length(splatlist) == 1){
-  #   return(arglist[[1]])
-  # }
   else {
     # Instantiate the degeprimer-class object, dp.
     dp <- do.call("new", c(list(Class="degeprimer"), splatlist) )
   }
 
-  ####################
-  ## Reconcile the names of the components in the
-  ## refseq, msa, and tree.
-  ## in the newly-minted phyloseq object
-  #shared_taxa    = intersect_taxa(dp)
-  #shared_samples = intersect_samples(dg)
+  # Check consistency between the nameing of the DNA/MSA/Tree
+  refseqNames <- msaNames <- treeNames <-NULL
 
+  if (!is.null(dp@refseq))    refseqNames <- names(dp@refseq)
+  if (!is.null(dp@msa))       msaNames    <- names(dp@msa)
+  if (!is.null(dp@phy_tree))  treeNames   <- dp@phy_tree$tip.label
 
-  # if( length(shared_taxa) < 1 ){
-  #   stop("Problem with OTU/taxa indices among those you provided.\n",
-  #        "Check using intersect() and taxa_names()\n"
-  #   )
-  # }
-  # if( length(shared_samples) < 1 ){
-  #   stop("Problem with sample indices among those you provided.\n",
-  #        "Check using intersect() and taxa_names()\n"
-  #   )
-  # }
-  #
-  # # Start with OTU indices
-  # ps = prune_taxa(shared_taxa, ps)
-  #
-  # # Verify there is more than one component
-  # # that describes samples before attempting to reconcile.
-  # ps = prune_samples(shared_samples, ps)
-  #
-  # # Force both samples and taxa indices to be in the same order.
-  # ps = index_reorder(ps, "both")
-  #
-  # # Replace any NA branch-length values in the tree with zero.
-  # if( !is.null(phy_tree(ps, FALSE)) ){
-  #   ps@phy_tree <- fix_phylo(ps@phy_tree)
-  # }
-  warning("No checks implemented to ensure data consistency!")
-
+  # keep non-null values, calculate name intersecation and assert that all lengths are the same
+  namelist   <- Filter(function(x) {!is.null(x)}, list(refseqNames,msaNames, treeNames))
+  lengthvec  <- as.numeric( Map(length, namelist) )
+  intlength  <- length(Reduce(intersect, namelist))
+  equalitycheck <- all.equal(rep(intlength, length(lengthvec)), lengthvec)
+  if (equalitycheck == FALSE) {
+    stop("Naming is inconsistent between your DNA, MSA, and tree. Please check your
+         sequences.")
+  }
 
   return(dp)
 }
