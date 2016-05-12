@@ -1,11 +1,26 @@
 #' Visualize the coverage of a primer on an Interactive Pylogenetic Tree
 #' @export
-visualize_coverage <- function(tree) {
-  nomatchcount <- table(tree$node.label == "No_Match")["TRUE"]
-  if (nomatchcount == 0){
-    warning("There doesn't seem to be match information. Has your tree been checked? Se Updatetree")
-  }
+visualize_coverage <- function(matchdf, tree) {
+  # note this funciton relies on the consistent ordering of nodes
+  # in phylo objects where tips come first, then nodes in the edgelist
+
+  #names of primer pairs having a match then get the  tip indices
+  matches  <- matchdf[!is.na(matchdf$expected),]$sequence
+  matchidx <- which(tree$tip.label %in% matches)
+
+  #get nodes attached to matched tips
+  connectednodes <- tree$edge[ tree$edge[,2] %in% matchidx, ]
+  connectednodes <- connectednodes[,1] #mat->vec
+  connectednodelabs <- connectednodes - length(tree$tip.label)
+
+  print(connectednodelabs)
+  tree$node.label[c(2:length(tree$node.label))] <- "No_Match"
+  tree$node.label[c(connectednodelabs)] <- "Primer_Match"
+
+  tree$tip.label <- purrr::map_chr(tree$tip.label, function(x){strsplit(x, "_")[[1]][[1]]})
+
   phylogenetictree(tree,colordomain=c("Primer_Match", "No_Match"))
+  return(tree)
 }
 #' Update Tree With Primer Information
 #'
