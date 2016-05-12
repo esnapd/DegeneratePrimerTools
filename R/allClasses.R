@@ -84,7 +84,7 @@ setClassUnion("XStringSetOrNULL", c("XStringSet", "NULL"))
 #' @importClassesFrom Biostrings DNAStringSet
 #' @importClassesFrom Biostrings XStringSet
 #' @keywords internal
-setClassUnion("MsaDNAMultipleAlignmentOrNULL", c("MsaDNAMultipleAlignment", "NULL"))
+setClassUnion("DNAMultipleAlignmentOrNULL", c("DNAMultipleAlignment", "NULL"))
 #' @keywords internal
 setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 ################################################################################
@@ -92,7 +92,7 @@ setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 #'
 #' Contains all currently-supported component data classes:
 #' \code{\link[Biostrings]{XStringSet-class}} (\code{"refseq"} slot).
-#' \code{\link[msa]{MsaDNAMultipleAlignment}} (\code{"msa"} slot).
+#' \code{\link[Biostrings]{DNAMultipleAlignment}} (\code{"msa"} slot).
 #' \code{\link[ape]{phylo}}-class (\code{"phy_tree"} slot),
 #' \code{{primerdata-class}} (\code{"primerdata"} slot),
 #'
@@ -118,12 +118,11 @@ setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 #'
 #' slots:
 #' \describe{
-#'    \item{otu_table}{a single object of class otu_table.}
-#'    \item{sam_data}{ a single object of class sample_data.}
-#'    \item{tax_table}{ a single object of class taxonomyTable.}
-#'    \item{phy_tree}{ a single object of the \code{\link[ape]{phylo}}-class, from the ape package.}
 #'    \item{refseq}{ a biological sequence set object of a class that
 #'         inherits from the \code{\link[Biostrings]{XStringSet-class}}, from the Biostrings package.}
+#'    \item{msa}{ a single object of the \code{\link[Biostrings]{DNAMultipleAlignment-class}}, from the Biostrings package.}
+#'    \item{phy_tree}{ a single object of the \code{\link[ape]{phylo}}-class, from the ape package.}
+#'    \item{phy_tree}{ a single object of the \code{primerdata-class}}.}
 #' }
 #' @seealso
 #'  The constructor, \code{\link{degeprimer}} and  the component
@@ -138,7 +137,7 @@ setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 setClass(Class="degeprimer",
          representation=representation(
            refseq     = "XStringSetOrNULL",
-           msa        = "MsaDNAMultipleAlignmentOrNULL",
+           msa        = "DNAMultipleAlignmentOrNULL",
            phy_tree   = "phyloOrNULL",
            primerdata = "primerdataOrNULL"),
          prototype=prototype(refseq=NULL, msa=NULL,phy_tree=NULL, primerdata=NULL)

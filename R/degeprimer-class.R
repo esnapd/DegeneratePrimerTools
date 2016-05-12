@@ -10,8 +10,8 @@
 #' @usage degeprimer(...)
 #'
 #' @param ... One or more component objects including the \code{phylo}-class
-#'  (defined by the \code{\link{ape-package}}), \code{MsaDNAMultipleAlignment}-class
-#'  (defined by the \code{\link{msa-package}}), \code{XStringSet}-class
+#'  (defined by the \code{\link{ape-package}}), \code{DNAMultipleAlignment-class}
+#'  (defined by the \code{\link{Biostrings-package}}), \code{XStringSet-class}
 #'  (defined by the \code{\link{Biostrings-package}}) classes as well as the
 #'  degeprimer-specific class, \code{\link{primerdata-class}}.
 #'
