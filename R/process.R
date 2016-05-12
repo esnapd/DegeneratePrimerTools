@@ -1,42 +1,45 @@
 #' Visualize the coverage of a primer on an Interactive Pylogenetic Tree
 #'
-#' @importFrom Biostrings DNAString countPattern
-visualize_coverage <- function(forwardseq, reverseseq, referenceseq, tree) {
-  #load the data
-  fp  <- DNAString(forwardseq)
-  rp  <- DNAString(reverseseq)
-  ref <- Map(function(x){DNAString(x)}, referenceseq)
+visualize_coverage <- function(matchdf, tree) {
+
 
   pattern = DNAString("TSGGTGTNT")
   matchPattern(pattern, DNAString("TGGGTGTCTTGGGTGTATTTGGTGTAT"), fixed = FALSE)
 }
+#' Find Primers matching A Set of Reference Sequences
 #'
-#'
+#' @importFrom Biostrings matchPattern
 find_primers <- function(fp, rp, refseq) {
-  if (!class(ks1) == "DNAString") {
+  if (!class(fp) == "DNAString") {
+    stop("Expecting a DNAString as the reference object")
+  }
+  if (!class(rp) == "DNAString") {
+    stop("Expecting a DNAString as the reference object")
+  }
+  if (!class(refseq) == "DNAStringSet") {
     stop("Expecting a DNAString as the reference object")
   }
 
-  #load the data
-  fp  <- DNAString(forwardseq)
-  rp  <- DNAString(reverseseq)
+  # determine if the FP/RP match the sequences.
+  primermatches <- lapply(refseq, function(x){
+    p1    <- matchPattern(pattern=fp, subject=x, fixed=FALSE)
+    p2    <- matchPattern(pattern=rc(rp), subject=x, fixed=FALSE)
+    p1loc <- start(p1)[1]
+    p2loc <- start(p2)[1]
+    if (length(p1) == 0) warning("No Matches for the Forward Primer")
+    if (length(p2) == 0) warning("No Matches for the Reverse Primer")
+    if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
+    if (length(p2) >  1) warning("Multiple matches for the forward primer, using the first.")
+    return(data.frame(start=p1loc,end=p2loc))
+  })
 
-
-  #calculate the positions
-  p1    <- matchPattern(pattern=fp, subject=ref, fixed=FALSE)
-  p2    <- matchPattern(pattern=fp, subject=ref, fixed=FALSE)
-  p1loc <- start(p1)[1]
-  p2loc <- start(p2)[1]
-
-  if (length(p1) == 0) stop("No Matches for the Forward Primer")
-  if (length(p2) == 0) stop("No Matches for the Reverse Primer")
-  if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
-  if (length(p2) >  1) warning("Multiple matches for the forward primer, using the first.")
-
-  return(list(start=p1loc,end=p2loc))
-
+  # combine and calculate stats
+  df          <- Reduce(rbind, primermatches)
+  df$expected <- df$end - df$start
+  df$sequence <- names(primermatches)
+  return(df)
 }
-#' Split FNA by Tree Distance And ReCreate
+#' Split FNA by Tree Distance And run Degenera On Each Subset
 #'
 #' @import ape
 #' @importFrom msa msaMuscle msaClustalW
