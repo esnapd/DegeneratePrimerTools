@@ -1,7 +1,18 @@
 #' Visualize the coverage of a primer on an Interactive Pylogenetic Tree
+#' @export
+visualize_coverage <- function(tree) {
+  nomatchcount <- table(tree$node.label == "No_Match")["TRUE"]
+  if (nomatchcount == 0){
+    warning("There doesn't seem to be match information. Has your tree been checked? Se Updatetree")
+  }
+  phylogenetictree(tree,colordomain=c("Primer_Match", "No_Match"))
+}
+#' Update Tree With Primer Information
 #'
-visualize_coverage <- function(matchdf, tree) {
-  # note this funciton relies on the consistent ordering of nodes
+#' Annotate a tree with Primer Information
+#' @export
+updateTreePrimerMatch <- function(matchdf ,tree) {
+  # note this function relies on the consistent ordering of nodes
   # in phylo objects where tips come first, then nodes in the edgelist
 
   #names of primer pairs having a match then get the  tip indices
@@ -17,11 +28,12 @@ visualize_coverage <- function(matchdf, tree) {
   tree$node.label[c(2:length(tree$node.label))] <- "No_Match"
   tree$node.label[c(connectednodelabs)] <- "Primer_Match"
 
-  phylogenetictree(tree,colordomain=c("Primer_Match", "No_Match"))
+  return(tree)
 }
 #' Find Primers matching A Set of Reference Sequences
 #'
 #' @importFrom Biostrings matchPattern
+#' @export
 find_primers <- function(fp, rp, refseq) {
   if (!class(fp) == "DNAString") {
     stop("Expecting a DNAString as the reference object")
@@ -56,15 +68,19 @@ find_primers <- function(fp, rp, refseq) {
 #'
 #' @import ape
 #' @importFrom msa msaMuscle msaClustalW
+#' @importFrom seqinr dist.alignment
 #' @export
 split_fna_tree <- function(tree,fnas, splits=2, degeneracyrange=c(1,4,10,50,100,1000), oligolength=21, ncpus=1) {
 
   distances   <- cophenetic.phylo(tree)
   kmeans_out  <- kmeans(distances, centers = splits)
   clusterdata <- lapply(1:splits, function(x){names(which(kmeans_out$cluster==x))})
-  subfnas     <- lapply(seq(clusterdata), function(x){fna[names(fna) %in% clusterdata[[x]]]})
+  subfnas     <- lapply(seq(clusterdata), function(x){fnas[names(fnas) %in% clusterdata[[x]]]})
   #alns        <- lapply(1:splits, function(x){msaMuscle(subfnas[[x]])})
   alns        <- lapply(1:splits, function(x){msaClustalW(subfnas[[x]])})
+  #alndists    <- lapply(alns, function(x){dist.alignment(x)})
+
+  trees       <- lapply(1:splits, function(x){msaClustalW(subfnas[[x]])})
 
   #run degeprime on each subset
   alnfiles       <- lapply(alns, function(x) tempfile())
