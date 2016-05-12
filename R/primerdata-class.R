@@ -36,7 +36,6 @@ setMethod("primerdata", "data.frame", function(object){
       stop("Dataframe names do not match DEGEPRIME output. Is your primer dataframe correct?")
     }
   }
-
   primdata <- new("primerdata", object)
   return(primdata)
 })
