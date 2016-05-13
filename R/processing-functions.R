@@ -35,63 +35,9 @@ build_tree <- function(dgprimer, method="ClustalW", maxiters="default", force=FA
 
   return(dgprimer)
 }
-#' Visualize the coverage of a primer on an Interactive Pylogenetic Tree
-#'
-#' @importFrom purrr map_chr
-#' @export
-visualize_coverage <- function(matched,tree) {
-  # note this funciton relies on the consistent ordering of nodes
-  # in phylo objects where tips come first, then nodes in the edgelist
-  # https://sites.google.com/site/phylogeneticworkshop2/labs/plotting-phylogenies
-
-  #matches <- dgprimer@primerdata
-  #tree    <- dgprimer@phy_tree
-
-
-  #names of primer pairs having a match then get the  tip indices
-  matches  <- matchdf[!is.na(matchdf$expected),]$sequence
-  matchidx <- which(tree$tip.label %in% matches)
-
-  #get nodes attached to matched tips
-  connectednodes    <- tree$edge[ tree$edge[,2] %in% matchidx, ]
-  connectednodes    <- connectednodes[,1] #mat->vec
-  connectednodelabs <- connectednodes - length(tree$tip.label)
-
-  print(connectednodelabs)
-  tree$node.label[c(2:length(tree$node.label))] <- "No_Match"
-  tree$node.label[c(connectednodelabs)]         <- "Primer_Match"
-
-  tree$tip.label <- map_chr(tree$tip.label, function(x){strsplit(x, "_")[[1]][[1]]})
-
-  phylogenetictree(tree,colordomain=c("Primer_Match", "No_Match"))
-  return(tree)
-}
-#' Update Tree With Primer Information
-#'
-#' Annotate a tree with Primer Information
-#' @export
-updateTreePrimerMatch <- function(matchdf ,tree) {
-  # note this function relies on the consistent ordering of nodes
-  # in phylo objects where tips come first, then nodes in the edgelist
-
-  #names of primer pairs having a match then get the  tip indices
-  matches  <- matchdf[!is.na(matchdf$expected),]$sequence
-  matchidx <- which(tree$tip.label %in% matches)
-
-  #get nodes attached to matched tips
-  connectednodes    <- tree$edge[ tree$edge[,2] %in% matchidx, ]
-  connectednodes    <- connectednodes[,1] #mat->vec
-  connectednodelabs <- connectednodes - length(tree$tip.label)
-
-  #set node names and plot
-  tree$node.label[c(2:length(tree$node.label))] <- "No_Match"
-  tree$node.label[c(connectednodelabs)] <- "Primer_Match"
-
-  return(tree)
-}
 #' Find Primers matching A Set of Reference Sequences
 #'
-#' Return teh best hit from each
+#' Return the best hit from each
 #' @importFrom Biostrings matchPattern reverseComplement
 #' @importFrom purrr compact
 #' @export
