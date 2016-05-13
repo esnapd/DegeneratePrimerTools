@@ -143,9 +143,6 @@ setClass(Class="degeprimer",
          prototype=prototype(refseq=NULL, msa=NULL,phy_tree=NULL, primerdata=NULL)
 )
 ################################################################################
-
-
-################################################################################
 #' The main experiment-level class for degprimer data
 #'
 #' Contains all currently-supported component data classes:
@@ -201,4 +198,29 @@ setClass(Class="degeprimer",
            primerpairs = "list"),
          prototype=prototype(refseq=NULL, msa=NULL,phy_tree=NULL, primerdata=NULL, primerpairs=list())
 )
+################################################################################
+#' Class for PrimerPairs
+#'
+#'#' slots:
+#' \describe{
+#'    \item{forwardprimer}{an instance  of the \code{\link[Biostrings]{DNAString-class}}, from the Biostrings package.}
+#'    \item{reverseprimer}{an instance  of the \code{\link[Biostrings]{DNAString-class}}, from the Biostrings package.}
+#'    \item{expectedsize}{ expected amplicon size}
+#'    \item{name}{primer name}
+#' }
+#'
+#' @importClassesFrom Biostrings DNAString
+#' @name primerpair-class
+#' @rdname primerpair-class
+#' @exportClass primerpair
+setClass(Class="primerpair",
+         representation=representation(
+           forwardprimer = "DNAString",
+           reverseprimer = "DNAString",
+           expectedsize = "numeric",
+           name         = "character"),
+         prototype = prototype(forwardprimer = NULL,
+                               reverseprimer = NULL,
+                               expectedsize  = NA_real_,
+                               name          = NA_character_))
 ################################################################################
