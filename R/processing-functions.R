@@ -91,14 +91,17 @@ updateTreePrimerMatch <- function(matchdf ,tree) {
 }
 #' Find Primers matching A Set of Reference Sequences
 #'
+#' Return teh best hit from each
 #' @importFrom Biostrings matchPattern reverseComplement
+#' @importFrom purrr compact
 #' @export
 setGeneric("find_primers", function(refseq, fp, rp ) standardGeneric("find_primers"))
 #'
 setMethod("find_primers", c("DNAString", "DNAString", "DNAString"), function(refseq, fp, rp ) {
   # determine if the FP/RP match the sequences.
-  p1    <- matchPattern(pattern=fp, subject=x, fixed=FALSE)
-  p2    <- matchPattern(pattern=reverseComplement(rp), subject=x, fixed=FALSE)
+  p1    <- matchPattern(pattern=fp, subject=refseq, fixed=FALSE)
+  p2    <- matchPattern(pattern=reverseComplement(rp), subject=refseq, fixed=FALSE)
+
   p1loc <- start(p1)[1]
   p2loc <- start(p2)[1]
   if (length(p1) == 0) warning("No Matches for the Forward Primer")
@@ -106,20 +109,21 @@ setMethod("find_primers", c("DNAString", "DNAString", "DNAString"), function(ref
   if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
   if (length(p2) >  1) warning("Multiple matches for the forward primer, using the first.")
 
-  df          <- data.frame(start=p1loc,end=p2loc)
-  df$expected <- df$end - df$start
-  df$sequence <- names(primermatches)
+  df <- data.frame(start=p1loc,end=p2loc)
   return(df)
 })
 #'
 #'
 setMethod("find_primers", c("DNAStringSet", "DNAString", "DNAString"), function(refseq, fp, rp ) {
   # determine if the FP/RP match the sequences.
-  primermatches <- lapply(refseq, function(x,fp=fp,rp=rp){
-    return(find_primers(x, fp, rp))
+  primermatches <- lapply(refseq, function(x,fp.=fp,rp.=rp){
+    return(find_primers(x, fp., rp.))
   })
   # combine and calculate stats
-  df          <- Reduce(rbind, primermatches)
+  df <- Reduce(rbind, primermatches)
+  df$expected <- df$end - df$start
+  df$sequence <- names(primermatches)
+  df <- na.omit(df)
   return(df)
 })
 #' Split FNA by Tree Distance And run Degenera On Each Subset

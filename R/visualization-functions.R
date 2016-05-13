@@ -46,7 +46,7 @@ peakfinder <- function(data, xvar, yvar, width=700, height=400){
 #' @importFrom zoo rollapply
 #' @importFrom ggrepel geom_text_repel
 #' @export
-plot_deg <- function(degedf) {
+plot_degeprimer <- function(degedf) {
   cutoff <- mean(degedf$coverage) + 2*sd(degedf$coverage)
   degedf$localmaxima <- rollapply(degedf$coverage, 9, function(x) which.max(x)==5, fill=NA)
 
@@ -62,10 +62,10 @@ plot_deg <- function(degedf) {
 #'
 #' @import htmlwidgets
 #' @export
-phylogenetictree <- function(tree,
-                             colordomain = c("Bacteria", "Eukaryota", "Archaea"),
-                             outerradius = 480,
-                             innerradius = 310, width = NULL, height = NULL) {
+plot_phylotree <- function(tree,
+                           colordomain = c("Bacteria", "Eukaryota", "Archaea"),
+                           outerradius = 480,
+                           innerradius = 310, width = NULL, height = NULL) {
 
   if (class(tree)=="phylo"){
     tree <- write.tree(tree)
