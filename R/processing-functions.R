@@ -98,7 +98,7 @@ setGeneric("find_primers", function(refseq, fp, rp ) standardGeneric("find_prime
 setMethod("find_primers", c("DNAString", "DNAString", "DNAString"), function(refseq, fp, rp ) {
   # determine if the FP/RP match the sequences.
   p1    <- matchPattern(pattern=fp, subject=x, fixed=FALSE)
-  p2    <- matchPattern(pattern=rc(rp), subject=x, fixed=FALSE)
+  p2    <- matchPattern(pattern=reverseComplement(rp), subject=x, fixed=FALSE)
   p1loc <- start(p1)[1]
   p2loc <- start(p2)[1]
   if (length(p1) == 0) warning("No Matches for the Forward Primer")
@@ -158,4 +158,37 @@ split_fna_tree <- function(tree,fnas, splits=2, degeneracyrange=c(1,4,10,50,100,
 
    return(list(fnas=subfnas, primerdata=primerdata))
 
+}
+#' Run and load degeprime and return the dataframe of results
+#'
+#' @importFrom parallel mclapply
+#' @export
+run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,400,1000),
+                          minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1) {
+
+  # use degeneracy range to determine the nubmer of jobs
+  drange    <- seq(degeneracyrange)
+  tempfiles <- lapply(drange, function(x) {tempfile()})
+
+  degendata <- mclapply(drange, function(x) {
+    #get per-run data
+    outputfile    <- tempfiles[[x]]
+    maxdegeneracy <-  degeneracyrange[[x]]
+    #calculate degeneracies
+    degePrime(alignmentfile=alignmentfile, outfile=outputfile,
+              oligolength=oligolength, maxdegeneracy = maxdegeneracy,
+              minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
+    #load the file and return a dataframe
+    df <- loadDegePrimeDF(outputfile)
+    df$degeneracy <- maxdegeneracy
+    return(df)
+  }, mc.cores=ncpus)
+
+  #aggregate the data
+  aggdata <- Reduce(rbind, degendata)
+
+  #add coverage information
+  aggdata$coverage <- aggdata$PrimerMatching/aggdata$TotalSeq
+
+  return(aggdata)
 }
