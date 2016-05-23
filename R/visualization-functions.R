@@ -52,7 +52,7 @@ plot_coverage <- function(dgprimer, primpair) {
 #' @param primerpairlist
 #' @importFrom ggtree gheatmap ggtree geom_tiplab
 #' @export
-plot_coveragematrix <- function(degprim, primerpairlist=NULL, ...) {
+plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ...) {
   if (!class(degprim) == "degeprimer") {
     stop("The first argument must be of class 'degeprimer'")
   }
@@ -60,15 +60,16 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, ...) {
     primerpairlist <- degprim@primerpairs
   }
 
+  refseq <- degprim@refseq
+
   # Create Matrix of Primer-Sequence Matching
   primerdata <- lapply(primerpairlist, function(ppair){
     # make primermatrix from one refseq against one primer
-    refseq=degprim@refseq
-    pname <- ppair@name
-    primerhits <- lapply(refseq, function(x){find_primers(x, fp=ppair@forwardprimer,rp=ppair@reverseprimer)})
-    hitdf <- do.call("rbind", primerhits)
+    pname        <- ppair@name
+    hitdf        <- find_primers(refseq, fp=ppair@forwardprimer,rp=ppair@reverseprimer, max.mismatch=max.mismatch)
     hitdf[pname] <- mapply(function(start,end) {ifelse(is.na(start) || is.na(end), "No Match","Match")},
                            hitdf$start, hitdf$end)
+    row.names(hitdf) <- hitdf$sequence
     hitdf[pname]
   })
 

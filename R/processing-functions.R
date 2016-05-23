@@ -113,7 +113,7 @@ run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,
 #' @import ggplot2
 #' @importFrom  shiny plotOutput runGadget dialogViewer fillRow checkboxGroupInput
 #' @export
-setGeneric("choose_primer", function(obj) standardGeneric("choose_primer"))
+setGeneric("choose_primer", function(object) standardGeneric("choose_primer"))
 #'
 #' @export
 setMethod("choose_primer", "degeprimer", function(object){choose_primer(object@primerdata)})
