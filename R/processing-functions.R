@@ -107,7 +107,7 @@ run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,
 }
 #' choose a primer from the DEGEPRIMER output
 #'
-#' obtain the peaks from a DEGEPRIME dataframe
+#'
 #'
 #' @import miniUI
 #' @import ggplot2

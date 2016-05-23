@@ -38,7 +38,6 @@ plot_coverage <- function(dgprimer, primpair) {
   connectednodes    <- connectednodes[,1] #mat->vec
   connectednodelabs <- connectednodes - length(tree$tip.label)
 
-  print(connectednodelabs)
   tree$node.label[c(2:length(tree$node.label))] <- "No_Match"
   tree$node.label[c(connectednodelabs)]         <- "Primer_Match"
 
@@ -46,6 +45,39 @@ plot_coverage <- function(dgprimer, primpair) {
 
   return(plot_phylotree(tree,colordomain=c("Primer_Match", "No_Match")))
 
+}
+#' Plot the Coverage of Degenerate primers
+#'
+#' @param degprim
+#' @param primerpairlist
+#' @importFrom ggtree gheatmap ggtree geom_tiplab
+#' @export
+plot_coveragematrix <- function(degprim, primerpairlist=NULL, ...) {
+  if (!class(degprim) == "degeprimer") {
+    stop("The first argument must be of class 'degeprimer'")
+  }
+  if (is.null(primerpairlist)){
+    primerpairlist <- degprim@primerpairs
+  }
+
+  # Create Matrix of Primer-Sequence Matching
+  primerdata <- lapply(primerpairlist, function(ppair){
+    # make primermatrix from one refseq against one primer
+    refseq=degprim@refseq
+    pname <- ppair@name
+    primerhits <- lapply(refseq, function(x){find_primers(x, fp=ppair@forwardprimer,rp=ppair@reverseprimer)})
+    hitdf <- do.call("rbind", primerhits)
+    hitdf[pname] <- mapply(function(start,end) {ifelse(is.na(start) || is.na(end), "No Match","Match")},
+                           hitdf$start, hitdf$end)
+    hitdf[pname]
+  })
+
+  df <- do.call("cbind", primerdata)
+
+  # pass the created matrix to ggtree's matrix mapping function
+  p  <- ggtree(degprim@phy_tree,ladderize = T)
+  p  <- p + geom_tiplab(size=3, align=FALSE)
+  gheatmap(p, df, ...)
 }
 #' draw a radial phylogenetic tree
 #'

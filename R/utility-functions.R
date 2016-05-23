@@ -98,8 +98,8 @@ setGeneric("find_primers", function(refseq, fp, rp ) standardGeneric("find_prime
 #'
 setMethod("find_primers", c("DNAString", "DNAString", "DNAString"), function(refseq, fp, rp ) {
   # determine if the FP/RP match the sequences.
-  p1    <- matchPattern(pattern=fp, subject=refseq, fixed=FALSE)
-  p2    <- matchPattern(pattern=reverseComplement(rp), subject=refseq, fixed=FALSE)
+  p1    <- matchPattern(pattern=fp, subject=refseq, fixed=FALSE, max.mismatch=1)
+  p2    <- matchPattern(pattern=reverseComplement(rp), subject=refseq, fixed=FALSE,max.mismatch=5)
 
   p1loc <- start(p1)[1]
   p2loc <- start(p2)[1]
@@ -125,3 +125,5 @@ setMethod("find_primers", c("DNAStringSet", "DNAString", "DNAString"), function(
   df <- na.omit(df)
   return(df)
 })
+
+
