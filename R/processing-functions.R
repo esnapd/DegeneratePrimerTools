@@ -80,19 +80,23 @@ run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,
                           minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1) {
 
   # use degeneracy range to determine the nubmer of jobs
+  if (length(degeneracyrange) == 1 & is.numeric(degeneracyrange)) {
+    degeneracyrange <- c(degeneracyrange)
+  }
+
   drange    <- seq(degeneracyrange)
   tempfiles <- lapply(drange, function(x) {tempfile()})
 
   degendata <- mclapply(drange, function(x) {
     #get per-run data
     outputfile    <- tempfiles[[x]]
-    maxdegeneracy <-  degeneracyrange[[x]]
+    maxdegeneracy <- degeneracyrange[[x]]
     #calculate degeneracies
     degePrime(alignmentfile=alignmentfile, outfile=outputfile,
               oligolength=oligolength, maxdegeneracy = maxdegeneracy,
               minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
     #load the file and return a dataframe
-    df <- loadDegePrimeDF(outputfile)
+    df <- read.table(outputfile,header = TRUE)
     df$degeneracy <- maxdegeneracy
     return(df)
   }, mc.cores=ncpus)
