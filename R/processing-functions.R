@@ -116,7 +116,7 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
               oligolength=oligolength, maxdegeneracy = maxdegeneracy,
               minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
     #load the file and return a dataframe
-    df <- read.table(outputfile,header = TRUE)
+    df <- read.table(outputfile,header = TRUE, stringsAsFactors = FALSE)
     df$degeneracy <- maxdegeneracy
     return(df)
   }, mc.cores=ncpus)
@@ -133,7 +133,66 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
 
   return(dgprimer)
 }
+#' Add Primer
+#'
+#' A convenience function to add a primer pair to the primerl list based on the
+#' degenracy and location of forward and reverse primers.
+#'
+#' @importform purrr map_chr
+#' @export
+add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
 
+  pdf           <- dgprimer@primerdata
+  existingpairs <- dgprimer@primerpairs
+
+  #check degenracy and position values
+  if (!fpos %in% unique(pdf$Pos)) stop("fpos value invalid. must be a Pos value present in the degeprimer table.")
+  if (!rpos %in% unique(pdf$Pos)) stop("rpos value invalid. must be a Pos value present in the degeprimer table.")
+  if (!fdeg %in% unique(pdf$degeneracy)) stop("fdeg value invalid. must be a degeneracy value present in the degeprimer table.")
+  if (!rdeg %in% unique(pdf$degeneracy)) stop("rdeg value invalid. must be a degeneracy value present in the degeprimer table.")
+
+  # check name uniqueness
+  if(length(existingpairs == 0)) {
+    existingnames <- c()
+  } else {
+    existingnames <- map_chr(existingpairs, function(x) {x@name})
+  }
+
+  if (name %in% existingnames) {
+    stop("Primer-pair names must be unique.")
+  }
+
+  #get sequences
+  fseq <-     pdf[pdf$Pos==fpos & pdf$degeneracy==fdeg,]$PrimerSeq
+  rseq <-  rc(pdf[pdf$Pos==rpos & pdf$degeneracy==rdeg,]$PrimerSeq)
+
+  newprimer <- new("primerpair", name=name,
+                   forwardprimer  = DNAString(fseq),
+                   reverseprimer  = DNAString(rseq))
+
+  print(existingpairs)
+  print(newprimer)
+  print(c(existingpairs,newprimer))
+  # Add the primer pair to the primerlist
+  num_existing_primers <- length(existingpairs)
+
+  if (num_existing_primers == 0) {
+    plist <- list(newprimer)
+  } else {
+    print("Appending Primers")
+    plist <- c(existingpairs, newprimer)
+    # plist <- list()
+    # for (i in seq(num_existing_primers)){
+    #   plist[[i]] <- existingpairs[[i]]
+    # }
+    # plist[[num_existing_primers + 1]] <- newprimer
+  }
+
+  # add the new list to the primerlsit slot
+  dgprimer@primerpairs <- plist
+
+  return(dgprimer)
+}
 #' choose a primer from the DEGEPRIMER output
 #'
 #'

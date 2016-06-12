@@ -1,0 +1,73 @@
+---
+title: "Basic Functionality"
+author: "zachcp"
+date: "June 12, 2016"
+output: html_document
+---
+
+## Load Sequences
+
+```{r}
+library(dplyr)
+library(Biostrings)
+library(DegeneratePrimerTools)
+
+# load sequences
+ahbafna <- system.file("sequences/AHBA.fna",package="DegeneratePrimerTools")
+AHBAseqs <- readDNAStringSet(ahbafna)
+AHBA_degeprimer <- degeprimer(AHBAseqs)
+AHBA_degeprimer
+```
+
+# Align Sequences
+
+```{r }
+# alignments use the MSA package. You an Also provide your own sequence alignment
+AHBA_degeprimer <- AHBA_degeprimer %>% run_alignment()
+```
+
+## Create Tree
+
+```{r }
+# build a tree from the multiple sequence alignment using the bionj funciton frmo APE.
+# you can also provide your own tree
+AHBA_degeprimer <- AHBA_degeprimer %>% build_tree()
+```
+
+## Find Primers
+```{r}
+# run DEGEPRIME to find degenerate primers and store them in the
+# primerdata slot
+AHBA_degeprimer <- AHBA_degeprimer %>% 
+design_primers(degeneracyrange=c(1,10), number_iterations=2)
+```
+
+
+## Recap
+```{r, eval=FALSE}
+#to get to this point it is also possible to use chaining
+AHBA_degeprimer <- degeprimer(AHBAseqs) %>%
+run_alignment() %>%
+build_tree() %>%
+design_primers(degeneracyrange=c(1,10), number_iterations=2) # this can take awhile
+```
+
+## Choose Primers
+```{r, eval=FALSE}
+# interactive display of primers that helps choose the best degernate primer locations
+AHBA_degeprimer %>% choose_primer()
+![](data-raw/choose_primer.png)
+```
+
+## Add Primer to the Object
+```{r}
+AHBA_degeprimer <- AHBA_degeprimer %>% 
+  add_primerpair(name="primer1", fpos=455, fdeg=10, rpos=617, rdeg=10) %>%
+  add_primerpair(name="primer2", fpos=928, fdeg=10, rpos=1133, rdeg=10)
+```
+
+# Plot Coverage
+```{}
+plot_coveragematrix(AHBA_degeprimer)
+```
+
