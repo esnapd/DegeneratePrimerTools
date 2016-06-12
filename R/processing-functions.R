@@ -72,12 +72,26 @@ split_fna_tree <- function(tree,fnas, splits=2, degeneracyrange=c(1,4,10,50,100,
    return(list(fnas=subfnas, primerdata=primerdata))
 
 }
-#' Run and load degeprime and return the dataframe of results
+#' Design Primers
 #'
+#' A convenience function to find degenerate primers usign the
+#' seqeuences of the degenerateprimers object.  Return teh resutls to
+#' the primerdata slot.
 #' @importFrom parallel mclapply
 #' @export
-run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,400,1000),
-                          minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1) {
+design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,400,1000),
+                          minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1,
+                          force=FALSE) {
+
+  # check if degepreime data ia associated with the class. if so, require force=TRUE
+  if (!is.null(dgprimer@primerdata) & force==FALSE) {
+    stop("Degenerate primer data alread exists. To overwrite please use force=TRUE")
+  }
+
+  # check if degepreime data ia associated with the class. if so, require force=TRUE
+  if (is.null(dgprimer@msa)) {
+    stop("Priemr Calculation requires a multiple sequence alignment")
+  }
 
   # use degeneracy range to determine the nubmer of jobs
   if (length(degeneracyrange) == 1 & is.numeric(degeneracyrange)) {
@@ -85,14 +99,20 @@ run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,
   }
 
   drange    <- seq(degeneracyrange)
+
   tempfiles <- lapply(drange, function(x) {tempfile()})
 
   degendata <- mclapply(drange, function(x) {
     #get per-run data
     outputfile    <- tempfiles[[x]]
     maxdegeneracy <- degeneracyrange[[x]]
+
+    #write alignments to disk.
+    alignfile <- tempfile()
+    writeXStringSet( as(dgprimer@msa,"DNAStringSet"), alignfile)
+
     #calculate degeneracies
-    degePrime(alignmentfile=alignmentfile, outfile=outputfile,
+    degePrime(alignmentfile=alignfile, outfile=outputfile,
               oligolength=oligolength, maxdegeneracy = maxdegeneracy,
               minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
     #load the file and return a dataframe
@@ -107,8 +127,13 @@ run_degeprime <- function(alignmentfile, oligolength, degeneracyrange=c(1,4,100,
   #add coverage information
   aggdata$coverage <- aggdata$PrimerMatching/aggdata$TotalSeq
 
-  return(aggdata)
+
+  # add the primer data to the object
+  dgprimer@primerdata <- new("primerdata", aggdata)
+
+  return(dgprimer)
 }
+
 #' choose a primer from the DEGEPRIMER output
 #'
 #'

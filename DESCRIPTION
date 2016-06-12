@@ -9,6 +9,7 @@ Authors@R: c(
 Description: Assist in designing Degenrate Primers Against A collection of
     Sequences
 License: GPL3
+SystemRequirements: Perl
 LazyData: TRUE
 Imports:
     Biostrings (>= 2.0),
