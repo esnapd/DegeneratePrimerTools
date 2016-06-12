@@ -152,7 +152,7 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
   if (!rdeg %in% unique(pdf$degeneracy)) stop("rdeg value invalid. must be a degeneracy value present in the degeprimer table.")
 
   # check name uniqueness
-  if(length(existingpairs == 0)) {
+  if(length(existingpairs) == 0) {
     existingnames <- c()
   } else {
     existingnames <- map_chr(existingpairs, function(x) {x@name})
@@ -166,21 +166,20 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
   fseq <-     pdf[pdf$Pos==fpos & pdf$degeneracy==fdeg,]$PrimerSeq
   rseq <-  rc(pdf[pdf$Pos==rpos & pdf$degeneracy==rdeg,]$PrimerSeq)
 
-  newprimer <- new("primerpair", name=name,
+  newprimer <- new("primerpair",
+                   name=name,
                    forwardprimer  = DNAString(fseq),
                    reverseprimer  = DNAString(rseq))
 
-  print(existingpairs)
-  print(newprimer)
-  print(c(existingpairs,newprimer))
   # Add the primer pair to the primerlist
   num_existing_primers <- length(existingpairs)
+  print(num_existing_primers)
 
   if (num_existing_primers == 0) {
     plist <- list(newprimer)
   } else {
     print("Appending Primers")
-    plist <- c(existingpairs, newprimer)
+    plist <- as.list( c(existingpairs, newprimer))
     # plist <- list()
     # for (i in seq(num_existing_primers)){
     #   plist[[i]] <- existingpairs[[i]]
@@ -188,7 +187,7 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
     # plist[[num_existing_primers + 1]] <- newprimer
   }
 
-  # add the new list to the primerlsit slot
+  # add the new list to the primer list slot
   dgprimer@primerpairs <- plist
 
   return(dgprimer)
