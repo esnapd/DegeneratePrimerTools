@@ -75,6 +75,13 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ..
 
   df <- do.call("cbind", primerdata)
 
+  if (ncol(df) == 1) {
+    df <- cbind(df,df)
+    names(df)[[2]] <- "dummy"
+  }
+  print("primerdata bound!")
+  print(df)
+
   # pass the created matrix to ggtree's matrix mapping function
   p  <- ggtree(degprim@phy_tree,ladderize = T)
   p  <- p + geom_tiplab(size=3, align=FALSE)
