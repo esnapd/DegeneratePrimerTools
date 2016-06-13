@@ -100,19 +100,21 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
 
   drange    <- seq(degeneracyrange)
 
-  tempfiles <- lapply(drange, function(x) {tempfile()})
+  tempfiles  <- lapply(drange, function(x) {tempfile()})
+
+  #create the trimmed file for DEGEPRIMER input
+  #write alignments to disk and trim the alignment
+  alignfile   <- tempfile()
+  trimmedfile <- tempfile()
+  writeXStringSet( as(dgprimer@msa,"DNAStringSet"), alignfile)
+  trimAlignment(infile=alignfile, outfile=trimmedfile, minoccupancy=0, refsequence = NULL, trailgap = FALSE)
 
   degendata <- mclapply(drange, function(x) {
     #get per-run data
     outputfile    <- tempfiles[[x]]
     maxdegeneracy <- degeneracyrange[[x]]
-
-    #write alignments to disk.
-    alignfile <- tempfile()
-    writeXStringSet( as(dgprimer@msa,"DNAStringSet"), alignfile)
-
     #calculate degeneracies
-    degePrime(alignmentfile=alignfile, outfile=outputfile,
+    degePrime(alignmentfile=trimmedfile, outfile=outputfile,
               oligolength=oligolength, maxdegeneracy = maxdegeneracy,
               minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
     #load the file and return a dataframe
