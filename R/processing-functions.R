@@ -90,7 +90,7 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
 
   # check if degepreime data ia associated with the class. if so, require force=TRUE
   if (is.null(dgprimer@msa)) {
-    stop("Priemr Calculation requires a multiple sequence alignment")
+    stop("Primer Calculation requires a multiple sequence alignment")
   }
 
   # use degeneracy range to determine the nubmer of jobs
@@ -99,7 +99,6 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
   }
 
   drange    <- seq(degeneracyrange)
-
   tempfiles  <- lapply(drange, function(x) {tempfile()})
 
   #create the trimmed file for DEGEPRIMER input
@@ -182,11 +181,6 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
   } else {
     print("Appending Primers")
     plist <- as.list( c(existingpairs, newprimer))
-    # plist <- list()
-    # for (i in seq(num_existing_primers)){
-    #   plist[[i]] <- existingpairs[[i]]
-    # }
-    # plist[[num_existing_primers + 1]] <- newprimer
   }
 
   # add the new list to the primer list slot
