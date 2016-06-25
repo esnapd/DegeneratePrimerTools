@@ -246,3 +246,43 @@ setMethod("choose_primer", "primerdata", function(object){
                                    height = 700))
 
 })
+#' Extract Amplicons from Sequences
+#'
+#' Find matches to degnerate primers against a nucleotide sequence and
+#' return the subsetted sequence or NULL
+#'
+#' @importFrom  Biostrings DNAStringSet DNAString matchPattern
+#' @export
+setGeneric("extract_amplicons", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2) standardGeneric("extract_amplicons"))
+#'
+#' @importFrom  Biostrings DNAStringSet DNAString matchPattern
+#' @export
+setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2){
+  fmatches <- matchPattern(fp,     object, fixed=FALSE, max.mismatch = 3)
+  rmatches <- matchPattern(rc(rp), object, fixed=FALSE, max.mismatch = 3)
+
+  # Return NULL if there are No Matches
+  if (length(fmatches) == 0 || length(rmatches) == 0) return(NULL)
+
+  # drop the match or provide a warning if there are multiple matches
+  if (length(fmatches) > 1 & drop.multiple == TRUE) return(NULL)
+  if (length(fmatches) > 1)  warning("More than one match for the forward primer, using the first")
+  if (length(rmatches) > 1 & drop.multiple == TRUE) return(NULL)
+  if (length(rmatches) > 1)  warning("More than one match for the reverse primer, using the first")
+
+  # check for negative indicies
+  ampliconlength <- end(rmatches) - start(fmatches)
+  if (ampliconlength <= 0) return(NULL)
+
+  return(object[start(fmatches):end(rmatches)])
+})
+#'
+#' @export
+#' @importFrom  Biostrings DNAStringSet DNAString matchPattern
+#' @importFrom purrr compact
+setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.multiple=TRUE,max.mismatch = 2){
+  amplicons <- lapply(object, function(x) {extract_amplicons(x, fp=fp, rp=rp)})
+  amplicons <- compact(amplicons)
+  print(amplicons)
+  DNAStringSet(amplicons)
+})
