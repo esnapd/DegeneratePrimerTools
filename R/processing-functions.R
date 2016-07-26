@@ -41,7 +41,7 @@ build_tree <- function(dgprimer, method="ClustalW", maxiters="default", force=FA
 #' @importFrom msa msaMuscle msaClustalW
 #' @importFrom seqinr dist.alignment
 #' @export
-split_fna_tree <- function(tree,fnas, splits=2, degeneracyrange=c(1,4,10,50,100,1000), oligolength=21, ncpus=1) {
+split_fna_tree <- function(tree, fnas, splits=2, degeneracyrange=c(1,4,10,50,100,1000), oligolength=21, ncpus=1) {
 
   distances   <- cophenetic.phylo(tree)
   kmeans_out  <- kmeans(distances, centers = splits)
@@ -286,3 +286,35 @@ setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.mul
   print(amplicons)
   DNAStringSet(amplicons)
 })
+#' Create Paired-End Reference Sequences from DNAStringSets
+#'
+#' When working with Amplicons that are too long to merge together it is sometiems desireable to concatenate
+#' the forward and reverse reads together. In order to calssify these sequences using Blast, you would need
+#' to generate referecnce sequences of the same "shape" as the amplicons. This function takes a DNAStringSet
+#' and two primer sequences and extracts the amplicon but concatenated the ends together, mimickign how a paired
+#' end read looks.
+#'
+#' @param dnastringset (Required).  A \code{\link[Biostrings]{DNAStringSet}} containing your target sequences.
+#' @param fp (Required).  Default \code{NULL}. Character string of the forward primer sequence.
+#' @param rp (Required).  Default \code{NULL}. Character string of the reverse primer sequence.
+#' @param trimf (optional). Default \code{240}. Amount to be trimmed from the forward primer match
+#' @param trimr (optional). Default \code{175}. Amount to be trimmed from the reverse primer match
+#' @param drop.multiple (optional). Default \code{TRUE}. Logical.
+#'   If there is more than one match to the forward or reverse sequence, should the result be dropped.
+#' @param max.mismatch   (optional). Default\code{2}. Maximum allowed mismatch betwen primer sequences and the target.
+#'
+#'
+#' @importFrom Biostrings xscat subseq
+#' @export
+extract_trimmed_amplicons <- function(dnastringset, fp, rp, trimf=240, trimr=175, drop.multiple=TRUE, max.mismatch = 2) {
+  amplicons <- extract_amplicons(dnastringset, fp, rp)
+  ampliconnames <- names(amplicons)
+
+  amF <- subseq(amplicons, end=trimf)
+  amR <- subseq(amplicons, start=-trimr)
+
+  ampliconends = xscat(amF, amR)
+  names(ampliconends) <- ampliconnames
+
+  ampliconends
+}
