@@ -283,7 +283,6 @@ setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multip
 setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.multiple=TRUE,max.mismatch = 2){
   amplicons <- lapply(object, function(x) {extract_amplicons(x, fp=fp, rp=rp)})
   amplicons <- compact(amplicons)
-  print(amplicons)
   DNAStringSet(amplicons)
 })
 #' Create Paired-End Reference Sequences from DNAStringSets
@@ -313,7 +312,7 @@ extract_trimmed_amplicons <- function(dnastringset, fp, rp, trimf=240, trimr=175
   amF <- subseq(amplicons, end=trimf)
   amR <- subseq(amplicons, start=-trimr)
 
-  ampliconends = xscat(amF, amR)
+  ampliconends <- xscat(amF, amR)
   names(ampliconends) <- ampliconnames
 
   ampliconends
