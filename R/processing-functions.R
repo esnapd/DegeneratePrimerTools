@@ -306,14 +306,16 @@ setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.mul
 #' @importFrom Biostrings xscat subseq
 #' @export
 extract_trimmed_amplicons <- function(dnastringset, fp, rp, trimf=240, trimr=175, drop.multiple=TRUE, max.mismatch = 2) {
+  #get the amplicons
   amplicons     <- extract_amplicons(dnastringset, fp, rp)
   ampliconnames <- names(amplicons)
 
+  #get forward and reverse and concatenate together
   amF <- subseq(amplicons, end=trimf)
   amR <- subseq(amplicons, start=-trimr)
-
   ampliconends <- xscat(amF, amR)
   names(ampliconends) <- ampliconnames
 
-  ampliconends
+  #filter minimum size
+  ampliconends[width(ampliconends) >= trimf+trimr]
 }
