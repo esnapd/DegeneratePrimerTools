@@ -258,8 +258,8 @@ setGeneric("extract_amplicons", function(object, fp, rp, drop.multiple=TRUE, max
 #' @importFrom  Biostrings DNAStringSet DNAString matchPattern
 #' @export
 setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2){
-  fmatches <- matchPattern(fp,     object, fixed=FALSE, max.mismatch = 3)
-  rmatches <- matchPattern(rc(rp), object, fixed=FALSE, max.mismatch = 3)
+  fmatches <- matchPattern(fp,     object, fixed=FALSE, max.mismatch = max.mismatch)
+  rmatches <- matchPattern(rc(rp), object, fixed=FALSE, max.mismatch = max.mismatch)
 
   # Return NULL if there are No Matches
   if (length(fmatches) == 0 || length(rmatches) == 0) return(NULL)
@@ -306,7 +306,7 @@ setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.mul
 #' @importFrom Biostrings xscat subseq
 #' @export
 extract_trimmed_amplicons <- function(dnastringset, fp, rp, trimf=240, trimr=175, drop.multiple=TRUE, max.mismatch = 2) {
-  amplicons <- extract_amplicons(dnastringset, fp, rp)
+  amplicons     <- extract_amplicons(dnastringset, fp, rp)
   ampliconnames <- names(amplicons)
 
   amF <- subseq(amplicons, end=trimf)
