@@ -249,14 +249,26 @@ setMethod("choose_primer", "primerdata", function(object){
 #' Extract Amplicons from Sequences
 #'
 #' Find matches to degnerate primers against a nucleotide sequence and
-#' return the subsetted sequence or NULL
+#' return the subsetted sequence or NULL. This matching algorith is based on
+#' \code{\link[Biostrings]{matchPattern}} to find matches for the degenerate
+#' primer seqeunces in your reference sequecne. This role of for this function
+#' is primarily within the context of extractign expected amplicon
+#' seqeucens and we therefore expect only a single amplicon per target and
+#' explicitly drop any seqeucence with greater than one match to a target sequence.
+#' Therefore this function is not suitable to finding primer targets on genomic
+#' DNA, and should be used for finding primer matches within the context of defined
+#' reference sequences like single genes, or the DNA seqeunces corresponding ot conserved
+#' protein domains.
 #'
-#' @importFrom  Biostrings DNAStringSet DNAString matchPattern
+#' @param fp (Required).  Default \code{NULL}. Character string of the forward primer sequence.
+#' @param rp (Required).  Default \code{NULL}. Character string of the reverse primer sequence.
+#' @param drop.multiple (optional). Default \code{TRUE}. Logical.
+#'   If there is more than one match to the forward or reverse sequence, should the result be dropped.
+#' @param max.mismatch   (optional). Default\code{2}. Maximum allowed mismatch betwen primer sequences and the target.
 #' @export
 setGeneric("extract_amplicons", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2) standardGeneric("extract_amplicons"))
 #'
 #' @importFrom  Biostrings DNAStringSet DNAString matchPattern
-#' @export
 setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2){
   fmatches <- matchPattern(fp,     object, fixed=FALSE, max.mismatch = max.mismatch)
   rmatches <- matchPattern(rc(rp), object, fixed=FALSE, max.mismatch = max.mismatch)
@@ -276,8 +288,6 @@ setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multip
 
   return(object[start(fmatches):end(rmatches)])
 })
-#'
-#' @export
 #' @importFrom  Biostrings DNAStringSet DNAString matchPattern
 #' @importFrom purrr compact
 setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.multiple=TRUE,max.mismatch = 2){
@@ -287,20 +297,15 @@ setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.mul
 })
 #' Create Paired-End Reference Sequences from DNAStringSets
 #'
-#' When working with Amplicons that are too long to merge together it is sometiems desireable to concatenate
-#' the forward and reverse reads together. In order to calssify these sequences using Blast, you would need
-#' to generate referecnce sequences of the same "shape" as the amplicons. This function takes a DNAStringSet
-#' and two primer sequences and extracts the amplicon but concatenated the ends together, mimickign how a paired
-#' end read looks.
+#' When working with Amplicons that are too long to merge together it is sometimes desireable to concatenate
+#' the forward and reverse reads together. In order to classify these sequences using Blast, you would need
+#' to generate a reference database of the same "shape" as the amplicons. This function takes a \code{\link[Biostrings]{DNAStringSet}},
+#' and two lengths. For amplicon-reference workflows, this can be used downstream of \code{\link{extract_amplicons}} to
+#' the ends of your amplicon.
 #'
 #' @param dnastringset (Required).  A \code{\link[Biostrings]{DNAStringSet}} containing your target sequences.
-#' @param fp (Required).  Default \code{NULL}. Character string of the forward primer sequence.
-#' @param rp (Required).  Default \code{NULL}. Character string of the reverse primer sequence.
 #' @param trimf (optional). Default \code{240}. Amount to be trimmed from the forward primer match
 #' @param trimr (optional). Default \code{175}. Amount to be trimmed from the reverse primer match
-#' @param drop.multiple (optional). Default \code{TRUE}. Logical.
-#'   If there is more than one match to the forward or reverse sequence, should the result be dropped.
-#' @param max.mismatch   (optional). Default\code{2}. Maximum allowed mismatch betwen primer sequences and the target.
 #'
 #'
 #' @importFrom Biostrings xscat subseq
