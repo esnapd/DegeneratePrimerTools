@@ -8,17 +8,22 @@
 #' @param alignmnettype. Optional. Will determine which of PFAM's prebuilt alignments to download. Can choose from "seed"
 #'             "full", "rp15", "rp35", "rp55", "rp75", "uniprot", "ncbi", "meta".
 #' @importFrom httr GET
+#' @importFrom httr content
 #' @importFrom purrr map_df
 #' @export
 #' @examples
 #' retrieve_PFAM_ids("PF16997")
 retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
   alignmenttypes <- c("seed", "full", "rp15", "rp35", "rp55", "rp75", "uniprot", "ncbi", "meta")
-  if (!alignmenttype %in% alignmenttypes) stop(paste("Alignment trype must bo one of", alignmenttypes))
+  if (!alignmenttype %in% alignmenttypes) stop(paste("Alignment type must be one of: ", paste0(alignmenttypes, collapse=" ")))
 
   pfamsite <- paste0("http://pfam.xfam.org/family/", pfamid ,"/alignment/", alignmenttype)
 
   try(r <- GET(pfamsite))
+
+  if (!grepl("^PF", pfamid)) stop("pfamids are prefixed with 'PF'")
+  if (r$status_code == 400)  stop("Invalid HTTP request. Check that your PFAM ID is correct and that the alignment type is available. For example the ncbi and meta are not always avaiable.")
+
 
   if (is.null(r)) stop("There was a problem downloading the PFAM")
 
@@ -30,13 +35,14 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
   seqrows <- rows[!1:length(rows) %in% markupLines]
   seqrows <- strsplit(seqrows, "\\s+")
 
-  df <- map_df(seqrows, function(s) {
+  df <- suppressWarnings(
+    map_df(seqrows, function(s) {
     id    <- strsplit(s[[1]], "/")[[1]][[1]]
     rng   <- strsplit(s[[1]], "/")[[1]][[2]]
     start <- strsplit(rng, "-")[[1]][[1]]
     end   <- strsplit(rng, "-")[[1]][[2]]
     data.frame(PFAM_ID = pfamid, Accession = id, start=start,end=end)
-  })
+  }))
 
   df$Accession <- gsub("\\..*$", "", df$Accession) #remove trailing version number
   df
@@ -46,6 +52,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
 #' Use the REST interface at UNIPROT to get ENA mappings for a protein.
 #'
 #' @importFrom httr POST
+#' @importFrom httr content
 #' @importFrom purrr map_df
 #' @seealso \url(http://www.uniprot.org/help/programmatic_access)
 #' @export
