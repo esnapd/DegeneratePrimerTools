@@ -134,7 +134,7 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot"
   pfamdf     <- retrieve_PFAM_ids(pfamid, alignmenttype = alignmenttype)
   uniprotids <- unique(pfamdf$Accession)
   embldf     <- retrieve_UNIPROT_to_EMBL(uniprotids)
-  seqs       <- retrieve_EMBL_sequences(embldf$EMBL_ID)
+  seqs       <- retrieve_EMBL_sequences(unique(embldf$EMBL_ID))
   #collate the data
   masterdf<- merge(pfamdf, embldf, by.x="Accession", by.y="UNIPROT_ID")
   #calculate DNA start/stop positions
@@ -148,14 +148,24 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot"
       #pull out a sequecne form the DNAstinrg set using the name, stop, and end.
       targetsequence <- sequences[grepl(seqname, names(sequences))]
 
+      # sequence not found can be legitmate
       if (length(targetsequence) == 0) {
-        warning(paste0(seqname, "is not found in the header of any sequences and may have been removes or suppressed form the ENA"))
+        warning(paste0(seqname, " is not found in the header of any sequences and may have been removed or suppressed from the ENA"))
         return(NA_character_)
       }
+
+      #multiple sequences is a problem
       if (length(targetsequence) > 1)  stop("There is an error in the ENA fasta headers or in the EMBL ID list")
 
-      dnadomains <- subseq(targetsequence, start=start, end=end)
-      return(as.character(dnadomains))
+      # I encoutnered this in some archael sequences and we shoudl flag it whent his happend.
+      if (end > width(targetsequence)) {
+        warning(paste0("The width of ", seqname, "is too narrow for the specified value. This can happen in certain sequences ldue to a framshift. See http://www.uniprot.org/uniprot/D3E4V4 and its
+                       associated nucleotide fasta for an example. This sequence is not being included and should be verified."))
+        return(NA_character_)
+      }
+
+      dnadomain <- subseq(targetsequence, start=start, end=end)
+      return(as.character(dnadomain))
       },
     masterdf$EMBL_ID_clean,
     masterdf$dnastart,
