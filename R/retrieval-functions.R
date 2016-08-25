@@ -148,7 +148,11 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot"
       #pull out a sequecne form the DNAstinrg set using the name, stop, and end.
       targetsequence <- sequences[grepl(seqname, names(sequences))]
 
-      if (length(targetsequence) != 1)  stop("There is an error in the ENA fasta headers or in the EMBL ID list")
+      if (length(targetsequence) == 0) {
+        warning(paste0(seqname, "is not found in the header of any sequences and may have been removes or suppressed form the ENA"))
+        return(NA_character_)
+      }
+      if (length(targetsequence) > 1)  stop("There is an error in the ENA fasta headers or in the EMBL ID list")
 
       dnadomains <- subseq(targetsequence, start=start, end=end)
       return(as.character(dnadomains))
