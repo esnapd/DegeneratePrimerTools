@@ -64,25 +64,11 @@ setOldClass("phylo")
 ################################################################################
 #' @keywords internal
 setClassUnion("phyloOrNULL", c("phylo", "NULL"))
-#' @importClassesFrom Biostrings BStringSet
 #' @importClassesFrom Biostrings DNAStringSet
-#' @importClassesFrom Biostrings RNAStringSet
-#' @importClassesFrom Biostrings AAStringSet
-#' @importClassesFrom Biostrings QualityScaledXStringSet
-#' @importClassesFrom Biostrings XStringQuality
-#' @importClassesFrom Biostrings PhredQuality
-#' @importClassesFrom Biostrings SolexaQuality
-#' @importClassesFrom Biostrings IlluminaQuality
-#' @importClassesFrom Biostrings QualityScaledBStringSet
 #' @importClassesFrom Biostrings QualityScaledDNAStringSet
-#' @importClassesFrom Biostrings QualityScaledRNAStringSet
-#' @importClassesFrom Biostrings QualityScaledAAStringSet
-#' @importClassesFrom Biostrings XStringSet
 #' @keywords internal
-#' @keywords internal
-setClassUnion("XStringSetOrNULL", c("XStringSet", "NULL"))
-#' @importClassesFrom Biostrings DNAStringSet
-#' @importClassesFrom Biostrings XStringSet
+setClassUnion("DNAStringSetOrNULL", c("DNAStringSet", "NULL"))
+#' @importClassesFrom Biostrings DNAMultipleAlignment
 #' @keywords internal
 setClassUnion("DNAMultipleAlignmentOrNULL", c("DNAMultipleAlignment", "NULL"))
 #' @keywords internal
@@ -91,7 +77,7 @@ setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 #' The main experiment-level class for degprimer data
 #'
 #' Contains all currently-supported component data classes:
-#' \code{\link[Biostrings]{XStringSet-class}} (\code{"refseq"} slot).
+#' \code{\link[Biostrings]{DNAStringSet-class}} (\code{"refseq"} slot).
 #' \code{\link[Biostrings]{DNAMultipleAlignment}} (\code{"msa"} slot).
 #' \code{\link[ape]{phylo}}-class (\code{"phy_tree"} slot),
 #' \code{{primerdata-class}} (\code{"primerdata"} slot),
@@ -136,7 +122,7 @@ setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 #' @exportClass degeprimer
 setClass(Class="degeprimer",
          representation=representation(
-           refseq     = "XStringSetOrNULL",
+           refseq     = "DNAStringSetOrNULL",
            msa        = "DNAMultipleAlignmentOrNULL",
            phy_tree   = "phyloOrNULL",
            primerdata = "primerdataOrNULL"),
@@ -146,7 +132,7 @@ setClass(Class="degeprimer",
 #' The main experiment-level class for degprimer data
 #'
 #' Contains all currently-supported component data classes:
-#' \code{\link[Biostrings]{XStringSet-class}} (\code{"refseq"} slot).
+#' \code{\link[Biostrings]{DNAStringSet-class}} (\code{"refseq"} slot).
 #' \code{\link[Biostrings]{DNAMultipleAlignment}} (\code{"msa"} slot).
 #' \code{\link[ape]{phylo}}-class (\code{"phy_tree"} slot),
 #' \code{{primerdata-class}} (\code{"primerdata"} slot),
@@ -174,7 +160,7 @@ setClass(Class="degeprimer",
 #' slots:
 #' \describe{
 #'    \item{refseq}{ a biological sequence set object of a class that
-#'         inherits from the \code{\link[Biostrings]{XStringSet-class}}, from the Biostrings package.}
+#'         inherits from the \code{\link[Biostrings]{DNAStringSet-class}}, from the Biostrings package.}
 #'    \item{msa}{ a single object of the \code{\link[Biostrings]{DNAMultipleAlignment-class}}, from the Biostrings package.}
 #'    \item{phy_tree}{ a single object of the \code{\link[ape]{phylo}}-class, from the ape package.}
 #'    \item{phy_tree}{ a single object of the \code{primerdata-class}}.}
@@ -185,13 +171,13 @@ setClass(Class="degeprimer",
 #'  \code{\link{tax_table}}, \code{\link{phy_tree}}, and \code{\link{refseq}}.
 #'
 #' @import BiocGenerics
-#' @importClassesFrom Biostrings XStringSet
+#' @importClassesFrom Biostrings DNAStringSet
 #' @name degeprimer-class
 #' @rdname degeprimer-class
 #' @exportClass degeprimer
 setClass(Class="degeprimer",
          representation=representation(
-           refseq      = "XStringSetOrNULL",
+           refseq      = "DNAStringSetOrNULL",
            msa         = "DNAMultipleAlignmentOrNULL",
            phy_tree    = "phyloOrNULL",
            primerdata  = "primerdataOrNULL",

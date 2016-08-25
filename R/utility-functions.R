@@ -19,7 +19,8 @@ rc <- function(sqs) {
 #'
 #' use trimaligment.pl to trim an MSA object
 #'
-#' @importFrom Biostrings DNAStringSet writeXStringSet
+#' @importFrom Biostrings DNAStringSet
+#' @importFrom Biostrings writeXStringSet
 #' @export
 trimMSA <- function(msa) {
   temp1  <- tempfile()

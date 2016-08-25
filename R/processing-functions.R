@@ -139,7 +139,7 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
 #' A convenience function to add a primer pair to the primerl list based on the
 #' degenracy and location of forward and reverse primers.
 #'
-#' @importform purrr map_chr
+#' @importFrom purrr map_chr
 #' @export
 add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
 

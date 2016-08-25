@@ -18,6 +18,8 @@ Imports:
     miniUI (>= 0.1.1),
     ggplot2 (>= 2.0),
     htmlwidgets (>= 0.6),
+    methods (>= 3.3.0),
+    purrr,
     ggtree,
     ggrepel,
     parallel,
