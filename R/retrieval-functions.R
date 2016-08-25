@@ -126,20 +126,23 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
     return(Reduce(append, dnas))
   }
 }
-#' A one-strop-shor for obtianing nucelotides form PFAM sequences.
+#' A one-stop-shop for obtianing nucelotides form PFAM sequences.
 #'
+#' @param pfamid. Required. A string coresponding to a PFAM accession id.
+#' @param alignmnettype. Optional. Will determine which of PFAM's prebuilt alignments to download. Can choose from "seed"
+#'             "full", "rp15", "rp35", "rp55", "rp75", "uniprot", "ncbi", "meta".
 #' @export
 #' @examples
 #' retrieve_PFAM_nucleotide_sequences("PF16997")
-retrieve_PFAM_nucleotide_sequences <- function(pfamid) {
-  pfamdf     <- retrieve_PFAM_ids(pfamid, alignmenttype = "uniprot")
+retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot") {
+  pfamdf     <- retrieve_PFAM_ids(pfamid, alignmenttype = alignmenttype)
   uniprotids <- pfamdf$Accession
   embldf     <- retrieve_UNIPROT_to_EMBL(uniprotids)
   seqs       <- retrieve_EMBL_sequences(embldf$EMBL_ID)
   #collate the data
   masterdf<- merge(pfamdf, embldf, by.x="Accession", by.y="UNIPROT_ID")
   #calculate DNA start/stop positions
-  masterdf$dnastart <- 3 * (masterdf$start - 1) - 1 #(n-1 * 3) -1
+  masterdf$dnastart <- 3 * (masterdf$start - 1) + 1 #(n-1 * 3)  + 1
   masterdf$dnaend   <- 3 * masterdf$end             #(n * 3)
   # remove the version nubmer form the EMBL IDs
   masterdf$EMBL_ID_clean <- gsub("\\..*$", "", masterdf$EMBL_ID)
@@ -155,9 +158,8 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamid) {
       return(as.character(dnadomains))
       },
     masterdf$EMBL_ID_clean,
-    masterdf$start,
-    masterdf$end)
+    masterdf$dnastart,
+    masterdf$dnaend)
 
-  masterdf[c("PFAM_ID", "Accession", "start", "end", "EMBL_ID", "dnastart", "dnaend", "domainsequence")]
-  return(masterdf)
+  return(masterdf[c("PFAM_ID", "Accession", "start", "end", "EMBL_ID", "dnastart", "dnaend", "domainsequence")])
 }

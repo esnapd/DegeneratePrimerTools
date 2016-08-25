@@ -2,6 +2,7 @@
 # Use testthat to test that onlinde sequence database retrieval
 ################################################################################
 library("DegeneratePrimerTools"); packageVersion("DegeneratePrimerTools")
+library("Biostrings"); packageVersion("Biostrings")
 library("testthat"); packageVersion("testthat")
 context('Checking sequence retrieval from online databases')
 
@@ -85,9 +86,17 @@ test_that("EMBL/ENA nucleotide sequcnes are fetched correctly", {
   expect_equal(length(fnas), 2)
 })
 
-test_that("All retrievela sequecnes work as an integrated pipeline", {
-  seqs <-  retrieve_PFAM_nucleotide_sequences("PF16997")
-  expect_is(seqs, "DNAStringSet")
-  expect_equal(length(fnas), 67)
+test_that("All retrievela sequences work as an integrated pipeline", {
+
+  seqdf <-  retrieve_PFAM_nucleotide_sequences("PF16997")
+  expect_is(seqdf, "data.frame")
+  expect_equal(dim(seqdf), c(135,8))
+
+  #test in frame translation
+  for (i in 1:10) {
+    dna <- seqdf$domainsequence[[i]]
+    expect_that(translate(DNAString(dna)), not(gives_warning()))
+    expect_is(translate(DNAString(dna)), "AAstring")
+  }
 })
 
