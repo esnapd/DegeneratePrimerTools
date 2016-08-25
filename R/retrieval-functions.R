@@ -42,7 +42,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
     rng   <- strsplit(s[[1]], "/")[[1]][[2]]
     start <- strsplit(rng, "-")[[1]][[1]]
     end   <- strsplit(rng, "-")[[1]][[2]]
-    data.frame(PFAM_ID = pfamid, Accession = id, start=start,end=end)
+    data.frame(PFAM_ID = pfamid, Accession = id, start=as.numeric(start),end=as.numeric(end))
   }))
 
   df$Accession <- gsub("\\..*$", "", df$Accession) #remove trailing version number
@@ -132,9 +132,32 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 #' @examples
 #' retrieve_PFAM_nucleotide_sequences("PF16997")
 retrieve_PFAM_nucleotide_sequences <- function(pfamid) {
-  pfamdf <- retrieve_PFAM_ids(pfamid, alignmenttype = "uniprot")
+  pfamdf     <- retrieve_PFAM_ids(pfamid, alignmenttype = "uniprot")
   uniprotids <- pfamdf$Accession
-  embldf <- retrieve_UNIPROT_to_EMBL(uniprotids)
-  seqs <- retrieve_EMBL_sequences(embldf$EMBL_ID)
-  seqs
+  embldf     <- retrieve_UNIPROT_to_EMBL(uniprotids)
+  seqs       <- retrieve_EMBL_sequences(embldf$EMBL_ID)
+  #collate the data
+  masterdf<- merge(pfamdf, embldf, by.x="Accession", by.y="UNIPROT_ID")
+  #calculate DNA start/stop positions
+  masterdf$dnastart <- 3 * (masterdf$start - 1) - 1 #(n-1 * 3) -1
+  masterdf$dnaend   <- 3 * masterdf$end             #(n * 3)
+  # remove the version nubmer form the EMBL IDs
+  masterdf$EMBL_ID_clean <- gsub("\\..*$", "", masterdf$EMBL_ID)
+  #pull out the dna
+  masterdf$domainsequence <- mapply(
+    function(seqname, start, end, sequences=seqs) {
+      #pull out a sequecne form the DNAstinrg set using the name, stop, and end.
+      targetsequence <- sequences[grepl(seqname, names(sequences))]
+
+      if (length(targetsequence) != 1)  stop("There is an error in the ENA fasta headers or in the EMBL ID list")
+
+      dnadomains <- subseq(targetsequence, start=start, end=end)
+      return(as.character(dnadomains))
+      },
+    masterdf$EMBL_ID_clean,
+    masterdf$start,
+    masterdf$end)
+
+  masterdf[c("PFAM_ID", "Accession", "start", "end", "EMBL_ID", "dnastart", "dnaend", "domainsequence")]
+  return(masterdf)
 }
