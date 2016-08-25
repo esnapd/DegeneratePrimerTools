@@ -10,6 +10,7 @@
 #' @importFrom httr GET
 #' @importFrom httr content
 #' @importFrom purrr map_df
+#' @seealso \url{http://pfam.xfam.org}
 #' @export
 #' @examples
 #' retrieve_PFAM_ids("PF16997")
@@ -54,7 +55,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
 #' @importFrom httr POST
 #' @importFrom httr content
 #' @importFrom purrr map_df
-#' @seealso \url(http://www.uniprot.org/help/programmatic_access)
+#' @seealso \url{http://www.uniprot.org/help/programmatic_access}
 #' @export
 #' @examples
 #' retrieve_UNIPROT_to_EMBL("Q4SMD5")
@@ -76,7 +77,7 @@ retrieve_UNIPROT_to_EMBL <- function(uniprotids, chunksize=200) {
 
       if (is.null(r)) stop("There was a problem obtaining the UNIPROT->ENA Mapping")
 
-      df <- read.table(text=content(r, "text"), header = TRUE)
+      df <- read.table(text=content(r, "text"), header = TRUE, stringsAsFactors = FALSE)
       names(df) <- c("UNIPROT_ID", "EMBL_ID")
 
       return(df)
@@ -92,7 +93,7 @@ retrieve_UNIPROT_to_EMBL <- function(uniprotids, chunksize=200) {
 #' @importFrom Biostrings union
 #' @return a DNAStringSet
 #' @export
-#' @seealso \url("https://www.ebi.ac.uk/ena/browse/data-retrieval-rest)
+#' @seealso \url{https://www.ebi.ac.uk/ena/browse/data-retrieval-rest}
 #' @examples
 #' retrieve_EMBL_sequences(c("A00145","A00146"))
 retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
@@ -111,17 +112,18 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 
   } else {
 
-    # split into groups no greater in size than the chunksize
+    # split into groups no greater in size than the chunksize, retrieve and write those IDs to file
+    # then read them in
     groups <- split(emblids, ceiling(seq_along(emblids)/chunksize))
     temps <- lapply(groups, function(x){return(tempfile())})
 
     seqs <- lapply(seq_along(groups), function(i) {
-      r <- GET(paste0(baseurl, paste0(emblids, collapse=","), opts))
+      r <- GET(paste0(baseurl, paste0(groups[[i]], collapse=","), opts))
       write(x=content(r,"text"), file=temps[[i]])
     })
 
     dnas <- lapply(temps, readDNAStringSet)
-    return(Reduce(union, dnas))
+    return(Reduce(append, dnas))
   }
 }
 #' A one-strop-shor for obtianing nucelotides form PFAM sequences.
