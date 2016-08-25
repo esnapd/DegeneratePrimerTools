@@ -80,13 +80,19 @@ test_that("Uniprot IDs can be converted to EMBL ids", {
   expect_identical(retrieve_UNIPROT_to_EMBL("Q4SMD5"), data.frame(UNIPROT_ID=c("Q4SMD5"), EMBL_ID=c("CAF98197.1")))
 })
 
-test_that("EMBL/ENA nucleotide sequcnes are fetched correctly", {
+test_that("EMBL/ENA nucleotide sequnces are fetched correctly", {
   fnas <- retrieve_EMBL_sequences(c("A00145","A00146"))
   expect_is(fnas, "DNAStringSet")
   expect_equal(length(fnas), 2)
 })
 
-test_that("All retrievela sequences work as an integrated pipeline", {
+test_that("EMBL/ENA Retrieval Code Correctly handles suppressed sequences", {
+  #good, good, bad
+  seqs <- retrieve_EMBL_sequences(c("KGE72166.1","KJE27958.1","AIE20100.1"))
+  expect_that(length(seqs), 2)
+})
+
+test_that("All retrieval functions work as an integrated pipeline", {
 
   seqdf <-  retrieve_PFAM_nucleotide_sequences("PF16997")
   expect_is(seqdf, "data.frame")

@@ -103,28 +103,24 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 
   if (is.character(emblids)) emblids <- c(emblids)
 
-  if (length(emblids) == 1) {
-    r <- GET(paste0(baseurl, emblids[[1]], opts))
-    temp1 <- tempfile()
-    write(x=content(r, "text"), file=temp1)
-    dna <- readDNAStringSet(temp1)
-    return(dna)
+  # split into groups no greater in size than the chunksize, retrieve and write those IDs to file
+  # then read them in
+  groups <- split(emblids, ceiling(seq_along(emblids)/chunksize))
+  temps <- lapply(groups, function(x){return(tempfile())})
 
-  } else {
+  seqs <- lapply(seq_along(groups), function(i) {
 
-    # split into groups no greater in size than the chunksize, retrieve and write those IDs to file
-    # then read them in
-    groups <- split(emblids, ceiling(seq_along(emblids)/chunksize))
-    temps <- lapply(groups, function(x){return(tempfile())})
+    paste0("Attempting to retrieve: ", paste0(groups[[i]], collapse= " "))
+    r <- GET(paste0(baseurl, paste0(groups[[i]], collapse=","), opts))
 
-    seqs <- lapply(seq_along(groups), function(i) {
-      r <- GET(paste0(baseurl, paste0(groups[[i]], collapse=","), opts))
-      write(x=content(r,"text"), file=temps[[i]])
-    })
+    # remove lines where sequences return error messages
+    lines <- scan(text=content(r, "text"), what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE)
+    lines <- lines[!grepl("has been suppressed at the submitter's request on", lines)]
+    write(x=lines, file=temps[[i]])
+  })
 
-    dnas <- lapply(temps, readDNAStringSet)
-    return(Reduce(append, dnas))
-  }
+  dnas <- lapply(temps, readDNAStringSet)
+  return(Reduce(append, dnas))
 }
 #' A one-stop-shop for obtianing nucelotides form PFAM sequences.
 #'
@@ -136,7 +132,7 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 #' retrieve_PFAM_nucleotide_sequences("PF16997")
 retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot") {
   pfamdf     <- retrieve_PFAM_ids(pfamid, alignmenttype = alignmenttype)
-  uniprotids <- pfamdf$Accession
+  uniprotids <- unique(pfamdf$Accession)
   embldf     <- retrieve_UNIPROT_to_EMBL(uniprotids)
   seqs       <- retrieve_EMBL_sequences(embldf$EMBL_ID)
   #collate the data
@@ -163,3 +159,4 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot"
 
   return(masterdf[c("PFAM_ID", "Accession", "start", "end", "EMBL_ID", "dnastart", "dnaend", "domainsequence")])
 }
+
