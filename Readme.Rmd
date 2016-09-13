@@ -15,6 +15,7 @@ library(DegeneratePrimerTools)
 # load sequences
 ahbafna <- system.file("sequences/AHBA.fna",package="DegeneratePrimerTools")
 AHBAseqs <- readDNAStringSet(ahbafna)
+AHBAseqs
 AHBA_degeprimer <- degeprimer(AHBAseqs)
 AHBA_degeprimer
 ```
@@ -34,6 +35,7 @@ AHBA_degeprimer
 # you can also provide your own tree
 AHBA_degeprimer <- AHBA_degeprimer %>% build_tree()
 AHBA_degeprimer
+plot(AHBA_degeprimer@phy_tree)
 ```
 
 ## Find Primers
@@ -41,7 +43,9 @@ AHBA_degeprimer
 # run DEGEPRIME to find degenerate primers and store them in the
 # primerdata slot
 AHBA_degeprimer <- AHBA_degeprimer %>% 
-  design_primers(degeneracyrange=c(1,10), number_iterations=2)
+  design_primers(degeneracyrange=c(1,10, 20, 50), number_iterations=2, force=TRUE)
+AHBA_degeprimer
+tail(AHBA_degeprimer@primerdata)
 ```
 
 
@@ -49,9 +53,9 @@ AHBA_degeprimer <- AHBA_degeprimer %>%
 ```{r, eval=FALSE}
 #to get to this point it is also possible to use chaining
 AHBA_degeprimer <- degeprimer(AHBAseqs) %>%
-run_alignment() %>%
-build_tree() %>%
-design_primers(degeneracyrange=c(1,10), number_iterations=2) # this can take awhile
+  run_alignment() %>%
+  build_tree() %>%
+  design_primers(degeneracyrange=c(1,10), number_iterations=2) # this can take awhile
 ```
 
 ## Choose Primers
@@ -64,12 +68,16 @@ AHBA_degeprimer %>% choose_primer()
 ## Add Primer to the Object
 ```{r}
 AHBA_degeprimer <- AHBA_degeprimer %>% 
-  add_primerpair(name="primer1", fpos=455, fdeg=10, rpos=617, rdeg=10) %>%
-  add_primerpair(name="primer2", fpos=928, fdeg=10, rpos=1133, rdeg=10)
+  add_primerpair(name="primerpair1", fpos=455, fdeg=10, rpos=617, rdeg=10) %>%
+  add_primerpair(name="primerpair2", fpos=928, fdeg=10, rpos=1133, rdeg=10)
+AHBA_degeprimer@primerpairs
 ```
 
 # Plot Coverage
 ```{r}
-plot_coveragematrix(AHBA_degeprimer)
+plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0)
+plot_coveragematrix(AHBA_degeprimer,max.mismatch = 1)
+plot_coveragematrix(AHBA_degeprimer,max.mismatch = 2)
+plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3)
 ```
 
