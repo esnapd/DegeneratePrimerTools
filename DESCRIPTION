@@ -19,13 +19,15 @@ Imports:
     ggplot2 (>= 2.0),
     htmlwidgets (>= 0.6),
     methods (>= 3.3.0),
-    purrr,
-    ggtree,
+    purrr (>= 0.2.0),
+    ggtree (>= 1.4.20),
     ggrepel,
     parallel,
     zoo
 RoxygenNote: 5.0.1
-Suggests: testthat,
+Suggests:
+    BiocStyle (>= 2.0.0),
+    testthat,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
