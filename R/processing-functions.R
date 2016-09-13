@@ -147,8 +147,8 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
   existingpairs <- dgprimer@primerpairs
 
   #check degenracy and position values
-  if (!fpos %in% unique(pdf$Pos)) stop("fpos value invalid. must be a Pos value present in the degeprimer table.")
-  if (!rpos %in% unique(pdf$Pos)) stop("rpos value invalid. must be a Pos value present in the degeprimer table.")
+  if (!fpos %in% unique(pdf$Pos))        stop("fpos value invalid. must be a Pos value present in the degeprimer table.")
+  if (!rpos %in% unique(pdf$Pos))        stop("rpos value invalid. must be a Pos value present in the degeprimer table.")
   if (!fdeg %in% unique(pdf$degeneracy)) stop("fdeg value invalid. must be a degeneracy value present in the degeprimer table.")
   if (!rdeg %in% unique(pdf$degeneracy)) stop("rdeg value invalid. must be a degeneracy value present in the degeprimer table.")
 
@@ -174,12 +174,10 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
 
   # Add the primer pair to the primerlist
   num_existing_primers <- length(existingpairs)
-  print(num_existing_primers)
 
   if (num_existing_primers == 0) {
     plist <- list(newprimer)
   } else {
-    print("Appending Primers")
     plist <- as.list( c(existingpairs, newprimer))
   }
 

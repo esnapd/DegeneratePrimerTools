@@ -25,7 +25,6 @@ degePrime <- function(alignmentfile, outfile,  oligolength, maxdegeneracy, minim
                         "-depth", minimumdepth,
                         "-skip",  skiplength,
                         "-iter",  number_iterations)
-  print(cli)
   system(cli)
 }
 #' trim a multiplesequence alignmentfile of gaps
@@ -47,6 +46,5 @@ trimAlignment <- function(infile, outfile, minoccupancy=0, refsequence = NULL, t
   trailgap     <- ifelse(trailgap==FALSE, "","-trailgap")
   degescript   <- system.file("DEGEPRIME/TrimAlignment.pl", package="DegeneratePrimerTools")
   cli          <- paste("perl", degescript, "-i", infile, "-o", outfile, minoccupancy, refsequence, trailgap)
-  print(cli)
   system(cli)
 }
