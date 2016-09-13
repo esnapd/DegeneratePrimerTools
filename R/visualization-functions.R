@@ -1,3 +1,4 @@
+
 #' Plot the output from rundegeprime
 #'
 #' @import ggplot2
@@ -20,7 +21,7 @@ plot_degeprimer <- function(degedf) {
 #'
 #' note this function relies on the consistent ordering of nodes
 #' in phylo objects where tips come first, then nodes in the edgelist
-#'https://sites.google.com/site/phylogeneticworkshop2/labs/plotting-phylogenies
+#' https://sites.google.com/site/phylogeneticworkshop2/labs/plotting-phylogenies
 #'
 #' @importFrom purrr map_chr
 #' @export
