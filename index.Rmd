@@ -28,7 +28,7 @@ DegeneratePrimerTools (DPT) is a package that facilitates degenerate primer desi
 
 In this vignette, a user has a set of DNA sequences for which he would like to design primers.  The workflow can be seen here with am ore detailed explanation below.
  
-```{r, cache=TRUE}
+```{r}
 library(dplyr)
 library(DegeneratePrimerTools)
 
