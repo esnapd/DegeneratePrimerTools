@@ -1,0 +1,23 @@
+output_dir: '.'
+navbar:
+  title: "DegeneratePrimerTools"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/esnapd/DegeneratePrimerTools
+output:
+  html_document:
+    theme: flatly
+    highlight: textmate
+    mathjax: null
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+
+
+
+

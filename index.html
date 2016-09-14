@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>About R Markdown</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="site_libs/highlight/textmate.css"
+      type="text/css" />
+<script src="site_libs/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">DegeneratePrimerTools</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/esnapd/DegeneratePrimerTools">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">About R Markdown</h1>
+
+</div>
+
+
+<style type="text/css">
+.title {
+  display: none;
+}
+
+</style>
+<div class="row" style="padding-top: 30px;">
+<h1 id="degenerateprimertools"><strong>DegeneratePrimerTools</strong></h1>
+<h3 id="dynamic-documents-for-r" style="padding-top: 0px;"><em>Dynamic Documents for R</em></h3>
+<h1 id="overview">Overview</h1>
+<p>DegeneratePrimerTools (DPT) is a package that facilitates degenerate primer design. DPT facilitates the retrieval of DNA sequences defined by a conserved <a href="http://pfam.xfam.org/">PFAM</a> domain and provides several classes for associating sequence data with alignments, trees and primer pairs. DPT uses the <a href="#cite:DegePrime">DEGEPRIME</a> program for primer design, an heavily uses the <a href="http://bioconductor.org/">Bioconductor</a> ecosystem for its data structures.</p>
+<h1 id="basic-usage">Basic Usage</h1>
+<p>In this vignette, a user has a set of DNA sequences for which he would like to design primers. The workflow can be seen here with am ore detailed explanation below.</p>
+<pre class="r"><code>library(dplyr)
+library(DegeneratePrimerTools)
+
+# load sequences
+ahbafna &lt;- system.file(&quot;sequences/AHBA.fna&quot;,package=&quot;DegeneratePrimerTools&quot;)
+AHBAseqs &lt;- Biostrings::readDNAStringSet(ahbafna)
+
+# run alignment, create tree, run DEGEPRIME on the MSA
+AHBA_degeprimer &lt;- degeprimer(AHBAseqs) %&gt;%
+  run_alignment() %&gt;%
+  build_tree() %&gt;%
+  design_primers( maxdegeneracies=c(1, 10, 20), number_iterations=2) # this can take awhile</code></pre>
+<pre><code>## use default substitution matrix</code></pre>
+<p>At this point, <code>AHBA_degeprimer</code> is an object that holds the original sequence information, the multiple sequence alignment, a phylogenetic tree of those sequences, and the DEGEPRIME primer design table. DEEPRIME has walked along the multiple sequence alignment and determined, for each location in the MSA, a degenerate primer that maximizes the coverage of sequences in the alignment that has a degeneracy value less than what is specified. In this case we ran DEGEPRIME twice, using maximum degeneracy values of 1 and 10.</p>
+<p>A user must now choose which primer pair to use given all the possible choices provided by DEGEPRIME. To assist in this process, DPT includes a Shiny app that visualizes potential degenerate primers by plotting each primer as point where the x-axis is the position along the ungapped MSA, and the height is the percentage of sequences in the MSA that is covered by that primer.</p>
+<h2 id="interactively-choose-primers">Interactively Choose Primers</h2>
+<pre class="r"><code>AHBA_degeprimer %&gt;% choose_primer()</code></pre>
+<div class="figure">
+<img src="images/choose_primers.png" alt="" />
+
+</div>
+<p>The screenshot above shows the interactive plot. A user interested in finding primers that amplify the maximum number of sequences in a given target can then choose the peaks. After a user chooses a peaks, the information about the selected points is returned to the console where a user can see the primer sequence as well as information about the position in the MSA, the degeneracy and other fields.</p>
+<h2 id="add-primer-pairs-to-the-object">Add Primer Pairs to the Object</h2>
+<p>Interactive inspection of primer pairs is used to select primers. users can use that information and design their own primers or they can explore the coverage of their primers across their target sequences. In the <em>primerdata</em> table that is the output of DEGEPRIME, each primer can be uniquely identified by a the position along the multiple sequence alignment and the maximum degeneracy value passed to the DEGEPRIME command line. We can therefore specify a primer pair by providing these two values for the forward and reverse primers.</p>
+<pre class="r"><code>AHBA_degeprimer &lt;- AHBA_degeprimer %&gt;% 
+  add_primerpair(name=&quot;primerpair1&quot;, fpos=455, fdeg=10, rpos=617, rdeg=10) %&gt;%
+  add_primerpair(name=&quot;primerpair2&quot;, fpos=928, fdeg=10, rpos=1133, rdeg=10)</code></pre>
+<h2 id="plot-coverage">Plot Coverage</h2>
+<p>Once primers are chosen it is desirable to view coverage of the target sequences. The <em>plot_coveragematrix</em> will calculate expected coverage of each primerpair in the <em>degeprimer</em> object by searching for exact matches of the forward and reverse primers against your target sequences. The most important parameter, is the max.mismatch which determines how many nucleotide differences are allowable between the degenerate primer and the target sequence.</p>
+<pre class="r"><code>plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="1056" /></p>
+<pre class="r"><code>plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-4-2.png" width="1056" /></p>
+<h1 id="sequence-retrieval-of-pfam-domain-sequences.">Sequence Retrieval of PFAM Domain sequences.</h1>
+<p>While many degenerate primer design projects are begun with sequences in mind, in many cases involving metagenomes, you may wish to design primers to maximize coverage to a target with only a few initial sequences. DegeneratePrimerTools provides helper functions to retrieve DNA sequences corresponding to the conserved PFAM domain protein sequences. To retrieve all DNA sequences that encode the PFAM16997 domain, for example, you could do the following:</p>
+<pre class="r"><code>PF16997dna &lt;- retrieve_PFAM_nucleotide_sequences(&quot;PF16997&quot;)</code></pre>
+<p>The result, <em>PF16997dna</em> is a Biostring DNAStringSet. Under the hood, this function:</p>
+<ol style="list-style-type: decimal">
+<li>retrieves PFAM domain information via the RET api</li>
+<li>parses the identifiers and locations</li>
+<li>maps the UNIPROT protein accessions to ENA nucleotide accessions</li>
+<li>retrieves the ENA nucleotide accessions.</li>
+<li>Extracts the regions of the DNA sequences corresponding to the protein domain.</li>
+</ol>
+<p>Because of this workflow the default PFAM alignment type that is retrieved is the “uniprot” alignment corresponding to all matches of the PFAM HMM against the full UNIPROT reference set. All of the publicly available options - “seed”, rp15“,”meta&quot; etc - are supported but in the case of large alignments (eg. the “NCBI” alignments), the PFAM website may not serve these files. In this case it will be necessary to download the full dataset from the PFAM FTP site and parse these accessions directly.</p>
+<p>As a workflow for the retrieval you could use a variation of the following:</p>
+<pre class="r"><code>PF16997dna &lt;- retrieve_PFAM_nucleotide_sequences(&quot;PF16997&quot;)
+
+PF16997degeprime &lt;- degeprimer(PF16997dna)%&gt;%
+  run_alignment() %&gt;%
+  build_tree() %&gt;%
+  design_primers( maxdegeneracies=c(1, 10, 20), number_iterations=2) # this can take awhile</code></pre>
+<h1 id="classes">Classes</h1>
+<p>DegeneratePrimerTools uses several classes that encapsulate data. These are the following:</p>
+<ol style="list-style-type: decimal">
+<li><p>The <em>primerdata</em> class. This class is used internally by DPT to ensure that the tabular output from the DEGEPRIME cli interface is of the expected shape.</p></li>
+<li><p>The <em>primerpair</em> class allows you define forward and reverse primer pairs.</p></li>
+<li><p>The <em>degeprimer</em> class. This is the class holding slots for nucleic acid sequence data, multiple sequence alignments, phylogenetic trees, <em>primerdata</em> DEGEPRIME tabular output and a list of <em>priemrpairs</em>.</p></li>
+</ol>
+<p>By providing a single object that contains all of the data, we can provide a standard interface for processing data via pipes as well as provide a single target for visualization functions.</p>
+<h1 id="references">References</h1>
+<p><a id="cite:bioconductor"></a> Robert C Gentleman, Vincent J. Carey, Douglas M. Bates, et al. <strong>Bioconductor: Open software development for computational biology and bioinformatics.</strong> <em>Genome Biology</em> 5:R80, 2004.</p>
+<p><a id="cite:DegePrime"></a> Luisa W. Hugertha, Hugo A. Weferb, Sverker Lundina, et al. <strong>DegePrime, a program for degenerate primer design for broad-taxonomic-range PCR in microbial ecology studies.</strong> <em>Appl Environ Microbiol</em> 2014 Aug;80(16):5116-23.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+
+</body>
+</html>
