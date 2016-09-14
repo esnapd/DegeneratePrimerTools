@@ -56,7 +56,7 @@ test_that("PFAM Ids are being correctly downloaded from the PFAM Website", {
   expect_equal(dim(dfmeta), c(2,4))
 
   # check incorrect alignment type
-  expect_error(retrieve_PFAM_ids("PF16997", alignmenttype = "wrongthing"), "Alignment type must be one of: seed full rp15 rp35 rp55 rp75 uniprot ncbi meta")
+  expect_error(retrieve_PFAM_ids("PF16997", alignmenttype = "wrongthing"))
   # check for errors in non-existent REST endpoints
   expect_error(retrieve_PFAM_ids("PF16997", alignmenttype = "meta"), "Invalid HTTP request. Check that your PFAM ID is correct and that the alignment type is available. For example the ncbi and meta are not always avaiable.")
   expect_error(retrieve_PFAM_ids("PF00501", alignmenttype = "ncbi"), "Invalid HTTP request. Check that your PFAM ID is correct and that the alignment type is available. For example the ncbi and meta are not always avaiable.")
@@ -73,11 +73,11 @@ test_that("Uniprot IDs can be converted to EMBL ids", {
 
   expect_is(uniprotdf, "data.frame")
   expect_equal(names(uniprotdf), c("UNIPROT_ID", "EMBL_ID"))
-  expect_equal(dim(pfamdf),    c(135,4))
+  expect_equal(dim(pfamdf),    c(131,4))
   expect_equal(dim(uniprotdf), c(135,2))
 
   #test a single ID
-  expect_identical(retrieve_UNIPROT_to_EMBL("Q4SMD5"), data.frame(UNIPROT_ID=c("Q4SMD5"), EMBL_ID=c("CAF98197.1")))
+  expect_identical(retrieve_UNIPROT_to_EMBL("Q4SMD5"), data.frame(UNIPROT_ID=c("Q4SMD5"), EMBL_ID=c("CAF98197.1"),stringsAsFactors = FALSE))
 })
 
 test_that("EMBL/ENA nucleotide sequnces are fetched correctly", {
@@ -89,7 +89,7 @@ test_that("EMBL/ENA nucleotide sequnces are fetched correctly", {
 test_that("EMBL/ENA Retrieval Code Correctly handles suppressed sequences", {
   #good, good, bad
   seqs <- retrieve_EMBL_sequences(c("KGE72166.1","KJE27958.1","AIE20100.1"))
-  expect_that(length(seqs), 2)
+  expect_equal(length(seqs), 2)
 })
 
 test_that("All retrieval functions work as an integrated pipeline", {
@@ -101,8 +101,7 @@ test_that("All retrieval functions work as an integrated pipeline", {
   #test in frame translation
   for (i in 1:10) {
     dna <- seqdf$domainsequence[[i]]
-    expect_that(translate(DNAString(dna)), not(gives_warning()))
-    expect_is(translate(DNAString(dna)), "AAstring")
+    expect_is(translate(DNAString(dna)), "AAString")
   }
 })
 

@@ -1,10 +1,10 @@
 #' Reverse Complement
-#' lifted from https://github.com/benjjneb/dada2/blob/master/R/misc.R
+#'
+#' lifted from dada2 https://github.com/benjjneb/dada2/blob/master/R/misc.R
 #'
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
-#' @export
 rc <- function(sqs) {
   if(length(sqs) < 1) {
     return(character(0))
@@ -14,14 +14,13 @@ rc <- function(sqs) {
     as(reverseComplement(DNAStringSet(sqs)), "character")
   }
 }
-
 #' Take An MSA Object and trim it
 #'
-#' use trimaligment.pl to trim an MSA object
+#' use trimaligment.pl to trim an MSA object. DEGEPRIMER is optimized for gapless alignments. This
+#' scripts will remove the gaps but mark the locations of gaps.
 #'
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings writeXStringSet
-#' @export
 trimMSA <- function(msa) {
   temp1  <- tempfile()
   temp2 <- tempfile()
@@ -37,8 +36,6 @@ trimMSA <- function(msa) {
 #'
 #' @param infile
 #' @param method
-#' @export
-#'
 makedegenerate <- function(infile, method="S") {
   if (!method %in% c("S","Z","SZ")) stop("Degeneracy method is only one one of 'S','Z'. or 'SZ'")
   table        <- paste0("-t=","\'",method,"\'")
@@ -91,7 +88,7 @@ makedegenerateseqs <- function(sequences, method="S") {
 }
 #' Find Primers matching A Set of Reference Sequences
 #'
-#' Return the best hit from each
+#' Return the best hit from each.
 #'
 #' @importFrom Biostrings matchPattern reverseComplement
 #' @export

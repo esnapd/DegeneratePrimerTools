@@ -24,6 +24,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
 
   if (!grepl("^PF", pfamid)) stop("pfamids are prefixed with 'PF'")
   if (r$status_code == 400)  stop("Invalid HTTP request. Check that your PFAM ID is correct and that the alignment type is available. For example the ncbi and meta are not always avaiable.")
+  if (r$status_code == 500)  stop("Invalid HTTP request. Status Code == 500. Error with PFAM server. Try later?")
 
 
   if (is.null(r)) stop("There was a problem downloading the PFAM")

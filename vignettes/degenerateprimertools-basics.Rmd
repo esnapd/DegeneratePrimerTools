@@ -34,7 +34,7 @@ AHBAseqs <- Biostrings::readDNAStringSet(ahbafna)
 AHBA_degeprimer <- degeprimer(AHBAseqs) %>%
   run_alignment() %>%
   build_tree() %>%
-  design_primers(degeneracyrange=c(1, 10, 20), number_iterations=2) # this can take awhile
+  design_primers( maxdegeneracies=c(1, 10, 20), number_iterations=2) # this can take awhile
 ```
 
 At this point, `AHBA_degeprimer` is an object that holds the original sequence information, the multiple sequence alignment, a phylogenetic tree of those sequences, and the DEGEPRIME primer design table. DEEPRIME has walked along the multiple sequence alignment and determined, for each location in the MSA, a degenerate primer that maximizes the coverage of sequences in the alignment that has a degeneracy value less than what is specified. In this case we ran DEGEPRIME twice, using maximum degeneracy values of 1 and 10.
@@ -98,7 +98,7 @@ PF16997dna <- retrieve_PFAM_nucleotide_sequences("PF16997")
 PF16997degeprime <- degeprimer(PF16997dna)%>%
   run_alignment() %>%
   build_tree() %>%
-  design_primers(degeneracyrange=c(1, 10, 20), number_iterations=2) # this can take awhile
+  design_primers( maxdegeneracies=c(1, 10, 20), number_iterations=2) # this can take awhile
 
 ```
 

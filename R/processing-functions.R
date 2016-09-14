@@ -1,5 +1,9 @@
 #' Run a Multiple Sequence Alignment
 #'
+#' @param dgprimer. Required. A degeprimer object.
+#' @param method. Optional. Default \code{"ClustalW"}. The choice of alignment software to pass to \code{\link[msa] msa}.
+#'            Can be  "ClustalW", "ClustalOmega", or  "Muscle".
+#' @param force. Optional. Default is \code{FALSE}. If an msa already exists, you must set FORCE to TRUE to overwrite it.
 #' @importFrom msa msa
 #' @export
 run_alignment <- function(dgprimer, method="ClustalW", maxiters="default", force=FALSE,...) {
@@ -16,15 +20,18 @@ run_alignment <- function(dgprimer, method="ClustalW", maxiters="default", force
 }
 #' Create a Tree from An MSA
 #'
+#' @param dgprimer Required. A degeprimer object.
+#' @param force. Optional. Default is \code{FALSE}. If an msa already exists, you must set FORCE to TRUE to overwrite it.
+#'
 #' @importFrom ape bionjs as.DNAbin dist.dna
 #' @export
-build_tree <- function(dgprimer, method="ClustalW", maxiters="default", force=FALSE,...) {
+build_tree <- function(dgprimer,force=FALSE,...) {
 
   if (is.null(dgprimer@msa)) {
     stop("Your degeprime object does not have a MultipleSequenceAlignment. Try using run-alignment")
   }
   if (force==FALSE  & !is.null(dgprimer@phy_tree)) {
-    stop("Your degeprime object already has an MSA. To overwrite use force=TRUE")
+    stop("Your degeprime object already has a phylogenetic tree. To overwrite use force=TRUE")
   }
 
   aln     <- as.DNAbin(dgprimer@msa)
@@ -35,7 +42,7 @@ build_tree <- function(dgprimer, method="ClustalW", maxiters="default", force=FA
 
   return(dgprimer)
 }
-#' Split FNA by Tree Distance And run Degenera On Each Subset
+#' Split FNA by Tree Distance And run DEGEPRIME On Each Subset
 #'
 #' @import ape
 #' @importFrom msa msaMuscle msaClustalW
@@ -47,9 +54,7 @@ split_fna_tree <- function(tree, fnas, splits=2, degeneracyrange=c(1,4,10,50,100
   kmeans_out  <- kmeans(distances, centers = splits)
   clusterdata <- lapply(1:splits, function(x){names(which(kmeans_out$cluster==x))})
   subfnas     <- lapply(seq(clusterdata), function(x){fnas[names(fnas) %in% clusterdata[[x]]]})
-  #alns        <- lapply(1:splits, function(x){msaMuscle(subfnas[[x]])})
   alns        <- lapply(1:splits, function(x){msaClustalW(subfnas[[x]])})
-  #alndists    <- lapply(alns, function(x){dist.alignment(x)})
 
   trees       <- lapply(1:splits, function(x){msaClustalW(subfnas[[x]])})
 
@@ -70,22 +75,25 @@ split_fna_tree <- function(tree, fnas, splits=2, degeneracyrange=c(1,4,10,50,100
     return(primdata)})
 
    return(list(fnas=subfnas, primerdata=primerdata))
-
 }
 #' Design Primers
 #'
-#' A convenience function to find degenerate primers usign the
+#' A convenience function to find degenerate primers using the
 #' seqeuences of the degenerateprimers object.  Return teh resutls to
 #' the primerdata slot.
+#'
+#' @param dgprimer Required. A degeprimer object.
+#' @param oligolength. Default is \code{21}. The lenght of primers to design.
+#' @param maxdegeneracies. Default is \code{21}. The lenght of primers to design.
 #' @importFrom parallel mclapply
 #' @export
-design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,400,1000),
+design_primers <- function(dgprimer, oligolength=21, maxdegeneracies=c(1,4,100,400,1000),
                           minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1,
                           force=FALSE) {
 
   # check if degepreime data ia associated with the class. if so, require force=TRUE
   if (!is.null(dgprimer@primerdata) & force==FALSE) {
-    stop("Degenerate primer data alread exists. To overwrite please use force=TRUE")
+    stop("Degenerate primer data already exists. To overwrite please use force=TRUE")
   }
 
   # check if degepreime data ia associated with the class. if so, require force=TRUE
@@ -94,11 +102,11 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
   }
 
   # use degeneracy range to determine the nubmer of jobs
-  if (length(degeneracyrange) == 1 & is.numeric(degeneracyrange)) {
-    degeneracyrange <- c(degeneracyrange)
+  if (length(maxdegeneracies) == 1 & is.numeric(maxdegeneracies)) {
+    maxdegeneracies <- c(maxdegeneracies)
   }
 
-  drange    <- seq(degeneracyrange)
+  drange    <- seq(maxdegeneracies)
   tempfiles  <- lapply(drange, function(x) {tempfile()})
 
   #create the trimmed file for DEGEPRIMER input
@@ -111,7 +119,7 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
   degendata <- mclapply(drange, function(x) {
     #get per-run data
     outputfile    <- tempfiles[[x]]
-    maxdegeneracy <- degeneracyrange[[x]]
+    maxdegeneracy <- maxdegeneracies[[x]]
     #calculate degeneracies
     degePrime(alignmentfile=trimmedfile, outfile=outputfile,
               oligolength=oligolength, maxdegeneracy = maxdegeneracy,
@@ -127,7 +135,6 @@ design_primers <- function(dgprimer, oligolength=21, degeneracyrange=c(1,4,100,4
 
   #add coverage information
   aggdata$coverage <- aggdata$PrimerMatching/aggdata$TotalSeq
-
 
   # add the primer data to the object
   dgprimer@primerdata <- new("primerdata", aggdata)
@@ -188,7 +195,9 @@ add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
 }
 #' choose a primer from the DEGEPRIMER output
 #'
-#'
+#' a shiny widget to visualize the output form DEGEPRIMER. This interactive plot puts
+#' the position of the MSA on the x-axis and coverage on the y-axis. Points can be selected
+#' by dragging the mouse. The point/primer information is returned to the R console.
 #'
 #' @import miniUI
 #' @import ggplot2
@@ -242,7 +251,6 @@ setMethod("choose_primer", "primerdata", function(object){
             viewer =  dialogViewer("Pick Points",
                                    width = 1000,
                                    height = 700))
-
 })
 #' Extract Amplicons from Sequences
 #'
@@ -288,7 +296,7 @@ setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multip
 })
 #' @importFrom  Biostrings DNAStringSet DNAString matchPattern
 #' @importFrom purrr compact
-setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.multiple=TRUE,max.mismatch = 2){
+setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2){
   amplicons <- lapply(object, function(x) {extract_amplicons(x, fp=fp, rp=rp)})
   amplicons <- compact(amplicons)
   DNAStringSet(amplicons)
@@ -308,12 +316,15 @@ setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.mul
 #'
 #' @importFrom Biostrings xscat subseq
 #' @export
+#' @examples
+#' dnatest <- DNAStringSet(list(DNAString("AAATTTCCCGGG"), DNAString("TTTCCCGGGAAA")))
+#' extract_ends(dnatest, trimf=5, trimr=3)
 extract_ends <- function(dnastringset, trimf=240, trimr=175) {
   #get forward and reverse and concatenate together
   amF <- subseq(dnastringset, end=trimf)
   amR <- subseq(dnastringset, start=-trimr)
   ampliconends <- xscat(amF, amR)
-  names(ampliconends) <- ampliconnames
+  names(ampliconends) <- dnastringset
 
   #filter minimum size
   ampliconends[width(ampliconends) >= trimf+trimr]
