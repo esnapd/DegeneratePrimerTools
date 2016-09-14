@@ -1,5 +1,5 @@
 ---
-title: "About R Markdown"
+title: "The DegeneratePrimerTools R-package. Facilitating amplicon analsysis of the metagenome"
 output: html_document
 ---
 
@@ -14,7 +14,7 @@ output: html_document
 
 # **DegeneratePrimerTools**
 
-### *Dynamic Documents for R* {style="padding-top: 0px;"}
+### *for targetting the metagenome* {style="padding-top: 0px;"}
 
 
 `r library("knitr")`
