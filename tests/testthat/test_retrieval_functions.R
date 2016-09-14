@@ -59,7 +59,7 @@ test_that("PFAM Ids are being correctly downloaded from the PFAM Website", {
   expect_error(retrieve_PFAM_ids("PF16997", alignmenttype = "wrongthing"))
   # check for errors in non-existent REST endpoints
   expect_error(retrieve_PFAM_ids("PF16997", alignmenttype = "meta"), "Invalid HTTP request. Check that your PFAM ID is correct and that the alignment type is available. For example the ncbi and meta are not always avaiable.")
-  expect_error(retrieve_PFAM_ids("PF00501", alignmenttype = "ncbi"), "Invalid HTTP request. Check that your PFAM ID is correct and that the alignment type is available. For example the ncbi and meta are not always avaiable.")
+  expect_error(retrieve_PFAM_ids("PF00501", alignmenttype = "ncbi"))
   # check for errors in non-existent REST endpoints
   expect_error(retrieve_PFAM_ids("P00501", alignmenttype = "seed"),  "pfamids are prefixed with 'PF'")
   # check that dots and have been reomved from the return Accesison values
