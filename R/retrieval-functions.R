@@ -49,6 +49,39 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
   df$Accession <- gsub("\\..*$", "", df$Accession) #remove trailing version number
   df
 }
+#' Combine the PFAM info for adjacent Protein Domains
+#'
+#'
+#' @importFrom data.table as.data.table
+#' @importFrom data.table setkey
+combine_domains <- function(nterm, cterm, gapsize = 30, allowableoverlap = 15) {
+  protnames <- c("PFAM_ID", "Accession", "start", "end")
+  stopmesg  <-"This function is meant to work on the four column dataframe returned by
+  retrieve_PFAM_ids()"
+  
+  if (!all.equal(names(nterm),protnames)) stop(stopmessg)
+  if (!all.equal(names(cterm),protnames)) stop(stopmessg)
+  
+  names(nterm) <- c("NPFAM_ID", "Accession", "Nstart", "Nend")
+  names(cterm) <- c("CPFAM_ID", "Accession", "Cstart", "Cend")
+  nterm <- as.data.table(nterm)
+  cterm <- as.data.table(cterm)
+  setkey(nterm, "Accession")
+  setkey(cterm, "Accession")
+  
+  # merge
+  together <- cterm[nterm]
+  # no rows where and N and C domains overlap to omuch or are negative
+  together <- together[ Cstart - Nend > -allowableoverlap]
+  # only keep adjacent domains within a reasonable aminoacid distance of one another
+  together <- together[ Cstart - Nend < gapsize]
+  
+  #fix some columns and retunr
+  together$PFAM_ID <- paste(together$NPFAM_ID, together$CPFAM_ID, collapse="_")
+  together$start   <- together$Nstart
+  together$end     <- together$Cend
+  together[, c("PFAM_ID", "Accession", "start", "end"), with=FALSE]
+}
 #' Get EMBL IDs from Uniprot IDs
 #'
 #' Use the REST interface at UNIPROT to get ENA mappings for a protein.
@@ -123,7 +156,7 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
   dnas <- lapply(temps, readDNAStringSet)
   return(Reduce(append, dnas))
 }
-#' A one-stop-shop for obtianing nucelotides form PFAM sequences.
+#' A one-stop-shop for obtaining nucelotides from PFAM sequences.
 #'
 #' @param pfamid. Required. A string coresponding to a PFAM accession id.
 #' @param alignmnettype. Optional. Will determine which of PFAM's prebuilt alignments to download. Can choose from "seed"
