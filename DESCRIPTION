@@ -17,10 +17,10 @@ Imports:
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
     ggplot2 (>= 2.0),
-    htmlwidgets (>= 0.6),
     methods (>= 3.3.0),
     purrr (>= 0.2.0),
     ggtree (>= 1.4.20),
+    data.table (>= 1.9.6),
     ggrepel,
     parallel,
     zoo
