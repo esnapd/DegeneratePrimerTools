@@ -30,6 +30,8 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ..
     primerpairlist <- degprim@primerpairs
   }
 
+  if (length(prmerpairlist) == 0) stop("This function requires primerpairs")
+  
   refseq <- degprim@refseq
 
   # Create Matrix of Primer-Sequence Matching
