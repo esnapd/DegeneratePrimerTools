@@ -80,5 +80,9 @@ plot_GC <- function(degprim,  ...) {
   # pass the created matrix to ggtree's matrix mapping function
   p  <- ggtree(degprim@phy_tree,ladderize = T)
   p  <- p + geom_tiplab(size=3, align=FALSE)
-  gheatmap(p, gc, ...) + scale_fill_gradient2(limits=c(0, 1), midpoint = 0.5)
+  gheatmap(p, gc, ...) + 
+    scale_fill_gradient2(limits=c(0, 1), 
+                         midpoint = 0.5) +
+    ggtitle("GC Content")
+    
 }
