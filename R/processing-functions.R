@@ -329,3 +329,27 @@ extract_ends <- function(dnastringset, trimf=240, trimr=175) {
   #filter minimum size
   ampliconends[width(ampliconends) >= trimf+trimr]
 }
+#' make primer table
+#'
+#' @importFrom purrr map_df
+#' @export
+#' 
+setGeneric("make_primer_table", function(object) standardGeneric("make_primer_table"))
+#'
+setMethod("make_primer_table", "degeprimer", function(object) {
+    primerpairs <- object@primerpairs
+    
+    if (length(primerpairs) == 0) stop("There are no primers defined. Add primers first.")
+    
+    primerdata <- map_df(primerpairs, function(p) {
+      df = data.frame(
+        primername = p@name,
+        forwardprimer = as.character(p@forwardprimer),
+        reverseprimer = as.character(p@reverseprimer),
+        expectedlength = p@expectedsize)
+    })
+    
+    primerdata
+})
+
+  
