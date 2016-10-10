@@ -54,6 +54,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
 #'
 #' @importFrom data.table as.data.table
 #' @importFrom data.table setkey
+#' @export
 combine_domains <- function(nterm, cterm, gapsize = 30, allowableoverlap = 15) {
   protnames <- c("PFAM_ID", "Accession", "start", "end")
   stopmesg  <-"This function is meant to work on the four column dataframe returned by
@@ -70,14 +71,12 @@ combine_domains <- function(nterm, cterm, gapsize = 30, allowableoverlap = 15) {
   setkey(cterm, "Accession")
   
   # merge
-  together <- cterm[nterm]
   # no rows where and N and C domains overlap to omuch or are negative
-  together <- together[ Cstart - Nend > -allowableoverlap]
   # only keep adjacent domains within a reasonable aminoacid distance of one another
-  together <- together[ Cstart - Nend < gapsize]
+  together <- cterm[nterm][ Cstart - Nend > -allowableoverlap][ Cstart - Nend < gapsize]
+  together[, PFAM_ID := mapply(function(x,y) {paste(x,y,sep="_")}, NPFAM_ID,CPFAM_ID)]
   
-  #fix some columns and retunr
-  together$PFAM_ID <- paste(together$NPFAM_ID, together$CPFAM_ID, collapse="_")
+  #fix some columns and return
   together$start   <- together$Nstart
   together$end     <- together$Cend
   together[, c("PFAM_ID", "Accession", "start", "end"), with=FALSE]
@@ -158,14 +157,26 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 }
 #' A one-stop-shop for obtaining nucelotides from PFAM sequences.
 #'
-#' @param pfamid. Required. A string coresponding to a PFAM accession id.
+#' @param pfamids. Required. A string corresponding to a PFAM accession id.
 #' @param alignmnettype. Optional. Will determine which of PFAM's prebuilt alignments to download. Can choose from "seed"
 #'             "full", "rp15", "rp35", "rp55", "rp75", "uniprot", "ncbi", "meta".
+#'             
+#' @importFrom purrr map_df
+#' @importFrom purrr reduce
 #' @export
 #' @examples
 #' retrieve_PFAM_nucleotide_sequences("PF16997")
-retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot") {
-  pfamdf     <- retrieve_PFAM_ids(pfamid, alignmenttype = alignmenttype)
+retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot") {
+  
+  if (!is.vector(pfamids)) { pfamids <- c(pfamids)}
+  pfamdfs    <- map_df(pfamids, ~retrieve_PFAM_ids(., alignmenttype=alignmenttype))
+  if (length(pfamdfs) == 1 ){
+    pfamdf <- pfamdfs[[1]]
+  } else {
+    pfamdf <- purrr::reduce(pfamdfs, combine_domains)
+  }
+  
+  #pfamdf     <- retrieve_PFAM_ids(pfamids, alignmenttype = alignmenttype)
   uniprotids <- unique(pfamdf$Accession)
   embldf     <- retrieve_UNIPROT_to_EMBL(uniprotids)
   seqs       <- retrieve_EMBL_sequences(unique(embldf$EMBL_ID))
@@ -179,10 +190,10 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamid, alignmenttype = "uniprot"
   #pull out the dna
   masterdf$domainsequence <- mapply(
     function(seqname, start, end, sequences=seqs) {
-      #pull out a sequecne form the DNAstinrg set using the name, stop, and end.
+      #pull out a sequence form the DNAstinrg set using the name, stop, and end.
       targetsequence <- sequences[grepl(seqname, names(sequences))]
 
-      # sequence not found can be legitmate
+      # sequence not found can be legitimate
       if (length(targetsequence) == 0) {
         warning(paste0(seqname, " is not found in the header of any sequences and may have been removed or suppressed from the ENA"))
         return(NA_character_)
