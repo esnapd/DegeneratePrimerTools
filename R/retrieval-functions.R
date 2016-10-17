@@ -55,7 +55,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
 #' @importFrom data.table as.data.table
 #' @importFrom data.table setkey
 #' @export
-combine_domains <- function(nterm, cterm, gapsize = 30, allowableoverlap = 15) {
+combine_domains <- function(nterm, cterm, gapsize = 100, allowableoverlap = 15) {
   protnames <- c("PFAM_ID", "Accession", "start", "end")
   stopmesg  <-"This function is meant to work on the four column dataframe returned by
   retrieve_PFAM_ids()"
@@ -73,8 +73,9 @@ combine_domains <- function(nterm, cterm, gapsize = 30, allowableoverlap = 15) {
   # merge
   # no rows where and N and C domains overlap to omuch or are negative
   # only keep adjacent domains within a reasonable amino acid distance of one another
-  together <- cterm[nterm][ Cstart - Nend > -allowableoverlap][ Cstart - Nend < gapsize]
-  together[, PFAM_ID := mapply(function(x,y) {paste(x,y,sep="_")}, NPFAM_ID,CPFAM_ID)]
+  together <- nterm[cterm][Cstart - Nend > - allowableoverlap][ Cstart - Nend < gapsize]
+  
+  together[, PFAM_ID := mapply(function(x,y) {paste(x,y,sep="_")}, NPFAM_ID, CPFAM_ID)]
   
   #fix some columns and return
   together$start   <- together$Nstart
@@ -160,26 +161,39 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 #' @param pfamids. Required. A string corresponding to a PFAM accession id.
 #' @param alignmnettype. Optional. Will determine which of PFAM's prebuilt alignments to download. Can choose from "seed"
 #'             "full", "rp15", "rp35", "rp55", "rp75", "uniprot", "ncbi", "meta".
-#'             
-#' @importFrom purrr map_df
+#' @param gapsize. Optional. Default \code{100}. Maximum distance in aminoacids that two domains can be if you want them to be combined.
+#' @param allowableoverlap. Optional. Default \code{15}. Maximum ovelap between two domains to still be included.
+#'              
+#' @importFrom purrr map
 #' @importFrom purrr reduce
 #' @export
 #' @examples
+#' # WAP1 Domain
+#' retrieve_PFAM_nucleotide_sequences("PF16997")
+#' 
 #' \dontrun{
-#' retrieve_PFAM_nucleotide_sequences("PF01761")
+#' # Aconitase Domain
+#' retrieve_PFAM_nucleotide_sequences("PF00330", alignmenttype = "seed")
+#'
+#' # Aconitase Domain plus Aconitase-C  Domain
+#' retrieve_PFAM_nucleotide_sequences(c("PF00330", "PF00694"), alignmenttype = "uniprot")
+#' 
 #'}
-retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot") {
+retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot", gapsize = 100, allowableoverlap = 15) {
   
   if (!is.vector(pfamids)) { pfamids <- c(pfamids)}
-  pfamdfs    <- map_df(pfamids, ~retrieve_PFAM_ids(., alignmenttype=alignmenttype))
+  pfamdfs    <- map(pfamids, ~retrieve_PFAM_ids(., alignmenttype=alignmenttype))
   
   if (length(unique(pfamdfs$PFAM_ID)) == 1) {
-    pfamdf <- pfamdfs
+    pfamdf <- pfamdfs[[1]]
   } else {
-    pfamdf <- reduce(pfamdfs, combine_domains)
+    pfamdf <- reduce(pfamdfs, ~combine_domains(.x, .y, gapsize=gapsize, allowableoverlap = allowableoverlap))
   }
+
+  if (nrow(pfamdf) == 0) stop("There are no sequences that have these adjacent domains. You can try changing the alignment type, the
+                             gapsize or the allowable overlapbetween sequences.")
   
-  #pfamdf     <- retrieve_PFAM_ids(pfamids, alignmenttype = alignmenttype)
+  
   uniprotids <- unique(pfamdf$Accession)
   embldf     <- retrieve_UNIPROT_to_EMBL(uniprotids)
   seqs       <- retrieve_EMBL_sequences(unique(embldf$EMBL_ID))

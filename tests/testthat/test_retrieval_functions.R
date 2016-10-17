@@ -103,5 +103,12 @@ test_that("All retrieval functions work as an integrated pipeline", {
     dna <- seqdf$domainsequence[[i]]
     expect_is(translate(DNAString(dna)), "AAString")
   }
+  
+  # try a different domain
+  seqdf2 <- retrieve_PFAM_nucleotide_sequences("PF00330", alignmenttype = "seed")
+  expect_is(seqdf2, "data.frame")
+  
+  # the "seed" is too small of space. this will trigger an error
+  expect_error(retrieve_PFAM_nucleotide_sequences(c("PF00330", "PF00694"), alignmenttype = "seed"))
 })
 
