@@ -72,7 +72,7 @@ combine_domains <- function(nterm, cterm, gapsize = 30, allowableoverlap = 15) {
   
   # merge
   # no rows where and N and C domains overlap to omuch or are negative
-  # only keep adjacent domains within a reasonable aminoacid distance of one another
+  # only keep adjacent domains within a reasonable amino acid distance of one another
   together <- cterm[nterm][ Cstart - Nend > -allowableoverlap][ Cstart - Nend < gapsize]
   together[, PFAM_ID := mapply(function(x,y) {paste(x,y,sep="_")}, NPFAM_ID,CPFAM_ID)]
   
@@ -165,15 +165,18 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
 #' @importFrom purrr reduce
 #' @export
 #' @examples
-#' retrieve_PFAM_nucleotide_sequences("PF16997")
+#' \dontrun{
+#' retrieve_PFAM_nucleotide_sequences("PF01761")
+#'}
 retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot") {
   
   if (!is.vector(pfamids)) { pfamids <- c(pfamids)}
   pfamdfs    <- map_df(pfamids, ~retrieve_PFAM_ids(., alignmenttype=alignmenttype))
-  if (length(pfamdfs) == 1 ){
-    pfamdf <- pfamdfs[[1]]
+  
+  if (length(unique(pfamdfs$PFAM_ID)) == 1) {
+    pfamdf <- pfamdfs
   } else {
-    pfamdf <- purrr::reduce(pfamdfs, combine_domains)
+    pfamdf <- reduce(pfamdfs, combine_domains)
   }
   
   #pfamdf     <- retrieve_PFAM_ids(pfamids, alignmenttype = alignmenttype)
@@ -185,7 +188,7 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot
   #calculate DNA start/stop positions
   masterdf$dnastart <- 3 * (masterdf$start - 1) + 1 #(n-1 * 3)  + 1
   masterdf$dnaend   <- 3 * masterdf$end             #(n * 3)
-  # remove the version nubmer form the EMBL IDs
+  # remove the version number form the EMBL IDs
   masterdf$EMBL_ID_clean <- gsub("\\..*$", "", masterdf$EMBL_ID)
   #pull out the dna
   masterdf$domainsequence <- mapply(
