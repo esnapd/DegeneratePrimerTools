@@ -122,6 +122,8 @@ retrieve_UNIPROT_to_EMBL <- function(uniprotids, chunksize=200) {
 #'
 #' Use the REST API to retrieve sequences from EMBL
 #'
+#' @param emblids. Required. A character or character vector of EMBL nucleotide accessions.
+#' @param chunksize. Optional. Default \code{200}. The size of the batch request to send to EMBL.
 #' @importFrom httr GET
 #' @importFrom Biostrings readDNAStringSet
 #' @importFrom Biostrings union
@@ -130,7 +132,7 @@ retrieve_UNIPROT_to_EMBL <- function(uniprotids, chunksize=200) {
 #' @seealso \url{https://www.ebi.ac.uk/ena/browse/data-retrieval-rest}
 #' @examples
 #' retrieve_EMBL_sequences(c("A00145","A00146"))
-retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
+retrieve_EMBL_sequences <- function(emblids, chunksize=200) {
 
   baseurl <- "https://www.ebi.ac.uk/ena/data/view/"
   opts    <- "&display=fasta&download=text"
@@ -140,7 +142,7 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
   # split into groups no greater in size than the chunksize, retrieve and write those IDs to file
   # then read them in
   groups <- split(emblids, ceiling(seq_along(emblids)/chunksize))
-  temps <- lapply(groups, function(x){return(tempfile())})
+  temps  <- lapply(groups, function(x){return(tempfile())})
 
   seqs <- lapply(seq_along(groups), function(i) {
 
@@ -150,11 +152,26 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=100) {
     # remove lines where sequences return error messages
     lines <- scan(text=content(r, "text"), what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE)
     lines <- lines[!grepl("has been suppressed at the submitter's request on", lines)]
+    
     write(x=lines, file=temps[[i]])
   })
-
-  dnas <- lapply(temps, readDNAStringSet)
-  return(Reduce(append, dnas))
+  
+  
+  try(dnas <- lapply(temps, readDNAStringSet))
+  try(dna  <- Reduce(append, dnas))
+  if (exists("dna")) return(dna)
+  
+  #if dna doesn't exist, print the offending values
+  
+  warning("DNA retrieved from EMBL contains non-fasta sequences in the return values. 
+            Attempting to locate and print the offending values")
+  
+  for (tmp in temps) {
+    tryCatch(dna <- readDNAStringSet(tmp),
+             #finally = print(paste(scan(file=tmp, what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE), tmp))
+             finally = file.copy(tmp, "~/Desktop/badfile.txt")
+             )
+    }
 }
 #' A one-stop-shop for obtaining nucelotides from PFAM sequences.
 #'
