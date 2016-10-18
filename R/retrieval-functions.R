@@ -118,6 +118,43 @@ retrieve_UNIPROT_to_EMBL <- function(uniprotids, chunksize=200) {
     }
   )
 }
+#' Get UNIPROT IDS from EMLB/Gennbank IDs
+#'
+#' Use the REST interface at UNIPROT to get UNIPROT mappings for a protein
+#' given the EMBL/Genbank ID
+#'
+#' @importFrom httr POST
+#' @importFrom httr content
+#' @importFrom purrr map_df
+#' @seealso \url{http://www.uniprot.org/help/programmatic_access}
+#' @export
+#' @examples
+#' retrieve_EMBL_to_UNIPROT("AEK75490.1")
+#' retrieve_EMBL_to_UNIPROT(c("AEK75490.1", "AEK75491.1"))
+retrieve_EMBL_to_UNIPROT <- function(uniprotids, chunksize=200) {
+  
+  baseurl <- "http://www.uniprot.org/mapping/"
+  
+  if (is.character(uniprotids)) uniprotids <- c(uniprotids)
+  
+  # split into groups no greater in size than the chunksize
+  groups <- split(uniprotids, ceiling(seq_along(uniprotids)/chunksize))
+  
+  # batch request ID mapping using the REST API
+  df <- map_df(
+    groups,
+    function(ids) {
+      try(r <- POST(url=baseurl, query=list( from="EMBL", to="ACC", query= paste0(ids, collapse = " "), format="tab")))
+      
+      if (is.null(r)) stop("There was a problem obtaining the UNIPROT->ENA Mapping")
+      
+      df <- read.table(text=content(r, "text"), header = TRUE, stringsAsFactors = FALSE)
+      names(df) <- c("EMBL_ID", "UNIPROT_ID")
+      
+      return(df)
+    }
+  )
+}
 #' Retrieve nucleotide sequences from EMBL ENA
 #'
 #' Use the REST API to retrieve sequences from EMBL
