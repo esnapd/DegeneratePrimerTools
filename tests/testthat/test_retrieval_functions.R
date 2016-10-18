@@ -112,3 +112,27 @@ test_that("All retrieval functions work as an integrated pipeline", {
   expect_error(retrieve_PFAM_nucleotide_sequences(c("PF00330", "PF00694"), alignmenttype = "seed"))
 })
 
+test_that("EMBL ids can be converted to Uniprot IDs", {
+  embldf    <- retrieve_EMBL_to_UNIPROT("AEK75490.1")
+  embldf2    <- retrieve_EMBL_to_UNIPROT(c("AEK75490.1", "AEK75491.1"))
+  
+  expect_is(embldf, "data.frame")
+  expect_is(embld2f, "data.frame")
+  expect_equal(nrow(embldf), 1)
+  expect_equal(nrow(embldf), 2)
+  expect_equal(nrow(embldf2), 2)
+  expect_equal(nrow(embldf2), 2)
+  
+  expect_equal(names(embldf), c("EMBL_ID", "UNIPROT_ID"))
+  expect_equal(names(embldf2), c("EMBL_ID", "UNIPROT_ID"))
+  
+  expect_equal(embldf$EMBL_ID[[1]], "AEK75490.1")
+  expect_equal(embldf$UNIPROT_ID[[1]], "F4F7G6")
+  
+  expect_equal(embldf2$EMBL_ID[[2]], "AEK75491.1")
+  expect_equal(embldf2$UNIPROT_ID[[2]], "G1C860")
+  
+  
+  #test a single ID
+  expect_identical(retrieve_UNIPROT_to_EMBL("Q4SMD5"), data.frame(UNIPROT_ID=c("Q4SMD5"), EMBL_ID=c("CAF98197.1"),stringsAsFactors = FALSE))
+})
