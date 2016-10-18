@@ -261,7 +261,7 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot
   #pull out the dna
   masterdf$domainsequence <- mapply(
     function(seqname, start, end, sequences=seqs) {
-      #pull out a sequence form the DNAstinrg set using the name, stop, and end.
+      #pull out a sequence form the DNAstring set using the name, stop, and end.
       targetsequence <- sequences[grepl(seqname, names(sequences))]
 
       # sequence not found can be legitimate
@@ -270,12 +270,12 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot
         return(NA_character_)
       }
 
-      #multiple sequences is a problem
+      # multiple sequences is a problem
       if (length(targetsequence) > 1)  stop("There is an error in the ENA fasta headers or in the EMBL ID list")
 
-      # I encoutnered this in some archael sequences and we shoudl flag it whent his happend.
+      # I encountered this in some archael sequences and we should flag it when this happend.
       if (end > width(targetsequence)) {
-        warning(paste0("The width of ", seqname, "is too narrow for the specified value. This can happen in certain sequences ldue to a framshift. See http://www.uniprot.org/uniprot/D3E4V4 and its
+        warning(paste0("The width of ", seqname, "is too narrow for the specified value. This can happen in certain sequences due to a frameshift. See http://www.uniprot.org/uniprot/D3E4V4 and its
                        associated nucleotide fasta for an example. This sequence is not being included and should be verified."))
         return(NA_character_)
       }
