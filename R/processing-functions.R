@@ -377,6 +377,8 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
+#' @importFrom dplyr %>%
+#' @importFrom dplyr left_join
 #' @export
 #' 
 add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
@@ -408,6 +410,8 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   primersaligned <- purrr::map(
     split(primerdata, primerdata$Primer), #split the primerdata df by primer
     function(pdata){
+      print(pdata)
+      
       pname <- pdata$Primer[[1]]
       fp    <- pdata$forwardprimer[[1]]
       rp    <- pdata$reverseprimer[[1]]
@@ -420,9 +424,10 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
       
       # calculate intervals.
       # middledash is total interval minus primers
+      startlen   <- start - 1
       endlen     <- msawidth - end
-      middlelen  <-  (end - start - fp_length - rp_length)
-      startdash  <- paste(rep("-", start), collapse="")
+      middlelen  <- (end - startlen - fp_length - rp_length)
+      startdash  <- paste(rep("-", startlen), collapse="")
       enddash    <- paste(rep("-", endlen), collapse="")
       middledash <- paste(rep("-", middlelen), collapse="" )
       
