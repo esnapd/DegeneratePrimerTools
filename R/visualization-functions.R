@@ -13,16 +13,18 @@ plot_degeprimer <- function(degedf) {
   gg <- gg + facet_grid(degeneracy~.) + theme_bw()
   gg + geom_text_repel(
     data= subset(degedf, coverage > cutoff & localmaxima == TRUE),
-    aes(label = Pos)
-  )
+    aes(label = Pos))
 }
 #' Plot the Coverage of Degenerate primers
 #'
 #' @param degprim
 #' @param primerpairlist
+#' @param max.mismatch
+#' @param tiplabelsize
+#' @param align
 #' @importFrom ggtree gheatmap ggtree geom_tiplab
 #' @export
-plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ...) {
+plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, tiplabelsize=3, align=TRUE, ...) {
   if (!class(degprim) == "degeprimer") {
     stop("The first argument must be of class 'degeprimer'")
   }
@@ -46,10 +48,12 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ..
   })
 
   df <- do.call("cbind", primerdata)
+  
+  print(df)
 
   # pass the created matrix to ggtree's matrix mapping function
-  p  <- ggtree(degprim@phy_tree,ladderize = T)
-  p  <- p + geom_tiplab(size=3, align=FALSE)
+  p  <- ggtree(degprim@phy_tree, ladderize = TRUE)
+  p  <- p + geom_tiplab(size = tiplabelsize, align = align)
   gheatmap(p, df, ...)
 }
 #' Plot the GC Content
@@ -63,8 +67,7 @@ plot_GC <- function(degprim,  ...) {
   if (!class(degprim) == "degeprimer") {
     stop("The first argument must be of class 'degeprimer'")
   }
-  
-  
+
   refseq <- degprim@refseq
   
   alph <- Biostrings::alphabetFrequency(refseq)
@@ -76,7 +79,6 @@ plot_GC <- function(degprim,  ...) {
   gc <- data.frame(gc)
   row.names(gc) <- names(refseq)
   
-  
   # pass the created matrix to ggtree's matrix mapping function
   p  <- ggtree(degprim@phy_tree,ladderize = T)
   p  <- p + geom_tiplab(size=3, align=FALSE)
@@ -84,5 +86,5 @@ plot_GC <- function(degprim,  ...) {
     scale_fill_gradient2(limits=c(0, 1), 
                          midpoint = 0.5) +
     ggtitle("GC Content")
-    
 }
+
