@@ -106,8 +106,6 @@ plot_msa <- function(msa) {
   dfs <- lapply(seq(dna), function(x){
     dna1 <- dna[[x]]
     name <- names(dna)[[x]]
-    print(dna1)
-    print(name)
     df <- data.frame(seq(dna1), strsplit(as.character(dna1), ""))
     names(df) <- c("position", "base")
     df$seqname <- name
