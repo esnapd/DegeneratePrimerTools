@@ -97,7 +97,9 @@ plot_GC <- function(degprim,  ...) {
 #' @export
 plot_msa <- function(msa) {
   
-  dna <- DNAStringSet(msa)
+  if (class(msa) == DNAStringSet) dna <- msa
+  if (class(msa) == DNAMultipleAlignment) dna <- DNAStringSet(msa)
+  
   msanames <- names(dna)
   
   dfs <- lapply(seq(dna), function(x){

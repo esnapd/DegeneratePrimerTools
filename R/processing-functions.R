@@ -377,7 +377,7 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' @importFrom purrr walk
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings union
-#' @examples 
+#' @export
 #' 
 add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   # find the matches between the primer and several sequences in the MSA
