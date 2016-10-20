@@ -1,7 +1,7 @@
 ---
 title: "Designing Primers"
 author: "zachcp"
-date: "June 30, 2016"
+date: "`r Sys.Date() `"
 output: 
   BiocStyle::html_document:
     fig_height: 7
@@ -70,6 +70,27 @@ Once primers are chosen it is desirable to view coverage of the target sequences
 plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0)
 plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3)
 ```
+
+## Plot Primer Locations
+
+Gives and overview of where your primers are and what the coverage is.
+
+```{r}
+msa1 <- add_primers_to_MSA(AHBA_degeprimer)
+plot_msa(msa1)
+```
+
+
+# Extra Plotting Functions
+
+## Plot GC Content
+
+Plot the GC Content of your Sequences.
+
+```{r}
+plot_GC(AHBA_degeprimer)
+```
+
 
 # Sequence Retrieval of PFAM Domain sequences.
 

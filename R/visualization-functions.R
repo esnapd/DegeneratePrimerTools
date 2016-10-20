@@ -50,8 +50,6 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ti
   })
 
   df <- do.call("cbind", primerdata)
-  
-  print(df)
 
   # pass the created matrix to ggtree's matrix mapping function
   p  <- ggtree(degprim@phy_tree, ladderize = TRUE)
@@ -96,15 +94,20 @@ plot_GC <- function(degprim,  ...) {
 #' @importFrom purrr reduce
 #' @export
 plot_msa <- function(msa) {
+  if (!class(msa) %in% c("DNAStringSet", "DNAMultipleAlignment"))  {
+    stop("This function requires a DNAStringSet or DNAMultipleAlignment") 
+  }
   
-  if (class(msa) == DNAStringSet) dna <- msa
-  if (class(msa) == DNAMultipleAlignment) dna <- DNAStringSet(msa)
+  if (class(msa) == "DNAStringSet") dna <- msa
+  if (class(msa) == "DNAMultipleAlignment") dna <- DNAStringSet(msa)
   
   msanames <- names(dna)
   
   dfs <- lapply(seq(dna), function(x){
     dna1 <- dna[[x]]
     name <- names(dna)[[x]]
+    print(dna1)
+    print(name)
     df <- data.frame(seq(dna1), strsplit(as.character(dna1), ""))
     names(df) <- c("position", "base")
     df$seqname <- name
@@ -121,6 +124,5 @@ plot_msa <- function(msa) {
   ggplot(df, aes(x=position, y=seqname, fill=base)) + 
     geom_tile()  + 
     theme_minimal()
-  
-  
+
 }

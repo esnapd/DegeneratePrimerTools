@@ -374,8 +374,8 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' @return a \code{\link[Biostrings] DNAMultipleAlignment}
 #' @importFrom purrr map_df
 #' @importFrom purrr map_chr
-#' @importFrom purrr walk
 #' @importFrom Biostrings DNAStringSet
+#' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
 #' @export
 #' 
@@ -395,10 +395,12 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   primertable$reverse_RC <- purrr::map_chr(primertable$reverseprimer, DegeneratePrimerTools:::rc) 
   
   # merge location data and sequence data
-  primerdata <- primerdata %>% left_join(primertable, by=c("Primer"="primername")) %>% na.omit()
+  primerdata <- primerdata %>% 
+    left_join(primertable, by=c("Primer"="primername")) %>% 
+    filter(!is.na(start), !is.na(end))
   
   # add sequences to the MSA
-  msa1 <- degeprime@msa
+  msa1     <- degeprime@msa
   msawidth <- ncol(msa1)
   
   # the new sequence to be added to the MSA will be
@@ -406,9 +408,6 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   primersaligned <- purrr::map(
     split(primerdata, primerdata$Primer), #split the primerdata df by primer
     function(pdata){
-      print("pdata!")
-      print(head(pdata))
-      print(pdata$forwardprimer)
       pname <- pdata$Primer[[1]]
       fp    <- pdata$forwardprimer[[1]]
       rp    <- pdata$reverseprimer[[1]]
@@ -430,7 +429,6 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
       dna <- DNAStringSet(paste0(startdash, fp, middledash, rp, enddash))
       names(dna) <- pname
       
-      if (!width(dna)==msawidth) stop("Incorrect construciton of the primerset")
       dna
     })
   
@@ -439,7 +437,6 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   dnacombined <- Biostrings::union(DNAStringSet(msa1), primersaligned)
   
   DNAMultipleAlignment(dnacombined)
-  
 }
 
   
