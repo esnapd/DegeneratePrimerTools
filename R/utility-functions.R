@@ -106,7 +106,7 @@ find_primers <- function(refseq, fp, rp, max.mismatch) {
     p1    <- matchPattern(pattern=fp, subject=x, fixed=FALSE, max.mismatch=max.mismatch)
     p2    <- matchPattern(pattern=reverseComplement(rp), subject=x, fixed=FALSE, max.mismatch=max.mismatch)
     p1loc <- start(p1)[1]
-    p2loc <- start(p2)[1]
+    p2loc <- end(p2)[1]
     if (length(p1) == 0) warning("No Matches for the Forward Primer")
     if (length(p2) == 0) warning("No Matches for the Reverse Primer")
     if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
