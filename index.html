@@ -9,7 +9,9 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="zachcp" />
 
+<meta name="date" content="2016-10-20" />
 
 <title>The DegeneratePrimerTools R-package. Facilitating amplicon analsysis of the metagenome</title>
 
@@ -94,6 +96,7 @@ button.code-folding-btn:focus {
   outline: none;
 }
 </style>
+
 
 <style type="text/css">
 /* padding for bootstrap navbar */
@@ -201,6 +204,8 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">The DegeneratePrimerTools R-package. Facilitating amplicon analsysis of the metagenome</h1>
+<h4 class="author"><em>zachcp</em></h4>
+<h4 class="date"><em>2016-10-20</em></h4>
 
 </div>
 
@@ -212,8 +217,6 @@ $(document).ready(function () {
 
 </style>
 <div class="row" style="padding-top: 30px;">
-<h1 id="degenerateprimertools"><strong>DegeneratePrimerTools</strong></h1>
-<h3 id="for-targetting-the-metagenome" style="padding-top: 0px;"><em>for targetting the metagenome</em></h3>
 <h1 id="overview">Overview</h1>
 <p>DegeneratePrimerTools (DPT) is a package that facilitates degenerate primer design. DPT facilitates the retrieval of DNA sequences defined by a conserved <a href="http://pfam.xfam.org/">PFAM</a> domain and provides several classes for associating sequence data with alignments, trees and primer pairs. DPT uses the <a href="#cite:DegePrime">DEGEPRIME</a> program for primer design, an heavily uses the <a href="http://bioconductor.org/">Bioconductor</a> ecosystem for its data structures.</p>
 <h1 id="basic-usage">Basic Usage</h1>
@@ -236,7 +239,7 @@ AHBA_degeprimer &lt;- degeprimer(AHBAseqs) %&gt;%
 <h2 id="interactively-choose-primers">Interactively Choose Primers</h2>
 <pre class="r"><code>AHBA_degeprimer %&gt;% choose_primer()</code></pre>
 <div class="figure">
-<img src="images/choose_primers.png" alt="" />
+<img src="images/choose_primers.png" />
 
 </div>
 <p>The screenshot above shows the interactive plot. A user interested in finding primers that amplify the maximum number of sequences in a given target can then choose the peaks. After a user chooses a peaks, the information about the selected points is returned to the console where a user can see the primer sequence as well as information about the position in the MSA, the degeneracy and other fields.</p>
@@ -247,10 +250,56 @@ AHBA_degeprimer &lt;- degeprimer(AHBAseqs) %&gt;%
   add_primerpair(name=&quot;primerpair2&quot;, fpos=928, fdeg=10, rpos=1133, rdeg=10)</code></pre>
 <h2 id="plot-coverage">Plot Coverage</h2>
 <p>Once primers are chosen it is desirable to view coverage of the target sequences. The <em>plot_coveragematrix</em> will calculate expected coverage of each primerpair in the <em>degeprimer</em> object by searching for exact matches of the forward and reverse primers against your target sequences. The most important parameter, is the max.mismatch which determines how many nucleotide differences are allowable between the degenerate primer and the target sequence.</p>
-<pre class="r"><code>plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="1056" /></p>
-<pre class="r"><code>plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-4-2.png" width="1056" /></p>
+<pre class="r"><code>plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0, offset=0.5)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="864" /></p>
+<pre class="r"><code>plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3, offset=0.5)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-4-2.png" width="864" /></p>
+<h2 id="plot-primer-locations">Plot Primer Locations</h2>
+<p>Gives and overview of where your primers are and what the coverage is.</p>
+<pre class="r"><code>msa1 &lt;- add_primers_to_MSA(AHBA_degeprimer)
+plot_msa(msa1)</code></pre>
+<pre><code>##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Macbecin_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Hygrocin_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Ansatrienin_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ATGACGAGAGGTTTTCACCCTGGTTATCGTGCGG...---------------------------------
+## [1] &quot;Divergolide_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Arifamycini&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Chaxamycin_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Neoansalactam_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Ansalactam_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Napthomycin_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;Rubradirin_AHBA&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;primerpair1&quot;
+##   1453-letter &quot;DNAString&quot; instance
+## seq: ----------------------------------...---------------------------------
+## [1] &quot;primerpair2&quot;</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="864" /></p>
+<h1 id="extra-plotting-functions">Extra Plotting Functions</h1>
+<h2 id="plot-gc-content">Plot GC Content</h2>
+<p>Plot the GC Content of your Sequences.</p>
+<pre class="r"><code>plot_GC(AHBA_degeprimer)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" width="864" /></p>
 <h1 id="sequence-retrieval-of-pfam-domain-sequences.">Sequence Retrieval of PFAM Domain sequences.</h1>
 <p>While many degenerate primer design projects are begun with sequences in mind, in many cases involving metagenomes, you may wish to design primers to maximize coverage to a target with only a few initial sequences. DegeneratePrimerTools provides helper functions to retrieve DNA sequences corresponding to the conserved PFAM domain protein sequences. To retrieve all DNA sequences that encode the PFAM16997 domain, for example, you could do the following:</p>
 <pre class="r"><code>PF16997dna &lt;- retrieve_PFAM_nucleotide_sequences(&quot;PF16997&quot;)</code></pre>
@@ -294,6 +343,7 @@ PF16997degeprime &lt;- degeprimer(PF16997dna)%&gt;%
 $(document).ready(function () {
   $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
 });
+
 
 </script>
 
