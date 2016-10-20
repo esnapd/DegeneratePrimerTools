@@ -77,8 +77,8 @@ AHBA_degeprimer <- AHBA_degeprimer %>%
 Once primers are chosen it is desirable to view coverage of the target sequences. The *plot_coveragematrix* will calculate expected coverage of each primerpair in the *degeprimer* object by searching for exact matches of the forward and reverse primers against your target sequences. The most important parameter, is the max.mismatch which determines how many nucleotide differences are allowable between the degenerate primer and the target sequence.
 
 ```{r}
-plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0, offset=0.5)
-plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3, offset=0.5)
+plot_coveragematrix(AHBA_degeprimer,max.mismatch = 0, offset=0.2)
+plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3, offset=0.2)
 ```
 
 ## Plot Primer Locations
