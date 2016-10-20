@@ -90,7 +90,12 @@ makedegenerateseqs <- function(sequences, method="S") {
 #'
 #' Return the best hit from each.
 #'
-#' @importFrom Biostrings matchPattern reverseComplement
+#' @param refseq. Required. DNAStringSet
+#' @param fp Required. Character DNA Sequence
+#' @param rp Required. Character DNA Sequence
+#' @param max.mismatch Required. Integer of the maximum mismatched
+#' @importFrom Biostrings matchPattern 
+#' @importFrom Biostrings reverseComplement
 #' @export
 find_primers <- function(refseq, fp, rp, max.mismatch) {
   if (!class(refseq) == "DNAStringSet") {

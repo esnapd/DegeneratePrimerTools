@@ -22,7 +22,9 @@ plot_degeprimer <- function(degedf) {
 #' @param max.mismatch
 #' @param tiplabelsize
 #' @param align
-#' @importFrom ggtree gheatmap ggtree geom_tiplab
+#' @importFrom ggtree gheatmap 
+#' @importFrom ggtree ggtree
+#' @importFrom ggtree geom_tiplab
 #' @export
 plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, tiplabelsize=3, align=TRUE, ...) {
   if (!class(degprim) == "degeprimer") {
@@ -59,7 +61,9 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, ti
 #' Plot the GC Content
 #'
 #' @param degprim
-#' @importFrom ggtree gheatmap ggtree geom_tiplab
+#' @importFrom ggtree gheatmap 
+#' @importFrom ggtree ggtree
+#' @importFrom ggtree geom_tiplab
 #' @importFrom Biostrings alphabetFrequency
 #' @importFrom ggplot2 scale_fill_gradient2
 #' @export
@@ -87,4 +91,34 @@ plot_GC <- function(degprim,  ...) {
                          midpoint = 0.5) +
     ggtitle("GC Content")
 }
-
+#' Plot the MSA Object
+#'
+#' @importFrom purrr reduce
+#' @export
+plot_msa <- function(msa) {
+  
+  dna <- DNAStringSet(msa)
+  msanames <- names(dna)
+  
+  dfs <- lapply(seq(dna), function(x){
+    dna1 <- dna[[x]]
+    name <- names(dna)[[x]]
+    df <- data.frame(seq(dna1), strsplit(as.character(dna1), ""))
+    names(df) <- c("position", "base")
+    df$seqname <- name
+    df})
+  
+  df <- purrr::reduce(dfs, rbind)
+  
+  # order the sequence to be the same as the MSA
+  df$seqname <- factor(df$seqname, levels=msanames)
+  
+  # filter out sequences
+  df <- df %>% filter(base!="-")
+  
+  ggplot(df, aes(x=position, y=seqname, fill=base)) + 
+    geom_tile()  + 
+    theme_minimal()
+  
+  
+}
