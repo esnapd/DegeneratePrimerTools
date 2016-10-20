@@ -271,7 +271,12 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot
       }
 
       # multiple sequences is a problem
-      if (length(targetsequence) > 1)  stop("There is an error in the ENA fasta headers or in the EMBL ID list")
+      if (length(targetsequence) > 1)  {
+        target_names <- paste(names(target_names), collapse = ",")
+        warning(paste("There is apossible error in the ENA fasta headers or in the EMBL ID list. Returning the first sequence. The
+                      accession values or this target are", target_names)) 
+        
+      }
 
       # I encountered this in some archael sequences and we should flag it when this happend.
       if (end > width(targetsequence)) {
