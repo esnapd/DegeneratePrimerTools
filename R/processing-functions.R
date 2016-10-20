@@ -368,4 +368,78 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 
 })
 
+#' Add Primer Pairs to the MSA to enable visualization.
+#'
+#' @param degeprime. Required. A \code{degeprimer-class} object.
+#' @return a \code{\link[Biostrings] DNAMultipleAlignment}
+#' @importFrom purrr map_df
+#' @importFrom purrr map_chr
+#' @importFrom purrr walk
+#' @importFrom Biostrings DNAStringSet
+#' @importFrom Biostrings union
+#' @examples 
+#' 
+add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
+  # find the matches between the primer and several sequences in the MSA
+  primerdata <- purrr::map_df(degeprime@primerpairs, function(ppair){
+    # make primermatrix from one refseq against one primer
+    pname        <- ppair@name
+    hitdf        <- find_primers(DNAStringSet(degeprime@msa), fp=ppair@forwardprimer,rp=ppair@reverseprimer, max.mismatch=max.mismatch)
+    hitdf$Match  <- mapply(function(start,end) {ifelse(is.na(start) || is.na(end), "No Match","Match")}, hitdf$start, hitdf$end)
+    hitdf$Primer <- pname
+    hitdf
+  })
+  
+  #convert primer info to tabular format
+  primertable <- make_primer_table(degeprime, wide=TRUE) 
+  primertable$reverse_RC <- purrr::map_chr(primertable$reverseprimer, DegeneratePrimerTools:::rc) 
+  
+  # merge location data and sequence data
+  primerdata <- primerdata %>% left_join(primertable, by=c("Primer"="primername")) %>% na.omit()
+  
+  # add sequences to the MSA
+  msa1 <- degeprime@msa
+  msawidth <- ncol(msa1)
+  
+  # the new sequence to be added to the MSA will be
+  # -----Forwardprimer-------ReversePrimer---------
+  primersaligned <- purrr::map(
+    split(primerdata, primerdata$Primer), #split the primerdata df by primer
+    function(pdata){
+      print("pdata!")
+      print(head(pdata))
+      print(pdata$forwardprimer)
+      pname <- pdata$Primer[[1]]
+      fp    <- pdata$forwardprimer[[1]]
+      rp    <- pdata$reverseprimer[[1]]
+      
+      fp_length <- nchar(fp)
+      rp_length <- nchar(rp)
+      
+      start <- pdata$start[[1]]
+      end   <- pdata$end[[1]]
+      
+      # calculate intervals.
+      # middledash is total interval minus primers
+      endlen     <- msawidth - end
+      middlelen  <-  (end - start - fp_length - rp_length)
+      startdash  <- paste(rep("-", start), collapse="")
+      enddash    <- paste(rep("-", endlen), collapse="")
+      middledash <- paste(rep("-", middlelen), collapse="" )
+      
+      dna <- DNAStringSet(paste0(startdash, fp, middledash, rp, enddash))
+      names(dna) <- pname
+      
+      if (!width(dna)==msawidth) stop("Incorrect construciton of the primerset")
+      dna
+    })
+  
+  primersaligned <- purrr::reduce(primersaligned, Biostrings::union)
+  
+  dnacombined <- Biostrings::union(DNAStringSet(msa1), primersaligned)
+  
+  DNAMultipleAlignment(dnacombined)
+  
+}
+
   
