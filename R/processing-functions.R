@@ -410,11 +410,11 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   primersaligned <- purrr::map(
     split(primerdata, primerdata$Primer), #split the primerdata df by primer
     function(pdata){
-      print(pdata)
       
       pname <- pdata$Primer[[1]]
       fp    <- pdata$forwardprimer[[1]]
       rp    <- pdata$reverseprimer[[1]]
+      rprc  <- pdata$reverse_RC[[1]]
       
       fp_length <- nchar(fp)
       rp_length <- nchar(rp)
@@ -431,7 +431,7 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
       enddash    <- paste(rep("-", endlen), collapse="")
       middledash <- paste(rep("-", middlelen), collapse="" )
       
-      dna <- DNAStringSet(paste0(startdash, fp, middledash, rp, enddash))
+      dna <- DNAStringSet(paste0(startdash, fp, middledash, rprc, enddash))
       names(dna) <- pname
       
       dna
