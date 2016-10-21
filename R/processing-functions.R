@@ -259,11 +259,11 @@ setMethod("choose_primer", "primerdata", function(object){
 #' \code{\link[Biostrings]{matchPattern}} to find matches for the degenerate
 #' primer seqeunces in your reference sequecne. This role of for this function
 #' is primarily within the context of extractign expected amplicon
-#' seqeucens and we therefore expect only a single amplicon per target and
+#' sequences and we therefore expect only a single amplicon per target and
 #' explicitly drop any seqeucence with greater than one match to a target sequence.
 #' Therefore this function is not suitable to finding primer targets on genomic
 #' DNA, and should be used for finding primer matches within the context of defined
-#' reference sequences like single genes, or the DNA seqeunces corresponding ot conserved
+#' reference sequences like single genes, or the DNA seqeunces corresponding to conserved
 #' protein domains.
 #'
 #' @param fp (Required).  Default \code{NULL}. Character string of the forward primer sequence.
@@ -443,5 +443,38 @@ add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
   
   DNAMultipleAlignment(dnacombined)
 }
-
+#' Pick Primer Pairs Automatically
+#'
+#' @importFrom zoo rollapply
+#' @importFrom dplyr %>%
+#' @importFrom dplyr arrange
+#' @importFrom dplyr filter
+#' 
+#' @param degeprime. Required. 
+#' @export
+autopick_primers <- function(degeprime, keepprimers=4, minsequences=5) {
+  if (is.null(degeprime@primerdata)) stop("Autopicking Primers requires primer information.")
+  
+  degedf <- degeprime@primerdata %>% filter(PrimerMatching >= minsequences)
+  
+  cutoff <- mean(degedf$coverage) + 2*sd(degedf$coverage)
+  
+  # calculate local maxima
+  degedf$localmaxima <- rollapply(degedf$coverage, 9, function(x) which.max(x)==5, fill=NA)
+  
+  #return a plot highlighting the high peaks (if there are any)
+  degedf <- degedf %>% 
+    filter(localmaxima  == TRUE) %>%
+    arrange(coverage)
+  
+  
+  
+  fullcoveragecount <- table(degedf$coverage == 1)['TRUE'] 
+  
+  if (fullcoveragecount > keepprimers) {
+    return(degedf %>% filter(coverage==1))
+  } else {
+    return(degedf[1:keepprimers,])
+  }
+}
   
