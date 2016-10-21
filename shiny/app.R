@@ -1,16 +1,23 @@
-library(shiny)
+library(DegeneratePrimerTools)
 library(Biostrings)
 library(msaR)
 
+library(dplyr)
+library(shiny)
 
 server <- function(input, output) {
     output$msa <- renderMsaR({
       inFile <- input$file1
       
-      if (is.null(inFile))
-        return(NULL)
+      if (is.null(inFile)) return(NULL)
       
-      msaR(inFile$datapath) 
+      dp <- degeprimer(readDNAStringSet(inFile$datapath)) %>%
+        run_alignment() %>%
+        build_tree() %>%
+        design_primers( maxdegeneracies=c(1, 10, 20), number_iterations=10)
+      
+      
+      msaR(dp@msa) 
     })
 }
 

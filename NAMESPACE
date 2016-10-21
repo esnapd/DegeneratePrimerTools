@@ -2,6 +2,7 @@
 
 export(add_primerpair)
 export(add_primers_to_MSA)
+export(autopick_primers)
 export(build_tree)
 export(choose_primer)
 export(combine_domains)
