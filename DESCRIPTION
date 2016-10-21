@@ -29,5 +29,6 @@ Suggests:
     BiocStyle (>= 2.0.0),
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    msaR
 VignetteBuilder: knitr
