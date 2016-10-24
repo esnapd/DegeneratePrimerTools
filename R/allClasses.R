@@ -2,8 +2,14 @@
 #' The S4 class for storing DEGEPRIME output data.
 #'
 #' DEGEPRIME is used to find degenerate primers from Multiple Sequence Alignments.
-#' The output dataframe is stored as a dataframe where one or more additional columns
-#' can be used to store metadata.
+#' The output is stored as a dataframe where one or more additional columns
+#' can be used to store metadata. Note that DEGEPRIMER works best on ungapped
+#' alignments and therefore the \code{trimAlignment} function is used to remove
+#' gapped locations. DEGEPRIME is aware of the locations of the caps so it doesn't
+#' design primers through the gaps. Nonetheless, the locations of the DEGEPRIMER
+#' output may not correspond to the positions in the original MSA> THis needs tob e
+#' kept in mind when using the positionsl informaiton - the sequence needs to be used
+#' to recalibrate the correct position.
 #'
 #' \describe{
 #'    \item{.Data}{data-frame data, inherited from the data.frame class.}
