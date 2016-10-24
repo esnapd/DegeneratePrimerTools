@@ -365,9 +365,114 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
     names(primerdataR) <- c("primername", "primer")
     
     return(rbind(primerdataF, primerdataR))
-
 })
+#' Add Primers to the MSA to enable visualization.
+#' 
+#' To add primer pairs to an MSA, see \code{add_primerpairs}.
+#'
+#' @param degeprime. Required. A \code{degeprimer-class} object.
+#' @param position. Required. A position in the DEGEPRIEMER output from which degenerate priemrs will be picked. 
+#' @param max.mismatch. Optional. Default \code{3}. Maxmimum mismatch between the primer and a DNA target.
+#' @param windowsize. Optional. Default \code{30}. Windowsize of MSA to return. A setting of '0' will retun the full lenght alignment
+#' @return a \code{\link[Biostrings] DNAMultipleAlignment}
+#' @importFrom purrr map
+#' @importFrom purrr map_df
+#' @importFrom purrr map_chr
+#' @importFrom purrr discard
+#' @importFrom Biostrings DNAStringSet
+#' @importFrom Biostrings DNAMultipleAlignment
+#' @importFrom Biostrings union
+#' @importFrom Biostrings subseq
+#' @importFrom dplyr %>%
+#' @importFrom dplyr left_join
+#' @importFrom dplyr select
+#' @export
+#' 
+add_primers_to_MSA <- function(degeprime, position, max.mismatch=3, windowsize=30) {
+  if (is.null(degeprime@primerdata)) stop("There is not primer information associated with this object")
+  
+  # obtain the primer sequences.
+  # find the matches between the primer and several sequences in the MSA
+  primerdata <- degeprime@primerdata
+  primerdata <- primerdata[primerdata$Pos == position,]
+  msa1       <- degeprime@msa
+  
+  if (nrow(primerdata) == 0) stop("There are no degenrate primers at this position.")
+  
+  # get match location between prierm and MSA sequences using string search
+  primerdata$msaloc <- lapply(primerdata$PrimerSeq, function(prim){
+    
+    # get the locations of your primer against each sequence in the MSA
+    primermatches <- lapply(DNAStringSet(msa1), function(x){
+      p1    <- matchPattern(pattern=prim, subject=x, fixed=FALSE, max.mismatch=max.mismatch)
+      p1loc <- start(p1)[1]
+      if (length(p1) == 0) warning("No Matches for the Forward Primer")
+      if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
+      return(p1loc)
+    })
+    
+    # primer location
+    primerlocation <- purrr::discard(unlist(primermatches), is.na)
+    if (length(unique(primerlocation))  > 1) stop("There can only be a single location chosen for primers matching an MSA")
+    
+    return(unique(primerlocation))
+  })
+  
+  
+  # add sequences to the MSA
+  msawidth <- ncol(msa1)
+  
+  # the new sequence to be added to the MSA will be
+  # -----Primer-------
+  primersaligned <- purrr::map(
+    split(primerdata, primerdata$PrimerSeq), #split the primerdata df by primer
+    function(pdata) {
+      
+      pname     <- paste("Pos", pdata$Pos[[1]],"Deg", pdata$degeneracy[[1]], "Calcdeg", pdata$PrimerDes[[1]], sep="_")
+      fp        <- pdata$PrimerSeq[[1]]
+      fp_length <- nchar(fp)
+      start     <- pdata$msaloc[[1]]
+      end       <- start + fp_length
 
+      # calculate intervals.
+      # middledash is total interval minus primers
+      startlen   <- start - 1
+      endlen     <- msawidth - end + 1
+      startdash  <- paste(rep("-", startlen), collapse="")
+      enddash    <- paste(rep("-", endlen), collapse="")
+
+      dna <- DNAStringSet(paste0(startdash, fp, enddash))
+      names(dna) <- pname
+      
+      dna
+    })
+  
+  # combine the sequences together
+  primersaligned <- purrr::reduce(primersaligned, Biostrings::union)
+  
+  # add the new squences ot the MSA
+  dnacombined <- Biostrings::union(DNAStringSet(msa1), primersaligned)
+  
+  if (windowsize == 0) {
+    DNAMultipleAlignment(dnacombined)
+  } else {
+    if (windowsize < 20) warning("You are slicing the MSA using a small number of basepairs. Conseder increasing your windowsize.")
+    
+    # center the return window on the center of the primer sequence
+    pos    <- primerdata$Pos[[1]]
+    center <- round(nchar(primerdata$PrimerSeq[[1]]) / 2)
+    start  <- pos + center
+    left   <- start - round(windowsize /2 )
+    right  <- start + round(windowsize /2 )
+    windowed_aln <- subseq(dnacombined, left, right)
+    return( DNAMultipleAlignment(windowed_aln))
+  }  
+  
+  
+  
+  
+  
+}
 #' Add Primer Pairs to the MSA to enable visualization.
 #'
 #' @param degeprime. Required. A \code{degeprimer-class} object.
@@ -381,7 +486,7 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' @importFrom dplyr left_join
 #' @export
 #' 
-add_primers_to_MSA <- function(degeprime, max.mismatch=3) {
+add_primerspairs_to_MSA <- function(degeprime, max.mismatch=3) {
   # find the matches between the primer and several sequences in the MSA
   primerdata <- purrr::map_df(degeprime@primerpairs, function(ppair){
     # make primermatrix from one refseq against one primer
