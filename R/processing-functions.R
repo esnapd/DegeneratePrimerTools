@@ -432,7 +432,7 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
     primerdata,
     function(pdata) {
       
-      pname     <- paste("Pos", pdata$Pos[[1]],"Deg", pdata$degeneracy[[1]], "Calcdeg", pdata$PrimerDes[[1]], sep="_")
+      pname     <- paste("Pos", pdata$Pos[[1]],"Deg", pdata$degeneracy[[1]], "Calcdeg", pdata$PrimerDeg[[1]], sep="_")
       fp        <- pdata$PrimerSeq[[1]]
       fp_length <- nchar(fp)
       start     <- pdata$msaloc[[1]]
