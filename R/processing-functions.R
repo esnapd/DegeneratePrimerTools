@@ -374,6 +374,8 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' @param max.mismatch. Optional. Default \code{3}. Maxmimum mismatch between the primer and a DNA target.
 #' @param windowsize. Optional. Default \code{30}. Windowsize of MSA to return. A setting of '0' will return the full length alignment. Note: if
 #' multiple positions are specified, it is no longer possible to specify a window.
+#' @param strict. Optional. Default \code{TRUE}. If there are multiple matches of a degenerate primer against a target sequence, usig strict will
+#' cause the functon to fail. If strict is FALSE, it will display the first match.
 #' @return a \code{\link[Biostrings] DNAMultipleAlignment}
 #' @importFrom purrr map
 #' @importFrom purrr by_row
@@ -390,7 +392,7 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' @importFrom dplyr arrange
 #' @export
 #' 
-add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=30) {
+add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=30, strict=TRUE) {
   if (is.null(degeprime@primerdata)) stop("There is not primer information associated with this object")
   
   # obtain the primer sequences: find the matches between the primer and several sequences in the MSA
@@ -418,7 +420,14 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
     
     # primer location
     primerlocation <- purrr::discard(unlist(primermatches), is.na)
-    if (length(unique(primerlocation))  > 1) stop("There can only be a single location chosen for primers matching an MSA")
+    if (length(unique(primerlocation))  > 1) {
+      if (strict) {
+        stop("There can only be a single location chosen for primers matching an MSA when using strict.")
+      } else {
+        warning("There are multiple matches of your degenerate sequecne agaisnt one or more target sequences. Since strict is set to FALSE, this will return the first match.")
+        primerlocation <- unique(primerlocation)[[1]]
+      }
+    }
     
     return(unique(primerlocation))
   })
