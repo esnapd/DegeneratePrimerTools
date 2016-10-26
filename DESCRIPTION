@@ -1,13 +1,13 @@
 Package: DegeneratePrimerTools
 Type: Package
 Title: Tools for Designing Degenerate Primers
-Version: 0.1.3
+Version: 0.1.4
 Authors@R: c(
     person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
     person("Ulysses", "Amanciao", , "uamanciode@rockefeller.edu", c("aut"))
     )
-Description: Assist in designing Degenrate Primers Against A collection of
-    Sequences
+Description: Assist in designing Degenerate Primers against a collection of
+    DNA Sequences
 License: GPL3
 SystemRequirements: Perl
 LazyData: TRUE
