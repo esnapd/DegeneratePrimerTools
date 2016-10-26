@@ -425,7 +425,7 @@ add_primers_to_MSA <- function(degeprime, position, max.mismatch=3, windowsize=3
   # the new sequence to be added to the MSA will be
   # -----Primer-------
   primersaligned <- purrr::map(
-    split(primerdata, primerdata$PrimerSeq), #split the primerdata df by primer
+    split(primerdata, primerdata$degeneracy), # split on degeneracy input
     function(pdata) {
       
       pname     <- paste("Pos", pdata$Pos[[1]],"Deg", pdata$degeneracy[[1]], "Calcdeg", pdata$PrimerDes[[1]], sep="_")
