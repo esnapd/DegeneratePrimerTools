@@ -317,7 +317,6 @@ setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.mul
 #' @importFrom Biostrings xscat subseq
 #' @export
 #' @examples
-#' dnatest <- DNAStringSet(list(DNAString("AAATTTCCCGGG"), DNAString("TTTCCCGGGAAA")))
 #' extract_ends(dnatest, trimf=5, trimr=3)
 extract_ends <- function(dnastringset, trimf=240, trimr=175) {
   #get forward and reverse and concatenate together
@@ -371,35 +370,41 @@ setMethod("make_primer_table", "degeprimer", function(object, wide=TRUE) {
 #' To add primer pairs to an MSA, see \code{add_primerpairs}.
 #'
 #' @param degeprime. Required. A \code{degeprimer-class} object.
-#' @param position. Required. A position in the DEGEPRIEMER output from which degenerate priemrs will be picked. 
+#' @param positions. Required. A position (or vector of positions) in the DEGEPRIEMER output from which degenerate primers will be picked. 
 #' @param max.mismatch. Optional. Default \code{3}. Maxmimum mismatch between the primer and a DNA target.
-#' @param windowsize. Optional. Default \code{30}. Windowsize of MSA to return. A setting of '0' will retun the full lenght alignment
+#' @param windowsize. Optional. Default \code{30}. Windowsize of MSA to return. A setting of '0' will return the full length alignment. Note: if
+#' multiple positions are specified, it is no longer possible to specify a window.
 #' @return a \code{\link[Biostrings] DNAMultipleAlignment}
 #' @importFrom purrr map
-#' @importFrom purrr map_df
-#' @importFrom purrr map_chr
+#' @importFrom purrr by_row
 #' @importFrom purrr discard
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
 #' @importFrom Biostrings subseq
+#' @importFrom Biostrings matchPattern
 #' @importFrom dplyr %>%
 #' @importFrom dplyr left_join
 #' @importFrom dplyr select
+#' @importFrom dplyr filter
+#' @importFrom dplyr arrange
 #' @export
 #' 
-add_primers_to_MSA <- function(degeprime, position, max.mismatch=3, windowsize=30) {
+add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=30) {
   if (is.null(degeprime@primerdata)) stop("There is not primer information associated with this object")
   
-  # obtain the primer sequences.
-  # find the matches between the primer and several sequences in the MSA
-  primerdata <- degeprime@primerdata
-  primerdata <- primerdata[primerdata$Pos == position,]
+  # obtain the primer sequences: find the matches between the primer and several sequences in the MSA
+  primerdata <- data.frame(degeprime@primerdata) %>%
+    filter(Pos %in% positions) %>%
+    arrange(Pos, degeneracy)
+  
+  if (nrow(primerdata) == 0) stop("There are no degenerate primers at the specified positions.")
+  
   msa1       <- degeprime@msa
+  msawidth   <- ncol(msa1)
   
-  if (nrow(primerdata) == 0) stop("There are no degenrate primers at this position.")
   
-  # get match location between prierm and MSA sequences using string search
+  # get match location between primer and MSA sequences using matchPattern
   primerdata$msaloc <- lapply(primerdata$PrimerSeq, function(prim){
     
     # get the locations of your primer against each sequence in the MSA
@@ -419,13 +424,12 @@ add_primers_to_MSA <- function(degeprime, position, max.mismatch=3, windowsize=3
   })
   
   
-  # add sequences to the MSA
-  msawidth <- ncol(msa1)
-  
+  # caclulate where ont eh MSA the sequecnes should be places and create a sequecne with
+  # dashes in the non-matching parts.
   # the new sequence to be added to the MSA will be
   # -----Primer-------
-  primersaligned <- purrr::map(
-    split(primerdata, primerdata$degeneracy), # split on degeneracy input
+  primerdata <- purrr::by_row(
+    primerdata,
     function(pdata) {
       
       pname     <- paste("Pos", pdata$Pos[[1]],"Deg", pdata$degeneracy[[1]], "Calcdeg", pdata$PrimerDes[[1]], sep="_")
@@ -434,8 +438,7 @@ add_primers_to_MSA <- function(degeprime, position, max.mismatch=3, windowsize=3
       start     <- pdata$msaloc[[1]]
       end       <- start + fp_length
 
-      # calculate intervals.
-      # middledash is total interval minus primers
+      # calculate intervals: middledash is total interval minus primers
       startlen   <- start - 1
       endlen     <- msawidth - end + 1
       startdash  <- paste(rep("-", startlen), collapse="")
@@ -445,18 +448,22 @@ add_primers_to_MSA <- function(degeprime, position, max.mismatch=3, windowsize=3
       names(dna) <- pname
       
       dna
-    })
+    }, .to="DNA")
   
   # combine the sequences together
-  primersaligned <- purrr::reduce(primersaligned, Biostrings::union)
+  primersaligned <- purrr::reduce(primerdata$DNA, Biostrings::union)
   
-  # add the new squences ot the MSA
+  # add the new sequences ot the MSA
   dnacombined <- Biostrings::union(DNAStringSet(msa1), primersaligned)
   
+  # There is not window slicing if multiple positions are bieng used
+  if (length(positions > 1)) return(DNAMultipleAlignment(dnacombined))
+  
+  # if a single posiiton is used, allow for windowing
   if (windowsize == 0) {
     DNAMultipleAlignment(dnacombined)
   } else {
-    if (windowsize < 20) warning("You are slicing the MSA using a small number of basepairs. Conseder increasing your windowsize.")
+    if (windowsize < 20) warning("You are slicing the MSA using a small number of basepairs. Consider increasing your windowsize.")
     
     # center the return window on the center of the primer sequence
     pos    <- primerdata$Pos[[1]]
