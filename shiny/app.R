@@ -50,7 +50,7 @@ server <- function(input, output) {
        id = "mpanel", 
        type = "pill",
        tabPanel("Full Alignment", 
-                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = 500, labelNameLength = 25)})),
+                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = 500, labelNameLength = 250)})),
        tabPanel("Region 1",
                 renderMsaR({msaR(msa1, menu = F, alignmentHeight = 500, labelNameLength = 250)}),
                 DT::renderDataTable(t1)),
