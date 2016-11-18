@@ -9,7 +9,14 @@ Authors@R: c(
 Description: Assist in designing Degenerate Primers against a collection of
     DNA Sequences
 License: GPL3
-SystemRequirements: Perl
+SystemRequirements: 
+  Perl,
+  blast,
+  FastTree,
+  GNU Parallel,
+  vsearch,
+  hmmer,
+  muscle
 LazyData: TRUE
 Imports:
     Biostrings (>= 2.0),
