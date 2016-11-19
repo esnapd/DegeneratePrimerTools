@@ -18,8 +18,10 @@ library(rBLAST)
 
 
 
-Clustering <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL){
+primer-validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL){
 
+  wd <- tempdir()
+  on.exit(unlink(list.files(wd)))
   
   ###### Preparing the PFAM sequences to blast against for filtering
   #PFAM <- "PF13714" # for PEP
@@ -52,7 +54,6 @@ Clustering <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL)
   # Create the new Vsearch folder for all the vsearch cluster files.
   
   dir.create(paste(getwd(), "/Vsearch", sep=""), showWarnings=F)
-  filename <- gsub("(.*).fasta$", "\\1", basename(file))
   filename <- gsub("(.*).fq$", "\\1", basename(file))
   sampleName <- paste(unlist(strsplit(basename(file), "_"))[1:2], collapse="_")
   target <- unlist(strsplit(basename(file), "_"))[1]
