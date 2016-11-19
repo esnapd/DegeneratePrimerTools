@@ -9,8 +9,8 @@
 #' @examples
 #' PFAM <- "PF13714"
  
-devtools::install_github("zachcp/phyloseq-tools")
-source("/Users/christophelemetre/Documents/Work/Primer_Design/R/phyloseq-tools.R")
+#devtools::install_github("zachcp/phyloseq-tools")
+#source("/Users/christophelemetre/Documents/Work/DegeneratePrimerTools-1/R/phyloseq-tools.R")
 source('http://bioconductor.org/biocLite.R')
 biocLite('phyloseq')
 library(phyloseq)
@@ -18,14 +18,16 @@ library(rBLAST)
 
 
 
-primer-validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL){
+primer_validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL){
 
+  logpath <-getwd()
   wd <- tempdir()
-  on.exit(unlink(list.files(wd)))
+  setwd("/Users/christophelemetre/Documents/Work/eSNaPD3/")
+  #on.exit(unlink(list.files(wd)))
   
   ###### Preparing the PFAM sequences to blast against for filtering
   #PFAM <- "PF13714" # for PEP
-  #PFAMnucSeqs <- retrieve_PFAM_nucleotide_sequences(PFAM, alignmenttype = "full")
+  PFAMnucSeqs <- retrieve_PFAM_nucleotide_sequences(PFAM, alignmenttype = "full")
   
   PFAMseqs <- DNAStringSet(PFAMnucSeqs$domainsequence[which(!is.na(PFAMnucSeqs$domainsequence))],use.names = TRUE)
   names(PFAMseqs) <- paste(sep="_",PFAMnucSeqs$PFAM_ID[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$Accession[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$EMBL_ID[which(!is.na(PFAMnucSeqs$domainsequence))])
@@ -110,12 +112,12 @@ primer-validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setw
   ###################################################################################################################################
   # BLAST sequences to filter
   
-  Biostrings::writeXStringSet(PFAMseqs, "PFAMseqsBlastDB.fasta",format = "fasta")
+  Biostrings::writeXStringSet(PFAMseqs, paste0("PFAM_",PFAM,"_seqsBlastDB.fasta"),format = "fasta")
   cat(paste(Sys.time(), "Write PFAM nucletoide sequences", "\n"), file=logfile, sep="", append=T)
   makeblastdb_args <- paste0("-in ", getwd(), "/PFAMseqsBlastDB.fasta -dbtype nucl")
   system2(command = "makeblastdb", args = makeblastdb_args)
   cat(paste(Sys.time(), "Create PFAM Blast database\n"), file=logfile, sep="", append=T)
-  bl <- blast(db = paste0(getwd(), "/PFAMseqsBlastDB.fasta"))
+  bl <- blast(db = paste0(getwd(), paste0("PFAM_",PFAM,"_seqsBlastDB.fasta")))
   cat(paste(Sys.time(), "Blast clusters on PFAM blast database\n"), file=logfile, sep="", append=T)
   
   print(bl, info=TRUE)
@@ -131,18 +133,6 @@ primer-validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setw
   CmdOut <- system2(command = vsearch_cmd, args = cluster_args, stdout = TRUE, stderr = TRUE) # Execute cluster at 95% command
   Cluster95Seqs <- readDNAStringSet(paste0(getwd(), "/Vsearch/",filename, "_cluster97.fasta"))
   UCfile <- import_usearch_uc(paste0(getwd(), "/Vsearch/", filename, "_cluster95.uc"), readDelimiter = "_M03834")
-  
-  
-  ###################################################################################################################################
-  # usearch rarefy - To be removed...
-  
-  #usearch_cmd <- paste0(usearchpath, "usearch8.1.1861_i86osx32")
-  #raref_args <- paste0("-fasta_rarify ",getwd(), "/Vsearch/", filename, "_cluster95.fasta "," -mingroupsize 2 -iters 100 -output ", getwd(), "/Vsearch/", filename, "_rarefied95.txt")
-  #CmdOut <- system2(command = usearch_cmd, args = raref_args, stdout = TRUE, stderr = TRUE) # Execute cluster at 95% command
-  
-  #RarefiedTable <- read.table(paste0(getwd(), "/Vsearch/", filename, "_rarefied95.txt"),col.names = c("idx","depth","diversity"), stringsAsFactors = FALSE) %>%
-  # mutate(sampleName = sampleName,
-  #         target=target)
   
   
   ###################################################################################################################################
@@ -176,7 +166,7 @@ fileList <- c("/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_01_
                "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_02_combined.fq",
                "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/AHBA_02_combined.fq")
 for (i in length(fileList)) {
-  RAR <- Clustering(file = fileList[i], PFAM = PFAMlist[i], vsearchpath = "integrated")
+  RAR <- primer_validation(file = fileList[i], PFAM = PFAMlist[i], vsearchpath = "integrated")
   df <- do.call("rbind", as.data.frame(RAR))
   #df2 <- rbind(df2, RAR)
 }
@@ -328,120 +318,6 @@ RarefPlot
   
   
   
-  # cluster sequences!
-  A <- system2(vsearchpath, paste(" -cluster_fast ", setwd, "/Vsearch/", filename, "_drep+1.fasta -strand both", " -id ", id, " -msaout ", setwd, "/Vsearch/cluster_file", cmd, " >", setwd,"/Vsearch/temp.txt", sep=""), stdout=T, stderr=T) # dereplicate!
-  cluster_args <- paste0("--cluster_OTU ", getwd(), "/Vsearch/", filename, "_derep.fasta", " -output ", getwd(), "/Vsearch/", filename, "_drep+1.fasta -sizeout")
-  CmdOut <- system2(command = vsearch_cmd, args = derep_args, stdout = TRUE, stderr = TRUE) # dereplicate!
-  
-  
-  temp <- readLines(paste(setwd, "/Vsearch/temp.txt", sep=""))
-  clust_no <- temp[grep("Clusters: ", temp)]
-  clust_no <- sub("Clusters: (.*) Size.*", "\\1", clust_no)
-  message(paste("Clusters: ", clust_no, collapse=""))
-  
-  
-  cat(paste(version, "\n\n", sep=""), file=logfile, sep="", append=T)
-  cat(paste("Used fasta file: ", file, "\nNumber of imput sequences: ", sequ, "\nDereplicated: ", derep, "\nCluster: ", clust_no, "\n\n", sep=""), file=logfile, sep="", append=T)
-  
-  cat(paste("VSEARCH comands:\n\n", vsearchpath, " -derep_fulllength ", meep, file, " -output ", setwd, "/Vsearch/", filename, "_drep.fasta >", setwd, "/Vsearch/temp.txt\n", 
-            vsearchpath, " -derep_fulllength ", setwd, "/Vsearch/", filename, "_drep.fasta", " -output ", setwd, "/Vsearch/", filename, "_drep+1.fasta -sizeout", "\n",
-            vsearchpath, " -cluster_fast ", setwd, "/Vsearch/", filename, "_drep+1.fasta -strand both", " -id ", id, " -msaout ", setwd, "/Vsearch/cluster_file", cmd, "  >", setwd,"/Vsearch/temp.txt", 
-            
-            "\n\n", sep=""), file=logfile, sep="", append=T)
-  
-  
-  # write single fasta files from 
-  dir.create(paste(setwd, "/Vsearch/cluster_fasta", sep=""), showWarnings=F)
-  
-  data <- readLines(paste(setwd, "/Vsearch/cluster_file", sep=""))
-  
-  
-  start <- which(data=="")
-  stop <- which(data==">consensus")
-  
-  
-  for (i in 1:length(start)){
-    sequ <- data[(start[i]+1):(stop[i]-1)]
-    
-    cat(sequ, file=paste(setwd, "/Vsearch/cluster_fasta", "/", i, ".fasta", sep=""), sep="\n")
-  }
-  
-  
-  
-  
-  cat("", file=paste(setwd, "/", filename, "_cons_cluster_", threshold, ".fasta", sep=""), append=F)
-  
-  # build consensus sequences!
-  
-  
-  upac <- read.csv(text=c("ID,comment,A,T,C,G,farbe
-                          A,Adenine,1,0,0,0,F
-                          C,Cytosine,0,0,1,0,F
-                          G,Guanine,0,0,0,1,F
-                          T,Thymine,0,1,0,0,F
-                          R,A or G,0.5,0,0,0.5,T
-                          Y,C or T,0,0.5,0.5,0,T
-                          S,G or C,0,0,0.5,0.5,T
-                          W,A or T,0.5,0.5,0,0,T
-                          K,G or T,0,0.5,0,0.5,T
-                          M,A or C,0.5,0,0.5,0,T
-                          B,C or G or T,0,0.3,0.3,0.3,T
-                          D,A or G or T,0.3,0.3,0,0.3,T
-                          H,A or C or T,0.3,0.3,0.3,0,T
-                          V,A or C or G,0.3,0,0.3,0.3,T
-                          N,any base,0.25,0.25,0.25,0.25,T
-                          -,gap,0,0,0,0,T"), stringsAsFactors=F)
-  
-  upac[upac==0.3] <- 1/3
-  upac.score <- upac[,3:6] > 0
-  
-  letter <- c()
-  for (j in 1:nrow(upac.score)){
-    letter[j] <- paste(as.numeric(upac.score[j,]), collapse="")
-  }
-  
-  
-  # loop import!
-  d <- 5
-  
-  
-  for (d in 1:length(start)){
-    
-    
-    alignment1 <- read.fasta(paste(setwd, "/Vsearch/cluster_fasta", "/", d, ".fasta", sep=""), seqonly=T)
-    alignment  <- toupper(alignment1)
-    alignment <- unlist(strsplit(alignment, split=""))
-    alignment <- match(alignment, upac$ID)
-    alignment <- matrix(alignment, nrow=length(alignment1), ncol=nchar(alignment1[1]), byrow=T)
-    
-    table(alignment)
-    
-    meep2 <- c()
-    for (k in 1:ncol(alignment)){
-      data <- alignment[,k]
-      
-      colu <- upac[data, 3:6]
-      
-      hey <- colSums(colu)
-      
-      # shanon entropy
-      p <- hey / sum(hey)
-      
-      if(threshold=="Majority"){
-        p <- p ==max(p)
-      } else {p <- p>=threshold}
-      
-      if(is.na(p[1])){p <- c(0,0,0,0)} # replace N's (they are detected and writen as NA)
-      meep2 <- c(meep2, paste(as.numeric(p), collapse=""))
-    }
-    
-    
-    
-    buildsequ <- upac$ID[match(meep2, letter)]
-    cat(paste(">", d, "\n", paste(buildsequ, sep="", collapse=""), "\n", sep=""), file=paste(setwd, "/", filename, "_cons_cluster_", threshold, ".fasta", sep=""), append=T)
-    
-    
-  }
   
   
 
