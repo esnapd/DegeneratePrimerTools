@@ -1,6 +1,6 @@
 #' run blast
 #'
-#' Convenience function for running blastn. Can accept as inputs wither files or DNAStringSets and
+#' Convenience function for running blastn. Can accept as inputs either files or DNAStringSets and
 #' can optionally return a file or a \link{[data.table] data.table} of the blast results.
 #'
 #' @param query. Required. Either a file location  (string) or a DNAStringSet
