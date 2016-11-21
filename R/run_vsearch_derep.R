@@ -1,71 +1,37 @@
-#' run vsearch global
+#' run vsearch dereplication
 #'
-#' Convenience function for running the vsearch global search. Can accept as inputs either filenames or DNAStringSets and
+#' Function for running the vsearch dereplication command. Accepts as inputs filename and logfile
 #' can optionally return a file or a \link{[data.table] data.table} of the results in blastformat.
 #'
-#' @param query. Required. Either a file location  (string) or a DNAStringSet
-#' @param target. Required. Either a file location (string) or a DNAStringSet
-#' @param outfile. Optional. Default \code{NULL} Either NUll or a filelocation
-#' @param id. Optional. Numeric value between 0 and 1. Default \code{0.95} Percent Identity of targets to subjects
+#' @param cmd. Required. Name/Location of the vsearch command (string)
+#' @param filename. Required. A file location (string)
+#' @param DerepFile Required. A file location (string)
+#' @param logfile. Required. A file location (string)
 #'
 #' @importFrom Biostrings writeXStringSet
-#' @importFrom data.table fread
+#' 
 #' @export
-run_vsearch_global <- function(query, target, outfile=NULL,id=0.95) {
-  #intermediate files will be run in temp if no output is sent, andl lets cleaup the tempdir when we are done.
-  wd <- tempdir()
-  on.exit(unlink(list.files(wd)))
+run_vsearch_derep <- function(cmd, filename, DerepFile, logfile){
+
   
-  # handle the query. if a character, check the file exists
-  # if its an DNAString set, write the fastafile out
-  if (is.character(query)) {
-    query <- file.path(normalizePath(dirname(query)), basename(query))
-    if(length(Sys.glob(paste(query, "*", sep="")))<1) stop("query sequence does not exit!")
-    queryfile <- query
-    
-  } else if (is(query, "DNAStringSet")) {
-    if(is.null(names(target))) stop("DNAStringSets must have names")
-    queryfile <- tempfile(tmpdir = wd, fileext="blastquery")
-    writeXStringSet(query, queryfile)
-    
-  } else {
-    stop("query must be a file location or a DNAStringSet")
-  }
+  #run the vsearch dereplication command.
+  derep_args <- paste0("--derep_fulllength ", file, " -output ", DerepFile, " -sizeout")
+  CmdOut <- system2(command = cmd, args = derep_args, stdout = TRUE, stderr = TRUE) # Execute dereplicate command
   
-  # handle the target. if a file, make sure that blastcmddb has been run.
-  # if its an DNAString set, write a blastdb in the temp directory
-  if (is.character(target)) {
-    targetdb <-  file.path(normalizePath(dirname(target)), basename(target))
-    if(length(Sys.glob(paste(targetdb, "*", sep="")))<1) stop("target sequence file does not exit!")
-    
-  } else if (is(target, "DNAStringSet")) {
-    if(is.null(names(target))) stop("DNAStringSets must have names")
-    
-    targetdb <- tempfile(tmpdir = wd, fileext = "targetdb")
-    writeXStringSet(x=target, filepath = targetdb)
-    
-  } else {
-    stop("target must be a file location or a DNAStringSet")
-  }
-  
-  # create the blast outputfile here
-  blastout <- tempfile(tmpdir=wd, fileext = "blastout")
-  if (!is.null(outfile)) {
-    blastout <- outfile
-  }
-  
-  #run the blast job
-  vsearchcmd <- paste("vsearch --usearch_global", queryfile, "-db", targetdb, "-id", id, '--blast6out', blastout)
-  print(vsearchcmd)
-  system(vsearchcmd)
+  cat(paste(Sys.time(), "- Dereplication with vsearch\n"), file=logfile, sep="", append=T)
+  cat(paste(Sys.time(), "vsearch", derep_args, "\n"), file=logfile, sep="", append=T)
   
   
-  # return. If the fileoutput has been specified, the blast value has been saved there. Otherwise
-  # read in the blast table.
-  if (is.null(outfile)) {
-    try(blastdt <- load_blast(blastout), silent=TRUE)
-    if (!exists("blastdt")) stop("BLAST did not return a match!")
-    
-    return(blastdt)
-  }
+  ###################################################################################################################################
+  # Collect information from vsearch derep command output for number of sequences, number of unique sequences and vsearch version.
+  
+  sequ <- as.numeric(sub(".*in (.*) seqs.*", "\\1", CmdOut[grep("nt in", CmdOut)]))
+  derep <- as.numeric(sub("(.*)unique sequences.*", "\\1", CmdOut[grep("unique sequences", CmdOut)]))
+  version <- sub("(.*)unique sequences.*", "\\1", CmdOut[grep("vsearch", CmdOut)][1])
+  
+  message(paste0(sequ, " input sequences -> ", derep, " dereplicated sequences"))
+  cat(paste(Sys.time(), sampleName, ": ", sequ, "input sequences ->", derep, " dereplicated sequences\n"), file=logfile, sep="", append=T)
+  
+  # return path of outputfile of vsearch derep command. Will be deleted after the completion of the function up.
+
 }
