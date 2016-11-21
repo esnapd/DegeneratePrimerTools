@@ -8,8 +8,8 @@
 #' @importFrom ggplot2 scale_fill_gradient2
 #' @export
 plot_GC <- function(degprim,  ...) {
-  if (!class(degprim) == "degeprimer") {
-    stop("The first argument must be of class 'degeprimer'")
+  if (!class(degprim) %in% c("degeprimer", "phyloseq")) {
+    stop("The first argument must be of class 'degeprimer' or 'phyloseq'")
   }
   
   refseq <- degprim@refseq
@@ -31,3 +31,4 @@ plot_GC <- function(degprim,  ...) {
                          midpoint = 0.5) +
     ggtitle("GC Content")
 }
+
