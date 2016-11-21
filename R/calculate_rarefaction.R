@@ -55,8 +55,10 @@ calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALS
   #add a standard deviation column
   rarefaction_curve_data_summary <- plyr::ddply(rarefaction_curve_data, c('Depth', 'Sample', 'Measure'), 
                                     plyr::summarise, 
-                                    Alpha_diversity_mean = mean(Alpha_diversity), 
-                                    Alpha_diversity_sd = sd(Alpha_diversity))
+                                    #Alpha_diversity_mean = mean(Alpha_diversity), 
+                                    #Alpha_diversity_sd = sd(Alpha_diversity)) 
+                                    Alpha_diversity_mean = mean(value), 
+                                    Alpha_diversity_sd = sd(value))
   
   #add the sample data
   #rarefaction_curve_data_summary_verbose <- merge(rarefaction_curve_data_summary, 
