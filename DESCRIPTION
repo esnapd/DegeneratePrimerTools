@@ -1,7 +1,7 @@
 Package: DegeneratePrimerTools
 Type: Package
 Title: Tools for Designing Degenerate Primers
-Version: 0.1.5
+Version: 0.1.7
 Authors@R: c(
     person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
     person("Ulysses", "Amanciao", , "uamanciode@rockefeller.edu", c("aut"))

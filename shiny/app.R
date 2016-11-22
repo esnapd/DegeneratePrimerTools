@@ -38,11 +38,11 @@ server <- function(input, output) {
      msa3 <- add_primers_to_MSA(dp, position = primerlocs[[3]], strict = FALSE)
      msa4 <- add_primers_to_MSA(dp, position = primerlocs[[4]], strict = FALSE)
      
-     t1 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[1]])
-     t2 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[2]])
-     t3 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[3]])
-     t4 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[4]])
-       
+     t1 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[1]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
+     t2 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[2]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
+     t3 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[3]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
+     t4 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[4]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
+     
      DT::renderDataTable(t1)
      # Region 4
      tabsetPanel(
@@ -54,19 +54,19 @@ server <- function(input, output) {
        tabPanel("Region 1",
                 renderMsaR({msaR(msa1, menu = F, alignmentHeight = 300, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)}),
-                DT::renderDataTable(t1)),
+                DT::renderDataTable(t1, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("Region 2",
                 renderMsaR({msaR(msa2, menu = F, alignmentHeight = 300, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)}),
-                DT::renderDataTable(t2)),
+                DT::renderDataTable(t2, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("Region 3",
                 renderMsaR({msaR(msa3, menu = F, alignmentHeight = 300, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)}),
-                DT::renderDataTable(t3)),
+                DT::renderDataTable(t3, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("Region 4",
                 renderMsaR({msaR(msa4, menu = F, alignmentHeight = 300, leftheader = FALSE,
                                  labelNameLength = 200, seqlogo=F)}),
-                DT::renderDataTable(t4)),
+                DT::renderDataTable(t4, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("IUPAC Reference",
                 renderTable(data.frame(code = names(Biostrings::IUPAC_CODE_MAP),
                                        nucleotides = Biostrings::IUPAC_CODE_MAP))))
