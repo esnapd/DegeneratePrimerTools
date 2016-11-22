@@ -29,48 +29,27 @@ server <- function(input, output) {
         design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
      #obtain the locations of peaks 
-     primerlocs <- autofind_primers(dp, keepprimers = 5)
+     primerlocs <- autofind_primers(dp, keepprimers = 4)
      
-     # Region1
-     msa1 <- add_primers_to_MSA(dp, position = primerlocs[[1]])
-     
-     msa2 <- add_primers_to_MSA(dp, position = primerlocs[[2]], strict = FALSE)
-     msa3 <- add_primers_to_MSA(dp, position = primerlocs[[3]], strict = FALSE)
-     msa4 <- add_primers_to_MSA(dp, position = primerlocs[[4]], strict = FALSE)
-     
-     t1 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[1]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
-     t2 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[2]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
-     t3 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[3]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
-     t4 <- data.frame(dp@primerdata) %>% filter(Pos==primerlocs[[4]]) %>% select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage)
-     
-     DT::renderDataTable(t1)
-     # Region 4
+     # Add all Peak Info to the MSA
+     msa1 <- add_primers_to_MSA(dp, positions = primerlocs)
+     t1 <- data.frame(dp@primerdata) %>% 
+       filter(Pos %in% primerlocs) %>% 
+       select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage) %>%
+       arrange(Pos)
+
+     # Create the Return MSA
      rowheight <- 15
-     tabsetPanel(
+     mainPanel(
        id = "mpanel", 
-       type = "pill",
-       tabPanel("Full Alignment", 
-                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = nrow(dp@msa)*rowheight, leftheader = FALSE,
-                                 labelNameLength = 160, seqlogo=F)})),
-       tabPanel("Region 1",
-                renderMsaR({msaR(msa1, menu = F, alignmentHeight = nrow(msa1)*rowheight, leftheader = FALSE,
-                                 labelNameLength = 160, seqlogo=F)}),
-                DT::renderDataTable(t1, rownames = FALSE, options = list(dom = 't'))),
-       tabPanel("Region 2",
-                renderMsaR({msaR(msa2, menu = F, alignmentHeight = nrow(msa2)*rowheight, leftheader = FALSE,
-                                 labelNameLength = 160, seqlogo=F)}),
-                DT::renderDataTable(t2, rownames = FALSE, options = list(dom = 't'))),
-       tabPanel("Region 3",
-                renderMsaR({msaR(msa3, menu = F, alignmentHeight = nrow(msa3)*rowheight, leftheader = FALSE,
-                                 labelNameLength = 160, seqlogo=F)}),
-                DT::renderDataTable(t3, rownames = FALSE, options = list(dom = 't'))),
-       tabPanel("Region 4",
-                renderMsaR({msaR(msa4, menu = F, alignmentHeight = nrow(msa4)*rowheight, leftheader = FALSE,
-                                 labelNameLength = 200, seqlogo=F)}),
-                DT::renderDataTable(t4, rownames = FALSE, options = list(dom = 't'))),
-       tabPanel("IUPAC Reference",
-                renderTable(data.frame(code = names(Biostrings::IUPAC_CODE_MAP),
-                                       nucleotides = Biostrings::IUPAC_CODE_MAP))))
+       renderMsaR({ msaR(msa1, menu = F, alignmentHeight = nrow(msa1)*rowheight, 
+                        leftheader = FALSE, labelNameLength = 160, seqlogo=F)}),
+       
+       DT::renderDataTable(t1, rownames = FALSE, options = list(dom = 't'))
+     )
+
+       #          renderTable(data.frame(code = names(Biostrings::IUPAC_CODE_MAP),
+       #                                 nucleotides = Biostrings::IUPAC_CODE_MAP))))
     }
   })
 }
@@ -82,6 +61,7 @@ server <- function(input, output) {
 ui <- fluidPage(
     titlePanel("Upload A Fasta File to Design Degenerate Primers"),
     sidebarLayout(
+      
       sidebarPanel(
         fileInput('file1', 'Choose a Fasta File',
                   accept=c('.fasta',
