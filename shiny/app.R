@@ -45,26 +45,27 @@ server <- function(input, output) {
      
      DT::renderDataTable(t1)
      # Region 4
+     rowheight <- 15
      tabsetPanel(
        id = "mpanel", 
        type = "pill",
        tabPanel("Full Alignment", 
-                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = nrow(dp@msa)*rowheight, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)})),
        tabPanel("Region 1",
-                renderMsaR({msaR(msa1, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                renderMsaR({msaR(msa1, menu = F, alignmentHeight = nrow(msa1)*rowheight, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)}),
                 DT::renderDataTable(t1, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("Region 2",
-                renderMsaR({msaR(msa2, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                renderMsaR({msaR(msa2, menu = F, alignmentHeight = nrow(msa2)*rowheight, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)}),
                 DT::renderDataTable(t2, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("Region 3",
-                renderMsaR({msaR(msa3, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                renderMsaR({msaR(msa3, menu = F, alignmentHeight = nrow(msa3)*rowheight, leftheader = FALSE,
                                  labelNameLength = 160, seqlogo=F)}),
                 DT::renderDataTable(t3, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("Region 4",
-                renderMsaR({msaR(msa4, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                renderMsaR({msaR(msa4, menu = F, alignmentHeight = nrow(msa4)*rowheight, leftheader = FALSE,
                                  labelNameLength = 200, seqlogo=F)}),
                 DT::renderDataTable(t4, rownames = FALSE, options = list(dom = 't'))),
        tabPanel("IUPAC Reference",
