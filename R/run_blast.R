@@ -74,7 +74,7 @@ run_blast <- function(query, target, outfile=NULL, parallel=FALSE, blast_args=""
   } else {
     blastcmd <- paste("blastn", "-db", targetdb, "-query", queryfile, "-out", blastout, '-outfmt 6', blast_args)
   }
-  
+  message(blastcmd)
   system(blastcmd)
   
   
