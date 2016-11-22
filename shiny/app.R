@@ -38,7 +38,7 @@ server <- function(input, output) {
         design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
      #obtain the locations of peaks 
-     primerlocs <- autofind_primers(dp, keepprimers = 4)
+     primerlocs <- autofind_primers(dp, keepprimers = 6)
      
      # Add all Peak Info to the MSA
      msa1 <- add_primers_to_MSA(dp, positions = primerlocs)
@@ -52,14 +52,19 @@ server <- function(input, output) {
      rowheight <- 15
      mainPanel(
        id = "mpanel", 
-       renderMsaR({ msaR(msa1, menu = F, alignmentHeight = nrow(msa1)*rowheight, 
-                        leftheader = FALSE, labelNameLength = 160, seqlogo=F)}),
+       renderMsaR({ msaR(msa1, 
+                         menu = F, 
+                         alignmentHeight = nrow(msa1)*rowheight, 
+                         leftheader = FALSE, 
+                         labelNameLength = 160, 
+                         labelid = FALSE,
+                         seqlogo=F)}),
        
        DT::renderDataTable(t1, 
                            rownames = FALSE, 
                            options = list(
                              dom = 't',
-                             pageLength = 5))
+                             pageLength = 50))
      )
 
     }
@@ -71,6 +76,13 @@ server <- function(input, output) {
 #' Handles file input and proveides a generic "Main Panel" output
 #' The content of that output is controlled by the server function
 ui <- fluidPage(
+  
+  # Add Some CSS to space out the two widget
+  tags$head( 
+    tags$style(HTML(".dataTables_wrapper {margin-top: 60px;}"))
+    ),
+  
+  
     titlePanel("Upload A Fasta File to Design Degenerate Primers"),
     sidebarLayout(
       sidebarPanel(
@@ -80,10 +92,8 @@ ui <- fluidPage(
           condition="output.fileUploaded",
           
           p("Choose a file to upload and the degeneracy values you would like
-            to pass to DEGEPRIME. This program will desing primers against your sequences 
-            useing each of the specified values."),
-          
-          p("Higher values will generate more degenerate primers at the expense of speed."),
+            to pass to DEGEPRIME. This program will design primers against your sequences 
+            using each of the specified values.Higher values will generate more degenerate primers at the expense of speed."),
           
           checkboxGroupInput(
             "checkGroup", 
