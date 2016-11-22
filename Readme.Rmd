@@ -81,3 +81,11 @@ plot_coveragematrix(AHBA_degeprimer,max.mismatch = 2)
 plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3)
 ```
 
+# Shiny App
+
+DegeneratePrimerTools provides a Shiny App that lets you upload a fastafile and optionally choose a series of degeneracy values. IT will run a multiple sequence alingment, use DEGEPRIME to find deernate primers and display the top 4 most conserved sites and the primers chosen at those sites.
+
+
+```{r, eval=FALSE}
+shiny::runGitHub("esnapd/DegeneratePrimerTools", subdir = "shiny")
+```
