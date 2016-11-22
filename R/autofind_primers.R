@@ -6,9 +6,14 @@
 #' @importFrom dplyr filter
 #' 
 #' @param degeprime. Required. 
+#' @param keepprimers Optional. Default \code{4}. How many primerpairs to keep.
+#' @param minsequences Optional. Default \code{3}. THe minimum number of sequences to be included in peak-pciking. This
+#' parameter is included to avoid the problem where primers are chosen on regions with samll numbpers of sequences, typically
+#' found at the end of an alignment.
+#' 
 #' @return vector of ints denoting the top peaks
 #' @export
-autofind_primers <- function(degeprime, keepprimers=4, minsequences=5) {
+autofind_primers <- function(degeprime, keepprimers=4, minsequences=3) {
   if (is.null(degeprime@primerdata)) stop("Autopicking Primers requires primer information.")
   
   # descard data where there are few sequences - i.e the beginning and ends of an alignmnet
