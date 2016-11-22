@@ -23,7 +23,7 @@ run_fasttree <- function(seqs,  outfile=NULL, fasttree_args="") {
     queryfile <- seqs
     
   } else if (is(seqs, "DNAStringSet")) {
-    if(is.null(names(target))) stop("DNAStringSets must have names")
+    if(is.null(names(seqs))) stop("DNAStringSets must have names")
     queryfile <- tempfile(tmpdir = wd, fileext = "inputseqs")
     writeXStringSet(seqs, queryfile)
     
@@ -45,7 +45,7 @@ run_fasttree <- function(seqs,  outfile=NULL, fasttree_args="") {
   # return. If the fileoutput has been specified, the blast value has been saved there. Otherwise
   # read in the blast table.
   if (is.null(outfile)) {
-    try(tree <- read.tree(blastout), silent=TRUE)
+    try(tree <- read.tree(treeout), silent=TRUE)
     if (!exists("tree")) stop("Unable to open the generated Tree file!")
     
     return(tree)
