@@ -49,19 +49,27 @@ server <- function(input, output) {
        id = "mpanel", 
        type = "pill",
        tabPanel("Full Alignment", 
-                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = 300, labelNameLength = 250, seqlogo=F)})),
+                renderMsaR({msaR(dp@msa, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                                 labelNameLength = 160, seqlogo=F)})),
        tabPanel("Region 1",
-                renderMsaR({msaR(msa1, menu = F, alignmentHeight = 300, labelNameLength = 250, seqlogo=F)}),
+                renderMsaR({msaR(msa1, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                                 labelNameLength = 160, seqlogo=F)}),
                 DT::renderDataTable(t1)),
        tabPanel("Region 2",
-                renderMsaR({msaR(msa2, menu = F, alignmentHeight = 300, labelNameLength = 250, seqlogo=F)}),
+                renderMsaR({msaR(msa2, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                                 labelNameLength = 160, seqlogo=F)}),
                 DT::renderDataTable(t2)),
        tabPanel("Region 3",
-                renderMsaR({msaR(msa3, menu = F, alignmentHeight = 300, labelNameLength = 250, seqlogo=F)}),
+                renderMsaR({msaR(msa3, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                                 labelNameLength = 160, seqlogo=F)}),
                 DT::renderDataTable(t3)),
        tabPanel("Region 4",
-                renderMsaR({msaR(msa4, menu = F, alignmentHeight = 300, labelNameLength = 250, seqlogo=F)}),
-                DT::renderDataTable(t4)))
+                renderMsaR({msaR(msa4, menu = F, alignmentHeight = 300, leftheader = FALSE,
+                                 labelNameLength = 200, seqlogo=F)}),
+                DT::renderDataTable(t4)),
+       tabPanel("IUPAC Reference",
+                renderTable(data.frame(code = names(Biostrings::IUPAC_CODE_MAP),
+                                       nucleotides = Biostrings::IUPAC_CODE_MAP))))
     }
   })
 }
