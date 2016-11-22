@@ -54,6 +54,7 @@ server <- function(input, output) {
        id = "mpanel", 
        renderMsaR({ msaR(msa1, 
                          menu = F, 
+                         height= nrow(msa1)*rowheight, 
                          alignmentHeight = nrow(msa1)*rowheight, 
                          leftheader = FALSE, 
                          labelNameLength = 160, 
@@ -76,12 +77,6 @@ server <- function(input, output) {
 #' Handles file input and proveides a generic "Main Panel" output
 #' The content of that output is controlled by the server function
 ui <- fluidPage(
-  
-  # Add Some CSS to space out the two widget
-  tags$head( 
-    tags$style(HTML(".dataTables_wrapper {margin-top: 60px;}"))
-    ),
-  
   
     titlePanel("Upload A Fasta File to Design Degenerate Primers"),
     sidebarLayout(
@@ -130,7 +125,7 @@ ui <- fluidPage(
           h4("IUPAC Degenerate Nucleotide Codes"),
           
           tableOutput("IUPAC")
-          )
+        )
       ),
       
       mainPanel(uiOutput("mainpanel"))
