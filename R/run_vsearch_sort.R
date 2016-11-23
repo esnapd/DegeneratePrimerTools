@@ -18,7 +18,7 @@ run_vsearch_sort <- function(cmd, filename, SortedFile, logfile){
   sort_args <- paste0("--sortbysize ", filename, " -output ", SortedFile, " -minsize 3")
   CmdOut <- system2(command = cmd, args = sort_args, stdout = TRUE, stderr = TRUE) # Execute sort command
   
-  cat(paste(Sys.time(), "- Sort sequences with Vsearch minimum size 3 for sample", sampleName, "\n"), file=logfile, sep="", append=T)
+  cat(paste(Sys.time(), "- Sort sequences with Vsearch minimum size 3 for sample", sampleName, "\n"), file=logfile, sep="", append=TRUE)
   cat(paste(Sys.time(), "vsearch", sort_args, "\n"), file=logfile, sep="", append=TRUE)
   
   
