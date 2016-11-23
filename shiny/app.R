@@ -45,7 +45,8 @@ server <- function(input, output) {
      
      t1 <- data.frame(dp@primerdata) %>% 
        filter(Pos %in% primerlocs) %>% 
-       select(Pos, PrimerSeq, PrimerDeg, degeneracy, coverage) %>%
+       mutate(RevComp= as.character(reverseComplement(DNAStringSet(PrimerSeq)))) %>%
+       select(Pos, PrimerSeq, RevComp, PrimerDeg, degeneracy, coverage) %>%
        arrange(Pos)
 
      # Create the Return MSA
@@ -67,10 +68,12 @@ server <- function(input, output) {
                              dom = 't',
                              pageLength = 50))
      )
-
     }
   })
 }
+
+
+
 
 #' UI Function
 #'
