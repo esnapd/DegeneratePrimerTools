@@ -18,8 +18,8 @@ run_vsearch_derep <- function(cmd, filename, DerepFile, logfile){
   derep_args <- paste0("--derep_fulllength ", filename, " -output ", DerepFile, " -sizeout")
   CmdOut <- system2(command = cmd, args = derep_args, stdout = TRUE, stderr = TRUE) # Execute dereplicate command
   
-  cat(paste(Sys.time(), "- Dereplication with vsearch\n"), file=logfile, sep="", append=T)
-  cat(paste(Sys.time(), "vsearch", derep_args, "\n"), file=logfile, sep="", append=T)
+  cat(paste(Sys.time(), "- Dereplication with vsearch\n"), file=logfile, sep="", append=TRUE)
+  cat(paste(Sys.time(), "vsearch", derep_args, "\n"), file=logfile, sep="", append=TRUE)
   
   
   ###################################################################################################################################
