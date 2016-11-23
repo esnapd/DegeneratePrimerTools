@@ -30,7 +30,7 @@ run_vsearch_derep <- function(cmd, filename, DerepFile, logfile){
   version <- sub("(.*)unique sequences.*", "\\1", CmdOut[grep("vsearch", CmdOut)][1])
   
   message(paste0(sequ, " input sequences -> ", derep, " dereplicated sequences"))
-  cat(paste(Sys.time(), sampleName, ": ", sequ, "input sequences ->", derep, " dereplicated sequences\n"), file=logfile, sep="", append=T)
+  cat(paste(Sys.time(), sampleName, ": ", sequ, "input sequences ->", derep, " dereplicated sequences\n"), file=logfile, sep="", append=TRUE)
   
   # return path of outputfile of vsearch derep command. Will be deleted after the completion of the function up.
 
