@@ -28,7 +28,7 @@ Imports:
     methods (>= 3.3.0),
     purrr (>= 0.2.0),
     ggtree (>= 1.4.20),
-    data.table (>= 1.9.6),
+    data.table (>= 1.9.8),
     ggrepel,
     parallel,
     zoo
