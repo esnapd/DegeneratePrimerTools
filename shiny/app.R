@@ -23,11 +23,12 @@ server <- function(input, output) {
   output$fileUploaded <- reactive({return(is.null(inFile()))})
   outputOptions(output, 'fileUploaded', suspendWhenHidden=FALSE)
   
+  # create the IUPAC table
   output$IUPAC <- renderTable(data.frame(
     code = names(Biostrings::IUPAC_CODE_MAP),
     nucleotides = Biostrings::IUPAC_CODE_MAP))
   
-  # return the display values
+  # obtain data from file and return the main panel output
   output$mainpanel <- renderUI({
     if(is.null(inFile())) { 
       return ()
@@ -37,37 +38,73 @@ server <- function(input, output) {
         build_tree() %>%
         design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
-     #obtain the locations of peaks 
-     primerlocs <- autofind_primers(dp, keepprimers = 6)
+     #obtain the locations of peaks and cehck for the presence of NAs
+     primerlocs   <- autofind_primers(dp, keepprimers = input$numberofsites, minsequences = input$minseqs)
+     primerlocNAs <- any(is.na(primerlocs))
      
-     # Add all Peak Info to the MSA
-     msa1 <- add_primers_to_MSA(dp, positions = primerlocs)
-     
-     t1 <- data.frame(dp@primerdata) %>% 
-       filter(Pos %in% primerlocs) %>% 
-       mutate(RevComp= as.character(reverseComplement(DNAStringSet(PrimerSeq)))) %>%
-       select(Pos, PrimerSeq, RevComp, PrimerDeg, degeneracy, coverage) %>%
-       arrange(Pos)
-
-     # Create the Return MSA
+     # if autofind has difficulties, provide one output,
+     # otherwise provide a main output.
      rowheight <- 15
-     mainPanel(
-       id = "mpanel", 
-       renderMsaR({ msaR(msa1, 
-                         menu = F, 
-                         height= nrow(msa1)*rowheight, 
-                         alignmentHeight = nrow(msa1)*rowheight, 
-                         leftheader = FALSE, 
-                         labelNameLength = 160, 
-                         labelid = FALSE,
-                         seqlogo=F)}),
+     
+     if (primerlocNAs) {
+       mainPanel(
+         id = "mpanel", 
+         h2("Warning! There is a problem with the autodetection of primers."),
+         
+         br(),
+         
+         h3("MSA of the input seqeunces."),
+         renderMsaR({ msaR(dp@msa, 
+                           menu = F, 
+                           height= nrow(dp@msa)*rowheight, 
+                           alignmentHeight = nrow(dp@msa)*rowheight, 
+                           leftheader = FALSE, 
+                           labelNameLength = 160, 
+                           labelid = FALSE,
+                           seqlogo=F)}),
+         br(),
+         h3("Primers Designed against this MSA"),
+         
+         p("This plot shows the coverage(y-axis) of primers designed at each location (x-axis)
+           across your ungapped alignment using a maximum degeneracy value of (color). If you are seeing this
+           plot there was an errro in the auto choosing of good primers. The auto-detection of primers looks
+           for peaks in this graph. If you see very few peaks, or peaks with very low coverage use the
+           MSA and thee plot to troubleshoot. Most likely you will need to increase your maximum degeneracy."),
+         
+         shiny::renderPlot(plot_degeprimer(degedf = dp@primerdata)
+         )
+       )
+     } else {
        
-       DT::renderDataTable(t1, 
-                           rownames = FALSE, 
-                           options = list(
-                             dom = 't',
-                             pageLength = 50))
-     )
+       #create the MSA and Table and Pass them to the Main Panel
+       msa1 <- add_primers_to_MSA(dp, positions = primerlocs)
+       
+       t1 <- data.frame(dp@primerdata) %>% 
+         filter(Pos %in% primerlocs) %>% 
+         mutate(RevComp= as.character(reverseComplement(DNAStringSet(PrimerSeq)))) %>%
+         select(Pos, PrimerSeq, RevComp, PrimerDeg, degeneracy, coverage) %>%
+         arrange(Pos)
+       
+       mainPanel(
+         id = "mpanel", 
+         h1("Problem with autodetection of primers."),
+           
+         renderMsaR({ msaR(msa1, 
+                           menu = F, 
+                           height= nrow(msa1)*rowheight, 
+                           alignmentHeight = nrow(msa1)*rowheight, 
+                           leftheader = FALSE, 
+                           labelNameLength = 160, 
+                           labelid = FALSE,
+                           seqlogo=F)}),
+         
+         DT::renderDataTable(t1, 
+                             rownames = FALSE, 
+                             options = list(
+                               dom = 't',
+                               pageLength = 50))
+         )
+     }
     }
   })
 }
@@ -85,13 +122,20 @@ ui <- fluidPage(
     sidebarLayout(
       sidebarPanel(
         
-        # Include this Conditonal Panel BEFORE File Upload
+        # Include this Conditional Panel BEFORE File Upload
         conditionalPanel(
           condition="output.fileUploaded",
           
           p("Choose a file to upload and the degeneracy values you would like
             to pass to DEGEPRIME. This program will design primers against your sequences 
             using each of the specified values.Higher values will generate more degenerate primers at the expense of speed."),
+          
+          fileInput('file1', 
+                    label=h4('Choose a Fasta File'),
+                    accept=c('.fasta', '.fa','.fna')
+          ),
+          
+          hr(),
           
           checkboxGroupInput(
             "checkGroup", 
@@ -105,14 +149,11 @@ ui <- fluidPage(
                            "Degeneracy 2000" = 2000),
             selected = c(50, 100, 200, 500)),
           
-          hr(),
-          
-          fileInput('file1', 
-                    label=h4('Choose a Fasta File'),
-                    accept=c('.fasta', '.fa','.fna')
-          )
+          numericInput("numberofsites", "Number of Primer Locations to Return:", 6, min = 1, max = 20),
+          numericInput("minseqs", "Minimum Sequence to Be Considered for Primer Design:", 3, min = 2, max = 10)
         ),
-      
+        
+        # Include this Conditional Panel AFTER File Upload
         conditionalPanel(
           condition="!output.fileUploaded",
           
