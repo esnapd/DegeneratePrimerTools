@@ -13,6 +13,7 @@
 #' @importFrom purrr map
 #' @importFrom purrr by_row
 #' @importFrom purrr discard
+#' @importFrom purrr reduce
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
@@ -47,7 +48,7 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
       p1    <- matchPattern(pattern=prim, subject=x, fixed=FALSE, max.mismatch=max.mismatch)
       p1loc <- start(p1)[1]
       if (length(p1) == 0) warning("No Matches for the Forward Primer")
-      if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
+      if (length(p1) > 1) warning("Multiple matches for the forward primer, using the first.")
       return(p1loc)
     })
     
@@ -55,9 +56,11 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
     primerlocation <- purrr::discard(unlist(primermatches), is.na)
     if (length(unique(primerlocation))  > 1) {
       if (strict) {
-        stop("There can only be a single location chosen for primers matching an MSA when using strict.")
+        msg <- paste("There can only be a single location chosen for primers matching an MSA when using strict.",
+                     "The primer sequence of interest is", prim , ".")
+        stop(msg)
       } else {
-        warning("There are multiple matches of your degenerate sequecne agaisnt one or more target sequences. Since strict is set to FALSE, this will return the first match.")
+        warning("There are multiple matches of your degenerate sequence against one or more target sequences. Since strict is set to FALSE, this will return the first match.")
         primerlocation <- unique(primerlocation)[[1]]
       }
     }
@@ -66,7 +69,7 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
   })
   
   
-  # caclulate where ont eh MSA the sequecnes should be places and create a sequecne with
+  # calculate where on the MSA the sequences should be placed and create a sequecne with
   # dashes in the non-matching parts.
   # the new sequence to be added to the MSA will be
   # -----Primer-------
