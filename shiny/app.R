@@ -77,7 +77,7 @@ server <- function(input, output) {
      } else {
        
        #create the MSA and Table and Pass them to the Main Panel
-       msa1 <- add_primers_to_MSA(dp, positions = primerlocs)
+       msa1 <- add_primers_to_MSA(dp, positions = primerlocs, mode = "consensus")
        
        t1 <- data.frame(dp@primerdata) %>% 
          filter(Pos %in% primerlocs) %>% 
