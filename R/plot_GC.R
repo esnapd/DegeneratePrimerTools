@@ -15,7 +15,7 @@ plot_GC <- function(degprim,  ...) {
   
   if (class(degeprim)== "phyloseq") {
     if (is.null(degeprim@phy_tree))
-      stop("your phylsoeq object must contain a phylogenetic tree")
+      stop("your phyloseq object must contain a phylogenetic tree")
   }
   
   refseq <- degprim@refseq

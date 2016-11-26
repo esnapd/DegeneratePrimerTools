@@ -11,7 +11,7 @@ primer_validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setw
 
   logpath <-getwd()
   wd <- tempdir()
-  setwd("/Users/christophelemetre/Documents/Work/eSNaPD3/")
+  #setwd("/Users/christophelemetre/Documents/Work/eSNaPD3/")
   #on.exit(unlink(list.files(wd)))
   
   ###### Preparing the PFAM sequences to blast against for filtering
