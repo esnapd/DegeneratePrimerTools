@@ -1,23 +1,12 @@
-#' eSNaPD core functions
+#' primer_validation
 #'
 #' Library of functions to run eSNaPD.
 #'
+#' @import phyloseq
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
-#' 
-#' @examples
-#' PFAM <- "PF13714"
- 
-#devtools::install_github("zachcp/phyloseq-tools")
-#source("/Users/christophelemetre/Documents/Work/DegeneratePrimerTools-1/R/phyloseq-tools.R")
-source('http://bioconductor.org/biocLite.R')
-biocLite('phyloseq')
-library(phyloseq)
-library(rBLAST)
-
-
-
+#' #library(rBLAST)
 primer_validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL){
 
   logpath <-getwd()
@@ -155,163 +144,10 @@ primer_validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setw
   # Clean up
   # delete all the intermediate files.
   
-  
-  
+
   
 }
 
-df <- ''
-PFAMlist <- c("PF13714", "PF13714", "PF01041")
-fileList <- c("/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_01_combined.fq",
-               "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_02_combined.fq",
-               "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/AHBA_02_combined.fq")
-for (i in length(fileList)) {
-  RAR <- primer_validation(file = fileList[i], PFAM = PFAMlist[i], vsearchpath = "integrated")
-  df <- do.call("rbind", as.data.frame(RAR))
-  #df2 <- rbind(df2, RAR)
-}
-
-fsdfsd
-d1 <- lapply(Sys.glob("rarefactiondata/*.txt"), loadrarefaction)
-d1 <- lapply(Sys.glob("Vsearch/*rarefied95.txt"), loadrarefaction)
-df <- do.call(rbind,d1)
-
-maxperprimer <- df %>% 
-  arrange(desc(diversity)) %>%
-  group_by(SampleName) %>%
-  slice(1:1) %>%
-  ungroup()
-
-
-grouping <- rep(c("PEP_01","PEP_02","PEP_04","PEP_06","PEPcontrol"), each = 100)
-RarefPlot <- ggplot(df, aes(x=depth,y=diversity, group=primer))+#, colour=grouping)) + 
-  geom_line() + 
-  #scale_color_manual(values=c("red","orange","yellow","blue","green")) +
-  #geom_text_repel(data = maxperprimer,aes(label=primer)) +
-  facet_wrap(~target, scales="free")
-
-RarefPlot
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  rarefaction_depths = c(5000,10000)
-  
-  rarefy_obj <- function(physeq, i,minsize, depth=5000) {
-    # prune samples
-    ad95rare <- rarefy_even_depth(physeq, sample.size = depth ,trimOTUs = TRUE, rngseed = i)
-    saveRDS(ad95rare, file=paste0("Vsearch/rarefaction/min",minsize,"/ad95_",depth,"_",i,".RDS"))
-  }
-  
-  cores = 20
-  
-  for (depth in rarefaction_depths) {
-    print(paste0("Rarefying to Depth of ", depth))
-    #for (minsize in c(1,2,10,100,1000)) {
-    for (minsize in c(2,5,10,100,1000)) {
-      print(paste0("Using Minimum OTU size of ", minsize))
-      physeqminsize <- prune_taxa(taxa_sums(PhyloSeqOTA) >= minsize, PhyloSeqOTA)
-      rarefn <- function(i) {rarefy_obj(physeq=physeqminsize, i=i, minsize = minsize, depth=depth)}
-      mclapply(1:100, rarefn, mc.cores = cores)
-    }
-  }
-  ###############################  ###############################  ###############################  ###############################
-  
-  PhyloSeqObj <- phyloseq(PhyloSeqOTA, "PEP_TT")
-  RarefPrimer <- rarefy_even_depth(PhyloSeqObj, sample.size = 1000 , rngseed = 500)
-  plot_richness(PhyloSeqObj)
-  ###############################  ###############################  ###############################
-  
-  # vegan rarefy
-  data(BCI,package = "vegan")
-  H <- vegan::diversity(BCI)
-  simp <- diversity(BCI, "simpson")
-  invsimp <- diversity(BCI, "inv")
-  r.2 <- vegan::rarefy(BCI, 2)
-  alpha <- fisher.alpha(BCI)
-  pairs(cbind(H, simp, invsimp, r.2, alpha), pch="+", col="blue")
-  ## Species richness (S) and Pielou's evenness (J):
-  S <- specnumber(BCI) ## rowSums(BCI > 0) does the same...
-  J <- H/log(S)
-  
-  
-  
-  
-  
-  
-  
-  # rarefaction plots
-  
-  library(dplyr)
-  library(ggrepel)
-  library(ggplot2)
-  library(purrr)
-  
-  loadrarefaction <- function(filename) {
-    basename <- strsplit(filename, "/")[[1]][[2]]
-    primer   <- strsplit(basename, "\\_")[[1]][[2]]
-    target   <- strsplit(basename, "\\_")[[1]][[1]]
-    #target   <- strsplit(basename, "\\.")[[1]][[1]]
-    #primer   <- "primer"
-    
-    read.table(filename, col.names = c("idx","depth","diversity"), stringsAsFactors = FALSE) %>%
-      mutate(basename = basename,
-             primer=primer,
-             target=target)
-  }
-  
-  
-  rm(df)
-  rm(d1)
-  setwd("/users/clemetre/Project_Ulysses/AmpliconsBlastAnalysis/AmpliconsData/20160724_UlyssesPrimers_processing/Filtering_Reads/PARAMETER_TESTING/")
-  #setwd("PEP/97cluster_prior_filter_then_95cluster/ClusterSize_greater_2/eVal_e-10/")
-  ###Filtering_Reads/PEP_filtering_with_new_sequences_from_package/")
-  
-  d1 <- lapply(Sys.glob("rarefactiondata/*.txt"), loadrarefaction)
-  d1 <- lapply(Sys.glob("Vsearch/*rarefied95.txt"), loadrarefaction)
-  df <- do.call(rbind,d1)
-  
-  maxperprimer <- df %>% 
-    arrange(desc(diversity)) %>%
-    group_by(primer) %>%
-    slice(1:1) %>%
-    ungroup()
-  
-  
-  grouping <- rep(c("PEP_01","PEP_02","PEP_04","PEP_06","PEPcontrol"), each = 100)
-  RarefPlot <- ggplot(df, aes(x=depth,y=diversity, group=primer))+#, colour=grouping)) + 
-    geom_line() + 
-    #scale_color_manual(values=c("red","orange","yellow","blue","green")) +
-    #geom_text_repel(data = maxperprimer,aes(label=primer)) +
-    facet_wrap(~target, scales="free")
-  
-  RarefPlot
-  
-  
-  
-  
   
   
   
