@@ -44,7 +44,7 @@ setMethod("extract_amplicons", "DNAString", function(object, fp, rp, drop.multip
 #' @importFrom  Biostrings DNAStringSet DNAString matchPattern
 #' @importFrom purrr compact
 setMethod("extract_amplicons", "DNAStringSet", function(object, fp, rp, drop.multiple=TRUE, max.mismatch = 2){
-  amplicons <- lapply(object, function(x) {extract_amplicons(x, fp=fp, rp=rp)})
+  amplicons <- lapply(object, function(x) {extract_amplicons(x, fp=fp, rp=rp, drop.multiple=drop.multiple, max.mismatch = max.mismatch)})
   amplicons <- compact(amplicons)
   DNAStringSet(amplicons)
 })

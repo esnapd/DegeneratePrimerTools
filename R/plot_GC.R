@@ -1,6 +1,7 @@
-#' Plot the GC Content
+#' Plot the GC Content 
+#' 
 #'
-#' @param degprim
+#' @param degprim. Required. A degeprime object or a a phyloseq object.
 #' @importFrom ggtree gheatmap 
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_tiplab
@@ -8,8 +9,13 @@
 #' @importFrom ggplot2 scale_fill_gradient2
 #' @export
 plot_GC <- function(degprim,  ...) {
-  if (!class(degprim) == "degeprimer") {
-    stop("The first argument must be of class 'degeprimer'")
+  if (!class(degprim) %in% c("degeprimer", "phyloseq")) {
+    stop("The first argument must be of class 'degeprimer' or 'phyloseq'")
+  }
+  
+  if (class(degeprim)== "phyloseq") {
+    if (is.null(degeprim@phy_tree))
+      stop("your phyloseq object must contain a phylogenetic tree")
   }
   
   refseq <- degprim@refseq
@@ -31,3 +37,4 @@ plot_GC <- function(degprim,  ...) {
                          midpoint = 0.5) +
     ggtitle("GC Content")
 }
+

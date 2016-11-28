@@ -1,4 +1,4 @@
-#' Primer validation and plot functions
+#' primer_validation
 #'
 #' Library of functions to run Primer validation analysis.
 #'
@@ -25,7 +25,7 @@ on.exit(unlink(list.files(wd)))
 
 
 primer_filtering <- function(file, vsearchpath, PFAM, cmd="", setwd=NULL){
-  
+
   
   ###### Preparing the PFAM sequences to blast against for filtering
   #PFAM <- "PF13714" # for PEP
@@ -114,8 +114,6 @@ primer_filtering <- function(file, vsearchpath, PFAM, cmd="", setwd=NULL){
   ###################################################################################################################################
   # Clean up
   # delete all the intermediate files and/or variables..
-  
-  
   
   return(SortedFile97)
 }
@@ -258,3 +256,6 @@ primer_analysis <- function(fileList, PFAMlist){
 
 
 
+  
+  
+  

@@ -1,7 +1,7 @@
 Package: DegeneratePrimerTools
 Type: Package
 Title: Tools for Designing Degenerate Primers
-Version: 0.1.5
+Version: 0.1.13
 Authors@R: c(
     person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
     person("Ulysses", "Amanciao", , "uamanciode@rockefeller.edu", c("aut"))
@@ -21,13 +21,14 @@ LazyData: TRUE
 Imports:
     Biostrings (>= 2.0),
     msa (>= 1.3.3),
+    msaR (>= 0.0.0.9004),
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
     ggplot2 (>= 2.0),
     methods (>= 3.3.0),
     purrr (>= 0.2.0),
     ggtree (>= 1.4.20),
-    data.table (>= 1.9.6),
+    data.table (>= 1.9.8),
     ggrepel,
     parallel,
     zoo

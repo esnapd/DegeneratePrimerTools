@@ -117,7 +117,7 @@ test_that("EMBL ids can be converted to Uniprot IDs", {
   embldf2    <- retrieve_EMBL_to_UNIPROT(c("AEK75490.1", "AEK75491.1"))
   
   expect_is(embldf, "data.frame")
-  expect_is(embld2f, "data.frame")
+  expect_is(embldf2, "data.frame")
   expect_equal(nrow(embldf), 1)
   expect_equal(nrow(embldf), 2)
   expect_equal(nrow(embldf2), 2)

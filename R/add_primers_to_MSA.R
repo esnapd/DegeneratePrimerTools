@@ -7,12 +7,14 @@
 #' @param max.mismatch. Optional. Default \code{3}. Maxmimum mismatch between the primer and a DNA target.
 #' @param windowsize. Optional. Default \code{30}. Windowsize of MSA to return. A setting of '0' will return the full length alignment. Note: if
 #' multiple positions are specified, it is no longer possible to specify a window.
-#' @param strict. Optional. Default \code{TRUE}. If there are multiple matches of a degenerate primer against a target sequence, usig strict will
-#' cause the functon to fail. If strict is FALSE, it will display the first match.
+#' @param mode Optional. Default \code{'consensus'}. If there are multiple matches of a degenerate primer against a target sequence, usig strict will
+#' cause the functon to fail. If 'strict' it will only allow single matches. If "first", it will allow the first match,
+#' if 'consensus', it will choose the most abundant location.
 #' @return a \code{\link[Biostrings] DNAMultipleAlignment}
 #' @importFrom purrr map
 #' @importFrom purrr by_row
 #' @importFrom purrr discard
+#' @importFrom purrr reduce
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
@@ -25,7 +27,7 @@
 #' @importFrom dplyr arrange
 #' @export
 #' 
-add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=30, strict=TRUE) {
+add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=30, mode="consensus") {
   if (is.null(degeprime@primerdata)) stop("There is not primer information associated with this object")
   
   # obtain the primer sequences: find the matches between the primer and several sequences in the MSA
@@ -47,18 +49,34 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
       p1    <- matchPattern(pattern=prim, subject=x, fixed=FALSE, max.mismatch=max.mismatch)
       p1loc <- start(p1)[1]
       if (length(p1) == 0) warning("No Matches for the Forward Primer")
-      if (length(p1) >  1) warning("Multiple matches for the forward primer, using the first.")
+      if (length(p1) > 1) warning("Multiple matches for the forward primer, using the first.")
       return(p1loc)
     })
     
     # primer location
     primerlocation <- purrr::discard(unlist(primermatches), is.na)
     if (length(unique(primerlocation))  > 1) {
-      if (strict) {
-        stop("There can only be a single location chosen for primers matching an MSA when using strict.")
-      } else {
-        warning("There are multiple matches of your degenerate sequecne agaisnt one or more target sequences. Since strict is set to FALSE, this will return the first match.")
+      if (mode=="strict") {
+        locs <- paste(unique(primerlocation), collapse=",")
+        msg <- paste("There can only be a single location chosen for primers matching an MSA when using strict.",
+                     "The primer sequence of interest is", prim , "and it is matching at the following locations:", locs)
+        stop(msg)
+      } else if (mode=="first"){
+        warning("There are multiple matches of your degenerate sequence against one or more target sequences. Since strict is set to FALSE, this will return the first match.")
         primerlocation <- unique(primerlocation)[[1]]
+      } else if (mode=="consensus") {
+        locfreqs <- sort( table(primerlocation), decreasing = TRUE)
+        consensus <- as.numeric(names(locfreqs[1]))
+        primerlocation <- consensus
+        
+        locs <- paste(unique(primerlocation), collapse=",")
+        msg <- paste("You are using the consesnsu mode to add primer location to an MSA. One of your primers with sequence",
+                     prim , "and it is matching at the following locations: ", locs, " We have chosen the consensus loction,",
+                     consensus,".")
+        stop(msg)
+        
+      } else {
+        stop("Invalid choice for mode. Can be 'strict', 'first', or 'consensus'")
       }
     }
     
@@ -66,7 +84,7 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
   })
   
   
-  # caclulate where ont eh MSA the sequecnes should be places and create a sequecne with
+  # calculate where on the MSA the sequences should be placed and create a sequecne with
   # dashes in the non-matching parts.
   # the new sequence to be added to the MSA will be
   # -----Primer-------
