@@ -155,16 +155,15 @@ primer_filtering <- function(file, vsearchpath, PFAM, cmd="", setwd=NULL){
 }
 
 
-PFAMlist <- c("PF13714", "PF13714", "PF13714", "PF13714", "PF13714", "PF13714")
-fileList <- c("/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_01_combined.fasta",
-              "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_02_combined.fasta",
-              "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_04_combined.fasta",
-              "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_06_combined.fasta",
-              "/Users/christophelemetre/Documents/Work/eSNaPD3/Sample_fq/PEP_Control_combined.fasta")
-df <- NULL
-Cluster95AllSeq <- NULL
 
-for (i in 1:length(fileList)) {
+
+
+primer_analysis <- function(fileList, PFAMlist){
+  
+  df <- NULL
+  Cluster95AllSeq <- NULL
+
+  for (i in 1:length(fileList)) {
       
       # Read the filename and extract the sample name and its target, assuming a field separator of "_"
       # Need to add a check on that field.
@@ -204,19 +203,19 @@ for (i in 1:length(fileList)) {
       df <- rbind (df, rarefaction_curve_data)
       Cluster95AllSeq <- append(Cluster95AllSeq, Cluster95Seqs, after=length(Cluster95AllSeq))
 
-}
+  }
 
-maxperprimer <- df %>% 
-  arrange(rank(-Diversity)) %>%
-  group_by(Sample) %>%
-  #slice(1:1) %>%
-  ungroup()
+  #maxperprimer <- df %>% 
+  #  arrange(rank(-Diversity)) %>%
+  #  group_by(Sample) %>%
+  #  #slice(1:1) %>%
+  #  ungroup()
 
 
-### Now For each Target in the entire set we want to plot their respective rarefaction curve and phylo tree 
-targets <- unique(df$Target)
+  ### Now For each Target in the entire set we want to plot their respective rarefaction curve and phylo tree 
+  targets <- unique(df$Target)
 
-for (i in 1:length(targets)){
+  for (i in 1:length(targets)){
 
       Target <- targets[i]
       Samples <- levels(df$Sample[which(df$Target %in% Target)])
@@ -279,12 +278,14 @@ for (i in 1:length(targets)){
       
       
       # Plot tree
-      T <- ggtree(TREE.laz, branch.length="none")# + geom_tippoint(color=colourtips, shape=20, size=1)
+      T <- ggtree(TREE.laz, branch.length="none")+ guides(fill=guide_legend(title=NULL))# + geom_tippoint(color=colourtips, shape=20, size=1)
       H <- gheatmap(T, SampleMatrix, offset = 0, width=0.2, colnames = FALSE)# + scale_fill_manual(values=ColourPalette)
-      
+            
       # Organize both Rarefaction curve and tree with the sample annotation Heatmap side by side with grid.arrange.
       grid.arrange(RarefPlot, H, ncol = 2)
       
+  }
+  
 }
 
 
