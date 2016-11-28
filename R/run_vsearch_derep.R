@@ -11,12 +11,12 @@
 #' @importFrom Biostrings writeXStringSet
 #' 
 #' @export
-run_vsearch_derep <- function(cmd, filename, DerepFile, logfile){
+run_vsearch_derep <- function(filename, DerepFile, logfile){
 
   
   #run the vsearch dereplication command.
   derep_args <- paste0("--derep_fulllength ", filename, " -output ", DerepFile, " -sizeout")
-  CmdOut <- system2(command = cmd, args = derep_args, stdout = TRUE, stderr = TRUE) # Execute dereplicate command
+  CmdOut <- system2(command = "vsearch", args = derep_args, stdout = TRUE, stderr = TRUE) # Execute dereplicate command
   
   cat(paste(Sys.time(), "- Dereplication with vsearch\n"), file=logfile, sep="", append=TRUE)
   cat(paste(Sys.time(), "vsearch", derep_args, "\n"), file=logfile, sep="", append=TRUE)
