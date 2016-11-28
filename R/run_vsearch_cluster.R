@@ -13,13 +13,13 @@
 #' @importFrom Biostrings writeXStringSet
 #' 
 #' @export
-run_vsearch_cluster <- function(cmd, filename, id=0.95, OutFasta, UCFile, logfile){
+run_vsearch_cluster <- function(filename, id=0.95, OutFasta, UCFile, logfile){
   
 
   cluster_args <- paste0("--cluster_fast ", filename, " -id ", id, " -centroids ", OutFasta, " -uc ", UCFile, " -sizein -sizeout")
-  CmdOut <- system2(command = cmd, args = cluster_args, stdout = TRUE, stderr = TRUE) # Execute cluster command
-  cat(paste(Sys.time(), "- Cluster sequences with vsearch at ", id, "% identity.\n"), file=logfile, sep="", append=T)
-  cat(paste(Sys.time(), "vsearch", cluster_args, "\n"), file=logfile, sep="", append=T)
+  CmdOut <- system2(command = "vsearch", args = cluster_args, stdout = TRUE, stderr = TRUE) # Execute cluster command
+  cat(paste(Sys.time(), "- Cluster sequences with vsearch at ", id, "% identity.\n"), file=logfile, sep="", append=TRUE)
+  cat(paste(Sys.time(), "vsearch", cluster_args, "\n"), file=logfile, sep="", append=TRUE)
 
   
   # return path of outputfile of vsearch cluster command. Will be deleted after the completion of the function up.

@@ -1,51 +1,54 @@
 #' primer_validation
 #'
-#' Library of functions to run eSNaPD.
+#' Library of functions to run Primer validation analysis.
 #'
+#' @import rBLAST
 #' @import phyloseq
+#' @import dplyr
+#' @import ggrepel
+#' @import ggplot2
+#' @import purrr
+#' @import ape
+#' @import Biobase
+#' @import gridExtra
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
-#' #library(rBLAST)
-primer_validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setwd=NULL){
+#' 
+#' @examples
+#' PFAM <- "PF13714"
+ 
 
-  logpath <-getwd()
-  wd <- tempdir()
-  #setwd("/Users/christophelemetre/Documents/Work/eSNaPD3/")
-  #on.exit(unlink(list.files(wd)))
+logpath <-getwd()
+wd <- tempdir()
+on.exit(unlink(list.files(wd)))
+
+
+primer_filtering <- function(file, vsearchpath, PFAM, cmd="", setwd=NULL){
+
   
   ###### Preparing the PFAM sequences to blast against for filtering
   #PFAM <- "PF13714" # for PEP
-  PFAMnucSeqs <- retrieve_PFAM_nucleotide_sequences(PFAM, alignmenttype = "full")
+  #PFAMnucSeqs <- retrieve_PFAM_nucleotide_sequences(PFAM, alignmenttype = "full")
   
-  PFAMseqs <- DNAStringSet(PFAMnucSeqs$domainsequence[which(!is.na(PFAMnucSeqs$domainsequence))],use.names = TRUE)
-  names(PFAMseqs) <- paste(sep="_",PFAMnucSeqs$PFAM_ID[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$Accession[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$EMBL_ID[which(!is.na(PFAMnucSeqs$domainsequence))])
-  message("Done with PFAM file")
+  #PFAMseqs <- DNAStringSet(PFAMnucSeqs$domainsequence[which(!is.na(PFAMnucSeqs$domainsequence))],use.names = TRUE)
+  #names(PFAMseqs) <- paste(sep="_",PFAMnucSeqs$PFAM_ID[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$Accession[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$EMBL_ID[which(!is.na(PFAMnucSeqs$domainsequence))])
+  #message("Done with PFAM file")
   
-  # To change for pre check of pre existence of datasets on the repo
-  if (vsearchpath=="integrated"){
-    if (operating_system=="MacOSX"){
-      vsearchpath <- paste("/Users/christophelemetre/miniconda2/bin", "/vsearch-2.3.0-osx-x86_64/bin/", sep="")
-      usearchpath <- paste("/Users/christophelemetre/miniconda2/bin", "/usearch8.1/", sep="")
-      Sys.chmod(vsearchpath, mode = "0777", use_umask = TRUE)} else {
-        vsearchpath <- paste(system.file(package="Primer_Design"), "/vsearch-2.3.0-osx-x86_64", sep="")
-        Sys.chmod(vsearchpath, mode = "0777", use_umask = TRUE)
-      }
-  }
   
+  vsearchCmd <- paste0(vsearchpath,"vsearch")
   
   ###################################################################################################################################
   # Check log file.
   
-  if(!is.null(setwd)){logfile <- paste(getwd(), "/log.txt", sep="")} else {logfile <- "log.txt"}
-  if(!file.exists(file)){meep <- paste(getwd(), "/", sep="")} else{meep <- ""}
+  if(!is.null(setwd)){logfile <- paste(logpath, "/log.txt", sep="")} else {logfile <- "log.txt"}
+  if(!file.exists(file)){meep <- paste(logpath, "/", sep="")} else{meep <- ""}
   
   
   ###################################################################################################################################
-  # Create the new Vsearch folder for all the vsearch cluster files.
+  # From the regex and the file name, extract target and sample name:
   
-  dir.create(paste(getwd(), "/Vsearch", sep=""), showWarnings=F)
-  filename <- gsub("(.*).fq$", "\\1", basename(file))
+  filename <- gsub("(.*).fasta$", "\\1", basename(file))
   sampleName <- paste(unlist(strsplit(basename(file), "_"))[1:2], collapse="_")
   target <- unlist(strsplit(basename(file), "_"))[1]
   
@@ -53,109 +56,206 @@ primer_validation <- function(file, vsearchpath="integrated", PFAM, cmd="", setw
   ###################################################################################################################################
   # Add new step in log file
   
-  cat(paste(Sys.time(), "- Initiate Clustering with Vsearch for sample", sampleName, "\n"), file=logfile, sep="", append=T)
+  cat(paste(Sys.time(), "- Initiate Clustering with Vsearch for sample", sampleName, "\n"), file=logfile, sep="", append=TRUE)
+  message(paste0("Reading ", file))
   
   
   ###################################################################################################################################
   # Dereplicate with vsearch
   
-  vsearch_cmd <- paste0(vsearchpath, "vsearch")
-  derep_args <- paste0("--derep_fulllength ", meep, file, " -output ", getwd(), "/Vsearch/", filename, "_derep.fasta -sizeout")
-  CmdOut <- system2(command = vsearch_cmd, args = derep_args, stdout = TRUE, stderr = TRUE) # Execute dereplicate command
-  cat(paste(Sys.time(), "- Dereplication with Vsearch for sample", sampleName, "\n"), file=logfile, sep="", append=T)
-  cat(paste(Sys.time(), vsearch_cmd, derep_args, "\n"), file=logfile, sep="", append=T)
-  
-  
-  ###################################################################################################################################
-  # Collect information from vsearch derep command output for number of sequences, number of unique sequences and vsearch version.
-  
-  sequ <- as.numeric(sub(".*in (.*) seqs.*", "\\1", CmdOut[grep("nt in", CmdOut)]))
-  derep <- as.numeric(sub("(.*)unique sequences.*", "\\1", CmdOut[grep("unique sequences", CmdOut)]))
-  version <- sub("(.*)unique sequences.*", "\\1", temp[grep("vsearch", temp)][1])
-  
-  
-  message(paste0("Reading ", filename,".fasta"))
-  message(paste0(sequ, " input sequences -> ", derep, " dereplicated sequences"))
-  cat(paste(Sys.time(), sampleName, ": ", sequ, "input sequences ->", derep, " ereplicated sequences\n"), file=logfile, sep="", append=T)
+  DerepFile <- paste0(wd, "/", sampleName, "_combined_derep.fasta")
+  run_vsearch_derep(vsearchCmd, file, DerepFile, logfile)
 
   
   ###################################################################################################################################
   # Sort dereplicated sequences
   
-  sort_args <- paste0("--sortbysize ", getwd(), "/Vsearch/", filename, "_derep.fasta", " -output ", getwd(), "/Vsearch/", filename, "_sorted.fasta -minsize 2")
-  CmdOut <- system2(command = vsearch_cmd, args = sort_args, stdout = TRUE, stderr = TRUE) # Execute sort command
-  cat(paste(Sys.time(), "- Sort sequences with Vsearch minimum size 2 for sample", sampleName, "\n"), file=logfile, sep="", append=T)
-  cat(paste(Sys.time(), vsearch_cmd, sort_args, "\n"), file=logfile, sep="", append=T)
+  SortedFile <- paste0(wd, "/", sampleName, "_sorted.fasta")
+  run_vsearch_sort(vsearchCmd, DerepFile, SortedFile, logfile)
   
   
   ###################################################################################################################################
   # Cluster sequences at 97% identity
   
-  cluster_args <- paste0("--cluster_fast ", getwd(), "/Vsearch/", filename, "_sorted.fasta", " -id 0.97", " -centroids ", getwd(), "/Vsearch/", filename, "_cluster97.fasta -uc ", getwd(), "/Vsearch/", filename, "_cluster97.uc -sizein -sizeout")
-  CmdOut <- system2(command = vsearch_cmd, args = cluster_args, stdout = TRUE, stderr = TRUE) # Execute cluster at 97% command
-  Cluster97Seqs <- readDNAStringSet(paste0(getwd(), "/Vsearch/",filename, "_cluster97.fasta"))
-  cat(paste(Sys.time(), "- Sort sequences with Vsearch minimum size 2 for sample", sampleName, "\n"), file=logfile, sep="", append=T)
-  cat(paste(Sys.time(), vsearch_cmd, sort_args, "\n"), file=logfile, sep="", append=T)
+  OutFasta97 <- paste0(wd, "/", sampleName, "_clustered97.fasta")
+  UCFile <- paste0(wd, "/", sampleName, "_clustered97.uc")
+  run_vsearch_cluster(vsearchCmd, SortedFile, id=0.97, OutFasta97, UCFile, logfile)
   
-  
-  ###################################################################################################################################
-  # BLAST sequences to filter
-  
-  Biostrings::writeXStringSet(PFAMseqs, paste0("PFAM_",PFAM,"_seqsBlastDB.fasta"),format = "fasta")
-  cat(paste(Sys.time(), "Write PFAM nucletoide sequences", "\n"), file=logfile, sep="", append=T)
-  makeblastdb_args <- paste0("-in ", getwd(), "/PFAMseqsBlastDB.fasta -dbtype nucl")
-  system2(command = "makeblastdb", args = makeblastdb_args)
-  cat(paste(Sys.time(), "Create PFAM Blast database\n"), file=logfile, sep="", append=T)
-  bl <- blast(db = paste0(getwd(), paste0("PFAM_",PFAM,"_seqsBlastDB.fasta")))
-  cat(paste(Sys.time(), "Blast clusters on PFAM blast database\n"), file=logfile, sep="", append=T)
-  
-  print(bl, info=TRUE)
-  cat(paste(Sys.time(), "Filter blast results to remove unrelated sequences\n"), file=logfile, sep="", append=T)
-  FilteredNames <- predict(bl, Cluster97Seqs, BLAST_args = "-evalue 1e-10")[1]
-  Filtered97seqs <- Cluster97Seqs[(names(Cluster97Seqs)) %in% FilteredNames$QueryID]
+  #Read the sorted sequences and the clustered sequences at 97% into a DNAStringSet
+  SortedSeqs <- readDNAStringSet(SortedFile)
+  Cluster97Seqs <- readDNAStringSet(OutFasta97)
 
   
   ###################################################################################################################################
-  # Cluster filtered sequences at 95% identity
+  # BLAST sequences to filter out unrelated amplicons to the PFAM of interest
   
-  cluster_args <- paste0("--cluster_fast ", getwd(), "/Vsearch/", filename, "_sorted.fasta -id 0.95 -centroids ", getwd(), "/Vsearch/", filename, "_cluster95.fasta -uc ", getwd(), "/Vsearch/", filename, "_cluster95.uc -sizein -sizeout")
-  CmdOut <- system2(command = vsearch_cmd, args = cluster_args, stdout = TRUE, stderr = TRUE) # Execute cluster at 95% command
-  Cluster95Seqs <- readDNAStringSet(paste0(getwd(), "/Vsearch/",filename, "_cluster97.fasta"))
-  UCfile <- import_usearch_uc(paste0(getwd(), "/Vsearch/", filename, "_cluster95.uc"), readDelimiter = "_M03834")
+  cat(paste(Sys.time(), "Running BLAST to filter out unrelated sequences to the PFAM of interest", "\n"), file=logfile, sep="", append=TRUE)
+  cat(paste(Sys.time(), "Blast clusters on PFAM blast database\n"), file=logfile, sep="", append=TRUE)
+  
+  FilteredNames <- unique(sort(run_blast(SortedSeqs, PFAMseqs, blast_args = "-evalue 1e-10")$queryID)) # Save the query sequence name that blast hit at e-10 eValue the Target sequences.
   
   
   ###################################################################################################################################
-  # phyloseq-tools rarefy
+  # Filter out the sequences from the original sorted file.
   
-  # Change the Path!!!
-  source("/Users/christophelemetre/Documents/Work/Primer_Design/R/phyloseq-tools.R")
-  rarefaction_curve_data <- (calculate_rarefaction_curves(UCfile, c('Observed'), seq(1, max(sample_sums(UCfile)), length.out=100), parallel = FALSE))[c(1,4,2)]
-  rarefaction_curve_data <- cbind(seq(1,100), rarefaction_curve_data)
-  rarefaction_curve_data <- cbind(rarefaction_curve_data, rep(target,100))
+  cat(paste(Sys.time(), "Filter blast results to remove unrelated sequences\n"), file=logfile, sep="", append=TRUE)
+  Filteredseqs <- SortedSeqs[(names(SortedSeqs)) %in% FilteredNames]
+  FilteredFile <- paste0(wd, "/", sampleName, "_filtered.fasta")
+  Biostrings::writeXStringSet(Filteredseqs, FilteredFile, format = "fasta")
   
-  colnames(rarefaction_curve_data) <- c("idx","Depth","Diversity", "Sample", "Target")
   
-  #summary(rarefaction_curve_data)
+  ###################################################################################################################################
+  # Sort the filtered sequences
   
-  return(rarefaction_curve_data)
+  SortedFile97 <- paste0(wd, "/", sampleName, "_sorted97.fasta")
+  run_vsearch_sort(vsearchCmd, FilteredFile, SortedFile97, logfile)
   
   
   ###################################################################################################################################
   # Clean up
-  # delete all the intermediate files.
+  # delete all the intermediate files and/or variables..
   
+  return(SortedFile97)
+}
 
+
+
+
+
+primer_analysis <- function(fileList, PFAMlist){
+  
+  df <- NULL
+  Cluster95AllSeq <- NULL
+
+  for (i in 1:length(fileList)) {
+      
+      # Read the filename and extract the sample name and its target, assuming a field separator of "_"
+      # Need to add a check on that field.
+      filename <- gsub("(.*).fq$", "\\1", basename(fileList[i]))
+      sampleName <- paste(unlist(strsplit(basename(fileList[i]), "_"))[1:2], collapse="_")
+      target <- unlist(strsplit(basename(fileList[i]), "_"))[1]
+  
+  
+      FilteredSeqsFasta <- primer_filtering(file = fileList[i], PFAM = PFAMlist[i], vsearchpath = "/Users/christophelemetre/miniconda2/bin/vsearch-2.3.0-osx-x86_64/bin/")
+      
+      
+      ###################################################################################################################################
+      # Cluster filtered sequences at 95% identity
+      
+      OutFasta95 <- paste0(wd, "/", sampleName, "_clustered95.fasta")
+      UCFile95 <- paste0(wd, "/", sampleName, "_clustered95.uc")
+      run_vsearch_cluster(vsearchCmd, FilteredSeqsFasta, id=0.97, OutFasta95, UCFile95, logfile)
+      Cluster95Seqs <- readDNAStringSet(OutFasta95)
+      UC95phylo <- import_usearch_uc(UCFile95)
+      
+      
+      ###################################################################################################################################
+      # phyloseq-tools rarefy
+      
+      # Change the Path
+      #source("/Users/christophelemetre/Documents/Work/Primer_Design/R/phyloseq-tools.R")
+      rarefaction_curve_data <- (calculate_rarefaction_curves(UC95phylo, c('Observed'), seq(1, max(sample_sums(UC95phylo)), length.out=100), parallel = FALSE))[c(1,4)]
+      #rarefaction_curve_data$Alpha_diversity_mean <- lowess(rarefaction_curve_data$Depth, rarefaction_curve_data$Alpha_diversity_mean, iter = 10000)$y
+      rarefaction_curve_data <- cbind(rarefaction_curve_data, rep(as.character(sampleName),100))
+      rarefaction_curve_data <- cbind(rarefaction_curve_data, rep(as.character(target),100))
+      rarefaction_curve_data <- cbind(seq(1:100), rarefaction_curve_data)
+      
+      colnames(rarefaction_curve_data) <- c("idx","Depth","Diversity", "Sample", "Target")
+      
+      #summary(rarefaction_curve_data)
+      
+      df <- rbind (df, rarefaction_curve_data)
+      Cluster95AllSeq <- append(Cluster95AllSeq, Cluster95Seqs, after=length(Cluster95AllSeq))
+
+  }
+
+  #maxperprimer <- df %>% 
+  #  arrange(rank(-Diversity)) %>%
+  #  group_by(Sample) %>%
+  #  #slice(1:1) %>%
+  #  ungroup()
+
+
+  ### Now For each Target in the entire set we want to plot their respective rarefaction curve and phylo tree 
+  targets <- unique(df$Target)
+
+  for (i in 1:length(targets)){
+
+      Target <- targets[i]
+      Samples <- levels(df$Sample[which(df$Target %in% Target)])
+      
+      #Defining the colour palette from the number of samples for the Target.
+      #ColourPalette <- palette(rainbow(length(Samples)))
+      
+      grouping <- rep(Samples, each = 100)
+
+      RarefPlot <- ggplot(df, aes(x=Depth,y=Diversity, group=grouping, colour=grouping)) + 
+        geom_point(shape = 1, size = 0.6) + 
+        geom_smooth(span = 1) +
+        #geom_line() +
+        #scale_color_manual(values=ColourPalette) +
+        #geom_text_repel(data = maxperprimer,aes(label=Samples)) +
+        guides(fill=guide_legend(title=NULL)) +
+        facet_wrap(~Target, scales="free")
+
+
+      ###################################################################################################################################
+      # Multiple sequence alignment with Muscle to generate the tree
+      
+      MSAClustered95 <- run_muscle(Cluster95AllSeq)
+
+
+      ###################################################################################################################################
+      # Generation of the tree with FastTree
+      
+      # check if the names of the sequences contain ":" or ";" and switch to "_" if any:
+      names(MSAClustered95) <- gsub("\\:", "_", names(MSAClustered95))
+      names(MSAClustered95) <- gsub("\\;", "_", names(MSAClustered95))
+      
+      # Then call the FastTree function on the multiple sequence alignment results from Muscle
+      Tree <- run_fasttree(MSAClustered95)
+      
+      
+      ###################################################################################################################################
+      # Now plot tree and rarefaction curve
+      
+      # Prepare the colours for each individual sample within the Target.
+      #numbertiplabs<-length(Tree$tip.label)
+      #colourtips <- rep("black",numbertiplabs)
+      #for (sam in 1:length(Samples)){
+      #  colourtips[grep(unlist(strsplit(Samples[sam], "_"))[2], Tree$tip.label)] <- ColourPalette[sam]
+      #}
+      #colourtips[grep("PEP_Control", Tree$tip.label)] <- ColourPalette[which(Samples=="PEP_Control")]
+      #plot(TREE.laz,tip.color=colourtips,adj=1,cex=0.3,use.edge.length=F)
+      #legend('topleft', Samples, lty=1, col=ColourPalette, bty='n', cex=0.8)
+      
+      # Prepare the labels 
+      LABS <- strsplit(Tree$tip.label, "_M038")
+      LABELS <- do.call(rbind, LABS)[,1]
+      SampleMatrix <- NULL
+      SampleMatrix <- do.call("cbind", list(LABELS))
+      rownames(SampleMatrix) <- Tree$tip.label
+      colnames(SampleMatrix) <- "Samples"
+      
+      #Tree$tip.label <- LABELS
+      TREE.laz<-ladderize(Tree,FALSE)
+      
+      
+      # Plot tree
+      T <- ggtree(TREE.laz, branch.length="none")+ guides(fill=guide_legend(title=NULL))# + geom_tippoint(color=colourtips, shape=20, size=1)
+      H <- gheatmap(T, SampleMatrix, offset = 0, width=0.2, colnames = FALSE)# + scale_fill_manual(values=ColourPalette)
+            
+      # Organize both Rarefaction curve and tree with the sample annotation Heatmap side by side with grid.arrange.
+      grid.arrange(RarefPlot, H, ncol = 2)
+      
+  }
   
 }
 
-  
-  
-  
-  
-  
-  
-  
-  
 
 
 
+
+  
+  
+  
