@@ -87,7 +87,6 @@ server <- function(input, output) {
        
        mainPanel(
          id = "mpanel", 
-         h1("Problem with autodetection of primers."),
            
          renderMsaR({ msaR(msa1, 
                            menu = F, 
