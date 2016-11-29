@@ -24,32 +24,7 @@ wd <- tempdir()
 on.exit(unlink(list.files(wd)))
 
 
-primer_filtering <- function(file, vsearchpath, PFAM, cmd="", setwd=NULL){
-
-<<<<<<< HEAD
-  logpath <-getwd()
-  wd <- tempdir()
-  #setwd("/Users/christophelemetre/Documents/Work/eSNaPD3/")
-  #on.exit(unlink(list.files(wd)))
-=======
-#' @import rBLAST
-#' @import phyloseq
-#' @import dplyr
-#' @import ggrepel
-#' @import ggplot2
-#' @import purrr
-#' @import ape
-#' @import Biobase
-#' @import gridExtra
-#' @importFrom Biostrings DNAString
-#' @importFrom Biostrings DNAStringSet
-#' @importFrom Biostrings reverseComplement
-#' 
-#' @examples
-#' PFAM <- "PF13714"
-
-
-primer_filtering <- function(file, PFAM, cmd="", setwd=NULL){
+primer_filtering <- function(file, PFAM, setwd=NULL){
 
   logpath <-getwd()
   wd <- tempdir()
@@ -89,14 +64,14 @@ primer_filtering <- function(file, PFAM, cmd="", setwd=NULL){
   # Dereplicate with vsearch
   
   DerepFile <- paste0(wd, "/", sampleName, "_combined_derep.fasta")
-  run_vsearch_derep(vsearchCmd, file, DerepFile, logfile)
+  run_vsearch_derep(file, DerepFile, logfile)
 
   
   ###################################################################################################################################
   # Sort dereplicated sequences
   
   SortedFile <- paste0(wd, "/", sampleName, "_sorted.fasta")
-  run_vsearch_sort(vsearchCmd, DerepFile, SortedFile, logfile)
+  run_vsearch_sort(DerepFile, SortedFile, logfile)
   
   
   ###################################################################################################################################
@@ -164,7 +139,7 @@ primer_analysis <- function(fileList, PFAMlist){
       target <- unlist(strsplit(basename(fileList[i]), "_"))[1]
   
   
-      FilteredSeqsFasta <- primer_filtering(file = fileList[i], PFAM = PFAMlist[i], vsearchpath = "/Users/christophelemetre/miniconda2/bin/vsearch-2.3.0-osx-x86_64/bin/")
+      FilteredSeqsFasta <- primer_filtering(file = fileList[i], PFAM = PFAMlist[i])
       
       
       ###################################################################################################################################
