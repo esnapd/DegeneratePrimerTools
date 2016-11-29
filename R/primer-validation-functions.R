@@ -1,7 +1,7 @@
 #' Primer validation and plot functions
 #'
 #' Library of functions to run Primer validation analysis.
-#'
+#' 
 #' @import rBLAST
 #' @import phyloseq
 #' @import dplyr
@@ -17,13 +17,11 @@
 #' 
 #' @examples
 #' PFAM <- "PF13714"
- 
-
-logpath <-getwd()
-wd <- tempdir()
-on.exit(unlink(list.files(wd)))
-
-
+#' 
+#' @param file. Required. File location (string)
+#' @param PFAM. Required. PFAM id of the target for the file being filtered (string)
+#' 
+#' @export
 primer_filtering <- function(file, PFAM, setwd=NULL){
 
   logpath <-getwd()
@@ -123,8 +121,11 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
 
 
 
-
-
+#' 
+#' @param fileList. Required. List of file locations  (vector of strings)
+#' @param PFAM. Required. list of PFAM id of the target matching the respective fasta file (vector of strings)
+#' 
+#' @export
 primer_analysis <- function(fileList, PFAMlist){
   
   df <- NULL
