@@ -120,7 +120,7 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
 }
 
 
-
+#' Primer analysis function to validate a set of primers for a target and plot their rarefaction curve and annotated tree.
 #' 
 #' @param fileList. Required. List of file locations  (vector of strings)
 #' @param PFAM. Required. list of PFAM id of the target matching the respective fasta file (vector of strings)
