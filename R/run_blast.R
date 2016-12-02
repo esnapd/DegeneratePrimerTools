@@ -34,16 +34,16 @@ run_blast <- function(query, target, outfile=NULL, parallel=FALSE, blast_args=""
     stop("query must be a file location or a DNAStringSet")
   }
   
-  # handle the target. if a file, make sure that blastcmddb has been run.
+  # handle the target. if a file, make sure that blastdbcmd has been run.
   # if its an DNAString set, write a blastdb in the temp directory
   if (is.character(target)) {
     targetdb <-  file.path(normalizePath(dirname(target)), basename(target))
     if(length(Sys.glob(paste(targetdb, "*", sep="")))<1) stop("target sequence file does not exit!")
     
-    blastdbinfo <- system(paste("blastdbcmd -db", targetdb, "-info"), intern=TRUE)
-    if (grepl("No alias or index file found")) {
+    blastdbinfo <- system2("blastdbcmd", paste("-db", targetdb, "-info"), stdout=TRUE, stderr = TRUE) #system(paste("blastdbcmd -db", targetdb, "-info"), intern=TRUE)
+    if (grepl("No alias or index file found", blastdbinfo)) {
       warning("No blast info found for this file. Creating blastdb")
-      system(paste("makeblastdb -dbtype nucl -in", targetdb))
+      system(paste("makeblastdb -dbtype nucl -in", targetdb," -parse_seqids"))
     } else{
       cat(paste(blastdbinfo, collapse="\n"))
       cat("\n")
