@@ -9,17 +9,21 @@
 #' @param dnastringset (Required).  A \code{\link[Biostrings]{DNAStringSet}} containing your target sequences.
 #' @param trimf (optional). Default \code{240}. Amount to be trimmed from the forward primer match
 #' @param trimr (optional). Default \code{175}. Amount to be trimmed from the reverse primer match
-#'
+#' @param sep (optional).   Default \code{"N"}. A sequence used as a delimiter between the extracted sequences.
 #'
 #' @importFrom Biostrings xscat subseq
 #' @export
 #' @examples
-#' extract_ends(dnatest, trimf=5, trimr=3)
-extract_ends <- function(dnastringset, trimf=240, trimr=175) {
+#' dnafile <- system.file("sequences","AHBA.fna",package="DegeneratePrimerTools")
+#' dnatest <- Biostrings::readDNAStringSet(dnafile)
+#' extract_ends(dnatest, trimf=5, trimr=3, sep="N")
+extract_ends <- function(dnastringset, trimf=240, trimr=175, sep="N") {
+  sep <- DNAString(sep)
+  
   #get forward and reverse and concatenate together
   amF <- subseq(dnastringset, end=trimf)
   amR <- subseq(dnastringset, start=-trimr)
-  ampliconends <- xscat(amF, amR)
+  ampliconends <- xscat(amF,sep, amR)
   names(ampliconends) <- dnastringset
   
   #filter minimum size
