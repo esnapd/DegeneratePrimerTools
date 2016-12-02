@@ -43,7 +43,7 @@ plot(AHBA_degeprimer@phy_tree)
 # run DEGEPRIME to find degenerate primers and store them in the
 # primerdata slot
 AHBA_degeprimer <- AHBA_degeprimer %>% 
-  design_primers(degeneracyrange=c(1,10, 20, 50), number_iterations=2, force=TRUE)
+  design_primers(maxdegeneracies=c(1,10, 20, 50), number_iterations=2, force=TRUE)
 AHBA_degeprimer
 tail(AHBA_degeprimer@primerdata)
 ```
@@ -55,7 +55,7 @@ tail(AHBA_degeprimer@primerdata)
 AHBA_degeprimer <- degeprimer(AHBAseqs) %>%
   run_alignment() %>%
   build_tree() %>%
-  design_primers(degeneracyrange=c(1,10), number_iterations=2) # this can take awhile
+  design_primers(maxdegeneracies=c(1,10), number_iterations=2) # this can take awhile
 ```
 
 ## Choose Primers
