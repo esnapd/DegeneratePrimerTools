@@ -10,7 +10,7 @@
 #' @importFrom Biostrings writeXStringSet
 #' 
 #' @export
-run_vsearch_sort <- function(cmd, filename, SortedFile, logfile){
+run_vsearch_sort <- function(filename, SortedFile, logfile){
   
   
   #run the vsearch dereplication command.
