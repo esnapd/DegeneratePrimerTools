@@ -26,7 +26,7 @@ run_blast <- function(query, target, outfile=NULL, parallel=FALSE, blast_args=""
     queryfile <- query
     
   } else if (is(query, "DNAStringSet")) {
-    if(is.null(names(target))) stop("DNAStringSets must have names")
+    if(is.null(names(query))) stop("DNAStringSets must have names")
     queryfile <- tempfile(tmpdir = wd, fileext="blastquery")
     writeXStringSet(query, queryfile)
     
