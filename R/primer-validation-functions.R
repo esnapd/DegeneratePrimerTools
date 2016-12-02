@@ -20,11 +20,11 @@
 #' 
 #' @param file. Required. File location (string)
 #' @param PFAM. Required. PFAM id of the target for the file being filtered (string)
+#' @param logfile. Required. A file location (string)
 #' 
 #' @export
-primer_filtering <- function(file, PFAM, setwd=NULL){
+primer_filtering <- function(file, Ref, logfile, setwd=NULL){
 
-  logpath <-getwd()
   wd <- tempdir()
   on.exit(unlink(list.files(wd)))
   
@@ -35,12 +35,6 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
   #PFAMseqs <- DNAStringSet(PFAMnucSeqs$domainsequence[which(!is.na(PFAMnucSeqs$domainsequence))],use.names = TRUE)
   #names(PFAMseqs) <- paste(sep="_",PFAMnucSeqs$PFAM_ID[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$Accession[which(!is.na(PFAMnucSeqs$domainsequence))],PFAMnucSeqs$EMBL_ID[which(!is.na(PFAMnucSeqs$domainsequence))])
   #message("Done with PFAM file")
-  
-  ###################################################################################################################################
-  # Check log file.
-  
-  if(!is.null(setwd)){logfile <- paste(logpath, "/log.txt", sep="")} else {logfile <- "log.txt"}
-  if(!file.exists(file)){meep <- paste(logpath, "/", sep="")} else{meep <- ""}
   
   
   ###################################################################################################################################
@@ -77,7 +71,7 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
   
   OutFasta97 <- paste0(wd, "/", sampleName, "_clustered97.fasta")
   UCFile <- paste0(wd, "/", sampleName, "_clustered97.uc")
-  run_vsearch_cluster(vsearchCmd, SortedFile, id=0.97, OutFasta97, UCFile, logfile)
+  run_vsearch_cluster(SortedFile, id=0.97, OutFasta97, UCFile, logfile)
   
   #Read the sorted sequences and the clustered sequences at 97% into a DNAStringSet
   SortedSeqs <- readDNAStringSet(SortedFile)
@@ -87,13 +81,13 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
   ###################################################################################################################################
   # BLAST sequences to filter out unrelated amplicons to the PFAM of interest
 
-  cat(paste(Sys.time(), "Running BLAST to filter out unrelated sequences to the PFAM of interest", "\n"), file=logfile, sep="", append=TRUE)
-  cat(paste(Sys.time(), "Blast clusters on PFAM blast database\n"), file=logfile, sep="", append=TRUE)
+  cat(paste(Sys.time(), "Running BLAST to filter out unrelated sequences to the Reference set for the target", "\n"), file=logfile, sep="", append=TRUE)
+  cat(paste(Sys.time(), "Blast clusters on Reference blast database\n"), file=logfile, sep="", append=TRUE)
 
   cat(paste(Sys.time(), "Running BLAST to filter out unrelated sequences to the PFAM of interest", "\n"), file=logfile, sep="", append=TRUE)
   cat(paste(Sys.time(), "Blast clusters on PFAM blast database\n"), file=logfile, sep="", append=TRUE)
   
-  FilteredNames <- unique(sort(run_blast(SortedSeqs, PFAMseqs, blast_args = "-evalue 1e-10")$queryID)) # Save the query sequence name that blast hit at e-10 eValue the Target sequences.
+  FilteredNames <- unique(sort(run_blast(SortedSeqs, Ref, blast_args = "-evalue 1e-10")$queryID)) # Save the query sequence name that blast hit at e-10 eValue the Target sequences.
   
   
   ###################################################################################################################################
@@ -109,7 +103,7 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
   # Sort the filtered sequences
   
   SortedFile97 <- paste0(wd, "/", sampleName, "_sorted97.fasta")
-  run_vsearch_sort(vsearchCmd, FilteredFile, SortedFile97, logfile)
+  run_vsearch_sort(FilteredFile, SortedFile97, logfile)
   
   
   ###################################################################################################################################
@@ -122,11 +116,21 @@ primer_filtering <- function(file, PFAM, setwd=NULL){
 
 #' Primer analysis function to validate a set of primers for a target and plot their rarefaction curve and annotated tree.
 #' 
-#' @param fileList. Required. List of file locations  (vector of strings)
-#' @param PFAM. Required. list of PFAM id of the target matching the respective fasta file (vector of strings)
+#' @param Target. Required. Target name (string)
+#' @param fileList. Required. List of file locations (vector of strings)
+#' @param Ref. Required. Reference sequences for the target investigated. Either file location (string) or DNAstringSet or Degeprimer RDS object.
 #' 
 #' @export
-primer_analysis <- function(fileList, PFAMlist){
+primer_analysis <- function(target, fileList, Ref){
+  
+  logpath <-getwd()
+  wd <- tempdir()
+  on.exit(unlink(list.files(wd)))
+  
+  ###################################################################################################################################
+  # Check log file.
+  
+  if(!is.null(setwd)){logfile <- paste(logpath, "/log.txt", sep="")} else {logfile <- "log.txt"}
   
   df <- NULL
   Cluster95AllSeq <- NULL
@@ -136,11 +140,9 @@ primer_analysis <- function(fileList, PFAMlist){
       # Read the filename and extract the sample name and its target, assuming a field separator of "_"
       # Need to add a check on that field.
       filename <- gsub("(.*).fq$", "\\1", basename(fileList[i]))
-      sampleName <- paste(unlist(strsplit(basename(fileList[i]), "_"))[1:2], collapse="_")
-      target <- unlist(strsplit(basename(fileList[i]), "_"))[1]
+      sampleName <- paste(unlist(strsplit(basename(fileList[i]), "_"))[1:3], collapse="_")
   
-  
-      FilteredSeqsFasta <- primer_filtering(file = fileList[i], PFAM = PFAMlist[i])
+      FilteredSeqsFasta <- primer_filtering(file = fileList[i], Ref, logfile)
       
       
       ###################################################################################################################################
@@ -148,7 +150,7 @@ primer_analysis <- function(fileList, PFAMlist){
       
       OutFasta95 <- paste0(wd, "/", sampleName, "_clustered95.fasta")
       UCFile95 <- paste0(wd, "/", sampleName, "_clustered95.uc")
-      run_vsearch_cluster(vsearchCmd, FilteredSeqsFasta, id=0.97, OutFasta95, UCFile95, logfile)
+      run_vsearch_cluster(FilteredSeqsFasta, id=0.97, OutFasta95, UCFile95, logfile)
       Cluster95Seqs <- readDNAStringSet(OutFasta95)
       UC95phylo <- import_usearch_uc(UCFile95)
       
