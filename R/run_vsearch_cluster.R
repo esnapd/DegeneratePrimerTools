@@ -3,7 +3,6 @@
 #' Function for running the vsearch dereplication command. Accepts as inputs filename and logfile
 #' can optionally return a file or a \link{[data.table] data.table} of the results in blastformat.
 #'
-#' @param cmd. Required. Name/Location of the vsearch command (string)
 #' @param filename. Required. A file location (string)
 #' @param id Required. A number [0-1] (float)
 #' @param OutFasta. Required. A file location (string)

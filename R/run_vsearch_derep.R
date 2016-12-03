@@ -3,7 +3,6 @@
 #' Function for running the vsearch dereplication command. Accepts as inputs filename and logfile
 #' can optionally return a file or a \link{[data.table] data.table} of the results in blastformat.
 #'
-#' @param cmd. Required. Name/Location of the vsearch command (string)
 #' @param filename. Required. A file location (string)
 #' @param DerepFile Required. A file location (string)
 #' @param logfile. Required. A file location (string)
@@ -25,6 +24,7 @@ run_vsearch_derep <- function(filename, DerepFile, logfile){
   ###################################################################################################################################
   # Collect information from vsearch derep command output for number of sequences, number of unique sequences and vsearch version.
   
+  sampleName <- paste(unlist(strsplit(basename(filename), "_"))[1:2], collapse="_")
   sequ <- as.numeric(sub(".*in (.*) seqs.*", "\\1", CmdOut[grep("nt in", CmdOut)]))
   derep <- as.numeric(sub("(.*)unique sequences.*", "\\1", CmdOut[grep("unique sequences", CmdOut)]))
   version <- sub("(.*)unique sequences.*", "\\1", CmdOut[grep("vsearch", CmdOut)][1])
