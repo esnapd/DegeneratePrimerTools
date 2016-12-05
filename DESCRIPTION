@@ -1,9 +1,10 @@
 Package: DegeneratePrimerTools
 Type: Package
 Title: Tools for Designing Degenerate Primers
-Version: 0.1.14
+Version: 0.1.15
 Authors@R: c(
     person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
+    person("Christophe", "lemetre", , "clemetre@mail.rockefeller.edu", c("aut")),
     person("Ulysses", "Amanciao", , "uamanciode@rockefeller.edu", c("aut"))
     )
 Description: Assist in designing Degenerate Primers against a collection of
@@ -28,7 +29,7 @@ Imports:
     methods (>= 3.3.0),
     purrr (>= 0.2.0),
     ggtree (>= 1.4.20),
-    data.table (>= 1.9.8),
+    data.table (>= 1.10.0),
     ggrepel,
     parallel,
     zoo
