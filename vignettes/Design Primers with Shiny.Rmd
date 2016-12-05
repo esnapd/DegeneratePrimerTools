@@ -1,0 +1,116 @@
+---
+title: "Design Degenerate Primers with Shiny"
+author: "zach cp"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+DegeneratePrimerTools (DPT) comes with facilities to design degenerate primers against target sequences. The initial workflow involved a user within R walking through the process of generating a multiple sequence alignment, running the primer-design software and picking primers that correspond to the most conserved portions of the target sequences. However, if we assume a few default parameters will be used we can simply run the entire pipeline and display the output. We can do this using [Shiny](https://shiny.rstudio.com/) framework.
+
+
+## Using the App
+
+This section deals with how to use and interpret the DPT shiny app. To see how to get the app up and running see the `Configuring the App` section below.
+
+#### Uploading The Fasta File
+
+DPT requires an input fasta. The shiny version of DPT requires that you specify the fasta input. This fasta will be uploaded and processed and the resulting MSA and primers will be displayed. In addition to the fasta file you are also presented with the following options, each of which can be changed:
+
+1. **Choose Degeneracy Values**. DPT will run the primer-design software for multiple maximum degeneracy values. These check boxes let you choose which values to use. Lower values will yield less degenerate primers and will complete quicker. Higher values are more degenerate and are more computationally taxing.
+2. **Number of Primer Locations to Return**. How many locations should be included in the return values? There is little harm in increasing this. DPT will try to return the most-conserved values first.
+3. **Minimum Sequences to Be considered for Primer Design**. Sometimes a multiple sequence alignment will have long portions of the alignment at the beginning or end of the sequences that have only one or two sequences. To avoid designing primers in regions like this you can specify the minimum number of sequences in a region to be considered for primer design.
+
+
+<br>
+<img src="images/uploadFasta.png" alt="UploadFasta" style="width: 600px;"/>
+
+### Navigating the Output
+
+The output from the DPT shiny app will look like the following image. This containing three primary features:
+
+1. **An Interactive Multiple sequence Alignment**. This MSA shows the original sequences that were uploaded. It also has the degenerate primers that were designed. The number of primers will be dependent on 1) the number of degeneracies you checked in the upload panel as well as 2) the number of sites you requester to return. The cartoon below the MSA is responsive to the mouse and allows you to navigate around the MSA.
+2. **A Table of Degenerate Primers**. A table of the degenerate primers that are visualized in the msa are available for inspection/copy/paste here.
+3. **A convenience table with degenerate IUPAC nucleotide codes**. On the left-hand side.
+
+<img src="images/output.png" alt="output" style="width: 600px;"/>
+
+### Interpreting the Results
+
+The output from the DPT shiny app will degenerate primers across a range of degeneracies at the most conserved regions of the alignment. You must now use this information to generate primer-pairs. There are a few factors we typically consider when designing primers:
+
+1. **Amplicon Length**. You typically have a target amplicon length based on your sequencing platform. We have used amplicons over a wide range of sizes. Ideally, with 2x300bp MiSeq runs you would be able to assemble 500bp amplcions. However we have found that the reverse read quality menas amplicons of 450bp or more will have trouble merging/assembling. If you go above this length you may need to adopt a paired-end workflow.
+2. **3-Prime GC-Clamp**. A `G` or `C` at the 3' position is preferred due to stabilizing effect of the extra base-pair at this position.
+3. **3-Prime Non-degenerate**. For the same reason as above, it woud lbe idea to have an exact match at the last few positions.
+4. **Melting Temperature Compatability**. This is tough one. In practive, amplcions of the same length and of approximately the same GC content should give a similar melting temperature. Tm calculations are aggregate so they can be useful to check for wildly disparate primer pairs but we have found that you will need to empirically determine conditions for which these match.
+
+
+
+
+Once you have looked at the output you should be well on your way to designing primer pairs. The output will 
+
+## Configuring the App
+
+### Run Locally
+
+```{r, eval=FALSE}
+# install DPT
+library(DegeneratePrimerTools)
+
+# run shiny from the file
+shiny::runGitHub("esnapd/DegeneratePrimerTools", subdir = "shiny")
+
+# or run locally if in the DPT project directory
+shiny::runApp(appDir = "shiny")
+  
+```
+
+### Run on Shiny-Server
+
+Rstudio provides the [shiny-server](https://www.rstudio.com/products/shiny/shiny-server/) as a means of running/distributing shiny-apps. DPT can effectively be used this way on a local cluster. To setup shiny-server it is best to peruse the [docs](http://docs.rstudio.com/shiny-server). To setup DPT there are a few considerations - most notably that the sequence alignment steps will require write access to the directory in which the shiny app is run.  This means that the default setup will not work and you must configure the DPT shiny app to run as a local user. This is the config file that we use:
+
+```{bash, eval=FALSE}
+# Config file located at: /etc/shiny-server/shiny-server.conf
+
+# Define a server that listens on port 3838
+# Note: you will need to make sure that port 3838 is open/avaialable to your users
+server {
+  listen 3838;
+  
+  # note we run as the home user and set the user_dirs  
+  location / {
+    run_as :HOME_USER:;
+    user_dirs;
+  }
+}
+```
+
+
+To setup your local apps you would use the following app and log structure. Note how the app structure will map to the URL.
+
+```{shell, eval=FALSE}
+# your user home directory
+└── zachcp
+    └── ShinyApps
+        ├── log
+        │   └── primerdesign-zcharlop-20161122-152237-39540.log
+        └── primerdesign
+            └── app.R
+            
+# You can then visit your app at the following IP address: http://<your_host>:3838/zcharlop/primerdesign/
+
+```
+
+To update the shiny-server app you need to replace your app.R file and restart shiny-server:
+
+```{shell, eval=FALSE}
+# RHEL 7
+sudo systemctl status shiny-server
+#RHEL 6.4
+sudo stop shiny-server
+```
+
+
