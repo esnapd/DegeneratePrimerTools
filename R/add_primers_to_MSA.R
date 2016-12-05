@@ -65,15 +65,15 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
         warning("There are multiple matches of your degenerate sequence against one or more target sequences. Since strict is set to FALSE, this will return the first match.")
         primerlocation <- unique(primerlocation)[[1]]
       } else if (mode=="consensus") {
-        locfreqs <- sort( table(primerlocation), decreasing = TRUE)
-        consensus <- as.numeric(names(locfreqs[1]))
+        locfreqs       <- sort( table(primerlocation), decreasing = TRUE)
+        consensus      <- as.numeric(names(locfreqs[1]))
         primerlocation <- consensus
         
         locs <- paste(unique(primerlocation), collapse=",")
-        msg <- paste("You are using the consesnsu mode to add primer location to an MSA. One of your primers with sequence",
+        msg  <- paste("You are using the consensus mode to add primer location to an MSA. One of your primers with sequence",
                      prim , "and it is matching at the following locations: ", locs, " We have chosen the consensus loction,",
                      consensus,".")
-        stop(msg)
+        message(msg)
         
       } else {
         stop("Invalid choice for mode. Can be 'strict', 'first', or 'consensus'")
