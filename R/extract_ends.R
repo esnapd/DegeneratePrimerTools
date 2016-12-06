@@ -11,7 +11,10 @@
 #' @param trimr (optional). Default \code{175}. Amount to be trimmed from the reverse primer match
 #' @param sep (optional).   Default \code{"N"}. A sequence used as a delimiter between the extracted sequences.
 #'
-#' @importFrom Biostrings xscat subseq
+#' @importFrom Biostrings subseq
+#' @importFrom Biostrings width
+#' @importFrom Biostrings xscat 
+#' @importFrom Biostrings DNAString
 #' @export
 #' @examples
 #' dnafile <- system.file("sequences","AHBA.fna",package="DegeneratePrimerTools")
