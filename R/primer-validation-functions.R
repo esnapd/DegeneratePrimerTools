@@ -2,8 +2,6 @@
 #'
 #' Library of functions to run Primer validation analysis.
 #' 
-#' @import rBLAST
-#' @import phyloseq
 #' @import dplyr
 #' @import ggrepel
 #' @import ggplot2
@@ -15,12 +13,10 @@
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
 #' 
-#' @examples
-#' PFAM <- "PF13714"
 #' 
-#' @param file. Required. File location (string)
-#' @param PFAM. Required. PFAM id of the target for the file being filtered (string)
-#' @param logfile. Required. A file location (string)
+#' @param file Required. File location (string)
+#' @param PFAM Required. PFAM id of the target for the file being filtered (string)
+#' @param logfile Required. A file location (string)
 #' 
 #' @export
 primer_filtering <- function(file, Ref, logfile, setwd=NULL){
@@ -256,10 +252,4 @@ primer_analysis <- function(target, fileList, Ref){
       
   }
 }
-
-
-
-
-  
-  
   
