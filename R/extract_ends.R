@@ -27,7 +27,7 @@ extract_ends <- function(dnastringset, trimf=240, trimr=175, sep="N") {
   amF <- subseq(dnastringset, end=trimf)
   amR <- subseq(dnastringset, start=-trimr)
   ampliconends <- xscat(amF,sep, amR)
-  names(ampliconends) <- dnastringset
+  names(ampliconends) <- names(dnastringset)
   
   #filter minimum size
   ampliconends[width(ampliconends) >= trimf+trimr]
