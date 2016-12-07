@@ -29,7 +29,7 @@ retrieve_PFAM_ids <- function(pfamid, alignmenttype = "uniprot") {
 
   if (is.null(r)) stop("There was a problem downloading the PFAM")
 
-    rows <- scan(text=content(r,"text"), what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE)
+    rows <- scan(text=content(r,"text", encoding="UTF8"), what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE)
 
   if (length(rows) < 3 || !identical(grep("^# STOCKHOLM", rows[1L]), 1L)) stop("invalid Stockholm file")
 
@@ -111,7 +111,7 @@ retrieve_UNIPROT_to_EMBL <- function(uniprotids, chunksize=200) {
 
       if (is.null(r)) stop("There was a problem obtaining the UNIPROT->ENA Mapping")
 
-      df <- read.table(text=content(r, "text"), header = TRUE, stringsAsFactors = FALSE)
+      df <- read.table(text=content(r, "text", encoding="UTF8"), header = TRUE, stringsAsFactors = FALSE)
       names(df) <- c("UNIPROT_ID", "EMBL_ID")
 
       return(df)
@@ -148,7 +148,7 @@ retrieve_EMBL_to_UNIPROT <- function(uniprotids, chunksize=200) {
       
       if (is.null(r)) stop("There was a problem obtaining the UNIPROT->ENA Mapping")
       
-      df <- read.table(text=content(r, "text"), header = TRUE, stringsAsFactors = FALSE)
+      df <- read.table(text=content(r, "text", encoding="UTF8"), header = TRUE, stringsAsFactors = FALSE)
       names(df) <- c("EMBL_ID", "UNIPROT_ID")
       
       return(df)
@@ -187,7 +187,7 @@ retrieve_EMBL_sequences <- function(emblids, chunksize=200) {
     r <- GET(paste0(baseurl, paste0(groups[[i]], collapse=","), opts))
 
     # remove lines where sequences return error messages
-    lines <- scan(text=content(r, "text"), what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE)
+    lines <- scan(text=content(r, "text", encoding="UTF8"), what = "", sep = "\n", strip.white = TRUE, quiet = TRUE, blank.lines.skip = FALSE)
     lines <- lines[!grepl("has been suppressed at the submitter's request on", lines)]
     
     write(x=lines, file=temps[[i]])
