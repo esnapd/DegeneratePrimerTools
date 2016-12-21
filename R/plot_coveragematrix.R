@@ -1,41 +1,61 @@
+#' plot_coveragematrix
+#' 
 #' Plot the Coverage of Degenerate primers
 #'
-#' @param degprim
-#' @param primerpairlist
-#' @param max.mismatch
-#' @param tiplabelsize
-#' @param align
+#' @param degprim Required.
+#' @param primerpairlist Optional. Default \code{NULL}. Otherwise we expect a list of \code{primerpair}s.
+#' @param max.mismatch Optional. Default \code{3}. The maximum mismatch allowed between a primer and target sequence to 
+#' be considered as a match.
+#' @param tiplabelsize Optional. Default \code{3}
+#' @param align Optional. Default \code{TRUE}
 #' @importFrom ggtree gheatmap 
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_tiplab
 #' @export
-plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=1, tiplabelsize=3, align=TRUE, ...) {
-  if (!class(degprim) == "degeprimer") {
-    stop("The first argument must be of class 'degeprimer'")
+plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=3, tiplabelsize=3, align=TRUE, ...) {
+  if (!class(degprim) %in% c("degeprimer", "phyloseq")) {
+    stop("The first argument must be of class 'degeprimer' or 'phyloseq'")
   }
-  if (is.null(primerpairlist)){
-    primerpairlist <- degprim@primerpairs
+  if (is.null(primerpairlist)){ 
+    message("no primerpairs specified. attmepting to find primer pairs.")
+    try(primerpairlist <- degprim@primerpairs) 
   }
   
-  if (length(primerpairlist) == 0) stop("This function requires primerpairs")
+  if (length(primerpairlist) == 0) stop("Primer pairs are not detected. This function requires primerpairs")
   
-  refseq <- degprim@refseq
+  try(refseq <- degprim@refseq)
+  if (!exists("refseq")) {stop("There is no associated reference sequence with your input object.")}
   
   # Create Matrix of Primer-Sequence Matching
-  primerdata <- lapply(primerpairlist, function(ppair){
-    # make primermatrix from one refseq against one primer
-    pname        <- ppair@name
-    hitdf        <- find_primers(refseq, fp=ppair@forwardprimer,rp=ppair@reverseprimer, max.mismatch=max.mismatch)
-    hitdf[pname] <- mapply(function(start,end) {ifelse(is.na(start) || is.na(end), "No Match","Match")},
-                           hitdf$start, hitdf$end)
-    row.names(hitdf) <- hitdf$sequence
-    hitdf[pname]
-  })
+  primerdata <- lapply(primerpairlist, function(ppair){does_primer_match(dna=refseq, primerpair=ppair)})
   
   df <- do.call("cbind", primerdata)
   
   # pass the created matrix to ggtree's matrix mapping function
-  p  <- ggtree(degprim@phy_tree, ladderize = TRUE)
+  p  <- ggtree(degprim@phy_tree, ladderize = TRUE) 
   p  <- p + geom_tiplab(size = tiplabelsize, align = align)
   gheatmap(p, df, ...)
+}
+#' does_primer_match
+#' 
+#' match a primerpair against a dna string set and return a singel column matrix of
+#' values that determine whether a primer pair matches that sequence or not.
+#' 
+#' @param dna Required. A \code{\link[Biostrings]DNAStringSet}
+#' @param primerpair Required. A \code{primerpair}.
+#' @param max.mismatch Optional. Default \code{3}.
+#'
+#' @return a single column matrix of whether
+#'
+#' @export
+does_primer_match <- function(dna, primerpair, max.mismatch=3) {
+  if (!class(dna) == "DNAStringSet") stop("dna must be a DNAStringSet")
+  if (!class(primerpair) == "primerpair") stop("primerpair must be a primerpair")
+  
+  pname        <- primerpair@name
+  hitdf        <- find_primers(dna, fp=primerpair@forwardprimer,rp=primerpair@reverseprimer, max.mismatch=max.mismatch)
+  hitdf[pname] <- mapply(function(start,end) {ifelse(is.na(start) || is.na(end), "No Match","Match")},
+                         hitdf$start, hitdf$end)
+  row.names(hitdf) <- hitdf$sequence
+  hitdf[pname]
 }

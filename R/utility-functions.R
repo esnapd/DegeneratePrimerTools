@@ -120,3 +120,21 @@ find_primers <- function(refseq, fp, rp, max.mismatch) {
   df$sequence <- names(primermatches)
   return(df)
 }
+#' get_GC
+#' 
+#' get GC content of a DNAStringSet
+#' 
+#' @importFrom Biostrings alphabetFrequency
+#' @params seqs
+#' @export
+get_GC <- function(seqs) {
+  alph <- alphabetFrequency(seqs)
+  gc   <- mapply(FUN = function(a,c,g,t) { 
+    (g + c)/ (a + c + t + g)
+  }, alph[,1], alph[,2], alph[,3], alph[,4] )
+  
+  gc <- data.frame(gc)
+  row.names(gc) <- names(seqs)
+  
+  gc
+}
