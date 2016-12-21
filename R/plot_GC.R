@@ -13,8 +13,8 @@ plot_GC <- function(degprim,  ...) {
     stop("The first argument must be of class 'degeprimer' or 'phyloseq'")
   }
   
-  if (class(degeprim)== "phyloseq") {
-    if (is.null(degeprim@phy_tree))
+  if (class(degprim)== "phyloseq") {
+    if (is.null(degerim@phy_tree))
       stop("your phyloseq object must contain a phylogenetic tree")
   }
   
