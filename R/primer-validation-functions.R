@@ -2,17 +2,12 @@
 #'
 #' Library of functions to run Primer validation analysis.
 #' 
-#' @import dplyr
-#' @import ggrepel
-#' @import ggplot2
 #' @import purrr
-#' @import ape
-#' @import Biobase
-#' @import gridExtra
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
-#' 
+#' @importFrom Biostrings readDNAStringSet
+#' @importFrom Biostrings writeXStringSet
 #' 
 #' @param file Required. File location (string)
 #' @param PFAM Required. PFAM id of the target for the file being filtered (string)
@@ -92,7 +87,7 @@ primer_filtering <- function(file, Ref, logfile, setwd=NULL){
   cat(paste(Sys.time(), "Filter blast results to remove unrelated sequences\n"), file=logfile, sep="", append=TRUE)
   Filteredseqs <- SortedSeqs[(names(SortedSeqs)) %in% FilteredNames]
   FilteredFile <- paste0(wd, "/", sampleName, "_filtered.fasta")
-  Biostrings::writeXStringSet(Filteredseqs, FilteredFile, format = "fasta")
+  writeXStringSet(Filteredseqs, FilteredFile, format = "fasta")
   
   
   ###################################################################################################################################
@@ -109,13 +104,17 @@ primer_filtering <- function(file, Ref, logfile, setwd=NULL){
   return(SortedFile97)
 }
 
-
 #' Primer analysis function to validate a set of primers for a target and plot their rarefaction curve and annotated tree.
 #' 
-#' @param Target. Required. Target name (string)
-#' @param fileList. Required. List of file locations (vector of strings)
-#' @param Ref. Required. Reference sequences for the target investigated. Either file location (string) or DNAstringSet or Degeprimer RDS object.
+#' @param target Required. target name (string)
+#' @param fileList Required. List of file locations (vector of strings)
+#' @param Ref Required. Reference sequences for the target investigated. Either file location (string) or DNAstringSet or Degeprimer RDS object.
 #' 
+#' @import ggplot2
+#' @importFrom Biostrings writeXStringSet
+#' @importFrom ggtree ggtree
+#' @importFrom ggtree gheatmap
+#' @importFrom gridExtra grid.arrange
 #' @export
 primer_analysis <- function(target, fileList, Ref){
   
