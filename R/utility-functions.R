@@ -122,7 +122,7 @@ find_primers <- function(refseq, fp, rp, max.mismatch) {
 }
 #' get_GC
 #' 
-#' get GC content of a DNAStringSet
+#' get GC content of a \code{\link[Biostrings]{DNAStringSet}}
 #' 
 #' @importFrom Biostrings alphabetFrequency
 #' @params seqs
