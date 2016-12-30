@@ -1,9 +1,23 @@
 ---
 title: "Basic Functionality"
 author: "zachcp"
-date: "June 12, 2016"
+date: "December 27, 2016"
 output: html_document
 ---
+
+## Install
+
+```{r, warning=FALSE, message=FALSE}
+# install bioconductor dependencies
+source("https://bioconductor.org/biocLite.R")
+biocLite(c("msa", "ggtree"))
+# install from github
+library(devtools)
+install_github("esnapd/DegeneratePrimerTools")
+
+# you will probably also want muscle and FastTree on your CLI
+# see [bioconda](https://bioconda.github.io/) for easy install of these programs
+```
 
 ## Load Sequences
 
