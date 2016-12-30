@@ -1,8 +1,13 @@
 #' plot_GC
 #' 
-#' Plot the GC Content 
+#' Plot the GC Content of the reference sequences 
+#' of a degeprimer object.
 #' 
-#' @param degprim. Required. A degeprime object or a a phyloseq object.
+#' @param degprim Required. A degeprime object or a a phyloseq object.
+#' @param lowGC Optional. Default \code{0}. The low GC value for the purpose of plotting.
+#' @param highGC Optional. Default \code{1}  The high GC value for the purpose of plotting.
+#' @param midGC Optional. Default \code{0.5}  The midpoint GC value for the purpose of
+#'  plotting. This is where the color will fade to white.
 #' @importFrom ggtree gheatmap 
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_tiplab

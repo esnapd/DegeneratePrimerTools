@@ -3,17 +3,18 @@
 #' Generate Rarefaction Curves from Phyloseq.
 #' Adopted from @@and3k https://github.com/joey711/phyloseq/issues/143
 #' 
-#' @param physeq phyloseq object
-#' @param measures vector of rarefaction measures
-#' @param depths vector of depths to rarefy to
-#' @param parallel wether to use ldplyr's parallel features
-#' @param ncpus nubmer of cpus
+#' @param physeq Required. A \code{\link[phyloseq]{phyloseq}} object.
+#' @param measures Required. Vector of rarefaction measures.
+#' @param depths Required. Vector of depths (ints) to rarefy to
+#' @param parallel Optional. Default \code{FALSE}. Whether to use ldplyr's parallel features
+#' @param ncpus Optional. Default \code{1} Number of cpus
 #' 
 #' @importFrom plyr ldply
 #' @importFrom plyr summarise
 #' @importFrom reshape2 melt
 #' @import foreach
-#' @import doParallel
+#' @import doParallel makeCluster
+#' @import doParallel registerDoParallel
 #' 
 #' @export
 calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALSE, ncpus=1) {
@@ -35,7 +36,6 @@ calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALS
   
   if (parallel){
     #if parallel setup the cluster
-    library(doParallel)
     print("Running Calculation in Parallel...")
     cl <- makeCluster(ncpus)
     registerDoParallel(cl)
@@ -58,11 +58,5 @@ calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALS
                                     Alpha_diversity_mean = mean(Alpha_diversity), 
                                     Alpha_diversity_sd = sd(Alpha_diversity)) 
   
-  #add the sample data
-  #rarefaction_curve_data_summary_verbose <- merge(rarefaction_curve_data_summary, 
-  #                                                data.frame(sample_data(physeq)), 
-  #                                                by.x = 'Sample', 
-  #                                                by.y = 'row.names')
-  #return(rarefaction_curve_data_summary_verbose)
   return(rarefaction_curve_data_summary)
 }

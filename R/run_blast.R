@@ -3,11 +3,11 @@
 #' Convenience function for running blastn. Can accept as inputs either files or DNAStringSets and
 #' can optionally return a file or a \link{[data.table] data.table} of the blast results.
 #'
-#' @param query. Required. Either a file location  (string) or a DNAStringSet
-#' @param target. Required. Either a file location (string) or a DNAStringSet
-#' @param outfile. Optional. Default \code{NULL} Either NUll or a filelocation
-#' @param parallel. Boolean. Default \code{FALSE}. Whether or not to use GNU parallel for speed.
-#' @param blast_args. Optional. Default \code{""}. String arguments to pass to the blast commandline.
+#' @param query Required. Either a file location  (string) or a DNAStringSet
+#' @param target Required. Either a file location (string) or a DNAStringSet
+#' @param outfile Optional. Default \code{NULL} Either NUll or a filelocation
+#' @param parallel Boolean. Default \code{FALSE}. Whether or not to use GNU parallel for speed.
+#' @param blast_args Optional. Default \code{""}. String arguments to pass to the blast commandline.
 #'
 #' @importFrom Biostrings writeXStringSet
 #' @importFrom data.table fread

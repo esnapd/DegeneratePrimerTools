@@ -1,7 +1,9 @@
+#' build tree
+#' 
 #' Create a Tree from An MSA
 #'
 #' @param dgprimer Required. A \code{\link{degeprimer}} object.
-#' @param force. Optional. Default is \code{FALSE}. If an msa already 
+#' @param force  Optional. Default is \code{FALSE}. If an msa already 
 #' exists, you must set FORCE to TRUE to overwrite it.
 #'
 #' @export

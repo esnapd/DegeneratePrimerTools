@@ -1,12 +1,13 @@
 #' run vsearch global
 #'
-#' Convenience function for running the vsearch global search. Can accept as inputs either filenames or DNAStringSets and
-#' can optionally return a file or a \link{[data.table] data.table} of the results in blastformat.
+#' Convenience function for running the vsearch global search. Can accept as 
+#' inputs either filenames or \code{\link[Biostrings]{DNAStringSet}} and can optionally return a file 
+#' or a \code{\link[data.table]{data.table}} of the results in blastformat.
 #'
-#' @param query. Required. Either a file location  (string) or a DNAStringSet
-#' @param target. Required. Either a file location (string) or a DNAStringSet
-#' @param outfile. Optional. Default \code{NULL} Either NUll or a filelocation
-#' @param id. Optional. Numeric value between 0 and 1. Default \code{0.95} Percent Identity of targets to subjects
+#' @param query Required. Either a file location  (string) or a DNAStringSet
+#' @param target Required. Either a file location (string) or a DNAStringSet
+#' @param outfile Optional. Default \code{NULL} Either NUll or a filelocation
+#' @param id  Optional. Numeric value between 0 and 1. Default \code{0.95} Percent Identity of targets to subjects
 #'
 #' @importFrom Biostrings writeXStringSet
 #' @importFrom data.table fread

@@ -5,11 +5,12 @@
 #' @importFrom dplyr arrange
 #' @importFrom dplyr filter
 #' 
-#' @param degeprime. Required. 
+#' @param degeprime  Required.  A \code{\link{degeprimer}} object.
 #' @param keepprimers Optional. Default \code{4}. How many primerpairs to keep.
-#' @param minsequences Optional. Default \code{3}. THe minimum number of sequences to be included in peak-pciking. This
-#' parameter is included to avoid the problem where primers are chosen on regions with samll numbpers of sequences, typically
-#' found at the end of an alignment.
+#' @param minsequences Optional. Default \code{3}. The minimum number of 
+#'  sequences to be included in peak-picking. This parameter is included to 
+#'  avoid the  problem where primers are chosen on regions with small numbers
+#'  of sequences, typically found at the end of an alignment.
 #' 
 #' @return vector of ints denoting the top peaks
 #' @export

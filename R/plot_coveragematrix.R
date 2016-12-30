@@ -38,10 +38,11 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=3, ti
 }
 #' does_primer_match
 #' 
-#' match a primerpair against a dna string set and return a singel column matrix of
-#' values that determine whether a primer pair matches that sequence or not.
+#' match a primerpair against a \code{\link[Biostrings]{DNAStringSet}} and 
+#' return a single column matrix of values that determine whether a primer
+#' pair matches that sequence or not.
 #' 
-#' @param dna Required. A \code{\link[Biostrings]DNAStringSet}
+#' @param dna Required. A \code{\link[Biostrings]{DNAStringSet}}
 #' @param primerpair Required. A \code{primerpair}.
 #' @param max.mismatch Optional. Default \code{3}.
 #'

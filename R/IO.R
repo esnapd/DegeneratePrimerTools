@@ -1,7 +1,7 @@
 #'
 #' Read HMMMer DomTbl File
 #'
-#' HMMER outputs several filetypes this one will read tits Domain scanning program
+#' HMMER outputs several filetypes this one will read its Domain scanning program
 #'
 #' @param filename. Required. HMMDom table output file
 #' @importFrom data.table fread
@@ -18,9 +18,8 @@ load_hmmmerdomtbl <- function(filename){
 }
 #' Load Blast Tabular Output Files.
 #'
-#' Loading blast data into R and returning a \code{\link{[data.table] data.table}} and
-#' creating an index on the indexcolumns
-#' keys on the QueryI and SubjectID
+#' Loading blast data into R and returning a \code{\link{[data.table]{data.table}}} and
+#' creating an index on the index columns; keys on the QueryI and SubjectID
 #'
 #' @param blastfile. Required. Path location of a blastfile.
 #' @param indexcols. Optional. List of columnvalues to set the index on.

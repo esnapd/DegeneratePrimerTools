@@ -1,6 +1,9 @@
 #' Plot the MSA Object
 #'
+#' @param msa Required. A multiple sequence alignment.
+#' @import ggplot2
 #' @importFrom purrr reduce
+#' @importFrom dplyr %>% 
 #' @export
 plot_msa <- function(msa) {
   if (!class(msa) %in% c("DNAStringSet", "DNAMultipleAlignment"))  {

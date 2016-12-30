@@ -1,7 +1,9 @@
 #' Add Primer Pairs to the MSA to enable visualization.
 #'
-#' @param degeprime. Required. A \code{degeprimer-class} object.
+#' @param degeprime Required. A \code{degeprimer-class} object.
+#' @param max.mismatch Optional. Default \code{3}.
 #' @return a \code{\link[Biostrings] DNAMultipleAlignment}
+#' @importFrom purrr map
 #' @importFrom purrr map_df
 #' @importFrom purrr map_chr
 #' @importFrom Biostrings DNAStringSet

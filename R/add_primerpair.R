@@ -1,9 +1,17 @@
 #' Add Primer
 #'
-#' A convenience function to add a primer pair to the primerl list based on the
-#' degenracy and location of forward and reverse primers.
+#' A convenience function to add a primer pair to the primer list based on the
+#' degeneracy and location of forward and reverse primers.
 #'
+#' @param dgprimer Required.
+#' @param name Required.
+#' @param fpos Required.
+#' @param fdeg Required.
+#' @param rpos Required.
+#' @param rdeg Required.
+#' 
 #' @importFrom purrr map_chr
+#' @importFrom Biostrings DNAString
 #' @export
 add_primerpair <-function(dgprimer, name, fpos, fdeg, rpos, rdeg) {
   

@@ -6,7 +6,12 @@
 #'
 #' @import miniUI
 #' @import ggplot2
-#' @importFrom  shiny plotOutput runGadget dialogViewer fillRow checkboxGroupInput
+#' @importFrom shiny plotOutput 
+#' @importFrom shiny runGadget 
+#' @importFrom shiny dialogViewer 
+#' @importFrom shiny fillRow 
+#' @importFrom shiny checkboxGroupInput 
+#' 
 #' @export
 setGeneric("choose_primer", function(object) standardGeneric("choose_primer"))
 #'
@@ -31,7 +36,6 @@ setMethod("choose_primer", "primerdata", function(object){
               # brush events on the plot using input$brush.
               plotOutput("plot", height = "100%", brush = "brush")
       )))
-  
   
   server <- function(input, output, session) {
     # Render the plot
