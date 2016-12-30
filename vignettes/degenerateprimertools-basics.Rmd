@@ -9,6 +9,10 @@ output:
     toc: yes
     toc_depth: 2
     number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Designing Primers}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 `r library("knitr")`
@@ -22,7 +26,7 @@ DegeneratePrimerTools (DPT) is a package that facilitates degenerate primer desi
 
 In this vignette, a user has a set of DNA sequences for which he would like to design primers.  The workflow can be seen here with am ore detailed explanation below.
  
-```{r}
+```{r, message=FALSE}
 library(dplyr)
 library(DegeneratePrimerTools)
 
@@ -34,7 +38,7 @@ AHBAseqs <- Biostrings::readDNAStringSet(ahbafna)
 AHBA_degeprimer <- degeprimer(AHBAseqs) %>%
   run_alignment() %>%
   build_tree() %>%
-  design_primers( maxdegeneracies=c(1, 10, 20), number_iterations=2) # this can take awhile
+  design_primers( maxdegeneracies=c(5, 10), number_iterations=2) # this can take awhile
 ```
 
 At this point, `AHBA_degeprimer` is an object that holds the original sequence information, the multiple sequence alignment, a phylogenetic tree of those sequences, and the DEGEPRIME primer design table. DEEPRIME has walked along the multiple sequence alignment and determined, for each location in the MSA, a degenerate primer that maximizes the coverage of sequences in the alignment that has a degeneracy value less than what is specified. In this case we ran DEGEPRIME twice, using maximum degeneracy values of 1 and 10.
@@ -76,7 +80,7 @@ plot_coveragematrix(AHBA_degeprimer,max.mismatch = 3)
 Gives and overview of where your primers are and what the coverage is.
 
 ```{r}
-msa1 <- add_primers_to_MSA(AHBA_degeprimer)
+msa1 <- add_primerpairs_to_MSA(AHBA_degeprimer)
 plot_msa(msa1)
 ```
 

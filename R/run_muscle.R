@@ -12,7 +12,7 @@
 #' @importFrom Biostrings readDNAStringSet
 #' @export
 run_muscle <- function(seqs,  outfile=NULL, muscle_args="-maxiters 2") {
-  #intermediate files will be run in temp if no output is sent.
+  # intermediate files will be run in temp if no output is set.
   wd <- tempdir()
   on.exit(unlink(list.files(wd)))
   

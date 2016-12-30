@@ -1,10 +1,11 @@
 #' run FastTree
 #'
-#' Convenience function for running \href{http://www.microbesonline.org/fasttree/}{FastTree}. Can accept as inputs either file names or DNAStringSets and
-#' can optionally return a file or a \link{[data.table] data.table} of the blast results.
+#' Convenience function for running \href{http://www.microbesonline.org/fasttree/}{FastTree}. 
+#' Can accept as inputs either file names or DNAStringSets and can optionally 
+#' return a file or a \link{[data.table]{data.table}} of the blast results.
 #'
-#' @param seqs Required. Either a file location  (string) or a DNAStringSet
-#' @param outfile. Optional. Default \code{NULL} Either NUll or a filelocation
+#' @param seqs Required. Either a file location  (string) or a \code{\link[Biostrings]{DNAStringSet}}
+#' @param outfile. Optional. Default \code{NULL} Either NULL or a filelocation
 #' @param fasttree_args. Optional. Default \code{"--maxiters=2"}. Commandline arguments to pass to FastTree.
 #'
 #' @importFrom Biostrings writeXStringSet

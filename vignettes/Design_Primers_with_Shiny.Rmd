@@ -91,7 +91,7 @@ server {
 
 To setup your local apps you would use the following app and log structure. Note how the app structure will map to the URL.
 
-```{shell, eval=FALSE}
+```
 # your user home directory
 └── zachcp
     └── ShinyApps
@@ -106,7 +106,7 @@ To setup your local apps you would use the following app and log structure. Note
 
 To update the shiny-server app you need to replace your app.R file and restart shiny-server:
 
-```{shell, eval=FALSE}
+```
 # RHEL 7
 sudo systemctl status shiny-server
 #RHEL 6.4

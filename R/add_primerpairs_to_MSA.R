@@ -11,7 +11,7 @@
 #' @importFrom dplyr left_join
 #' @export
 #' 
-add_primerspairs_to_MSA <- function(degeprime, max.mismatch=3) {
+add_primerpairs_to_MSA <- function(degeprime, max.mismatch=3) {
   # find the matches between the primer and several sequences in the MSA
   primerdata <- purrr::map_df(degeprime@primerpairs, function(ppair){
     # make primermatrix from one refseq against one primer

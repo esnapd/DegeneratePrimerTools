@@ -2,15 +2,20 @@
 #' 
 #' To add primer pairs to an MSA, see \code{add_primerpairs}.
 #'
-#' @param degeprime. Required. A \code{degeprimer-class} object.
-#' @param positions. Required. A position (or vector of positions) in the DEGEPRIEMER output from which degenerate primers will be picked. 
-#' @param max.mismatch. Optional. Default \code{3}. Maxmimum mismatch between the primer and a DNA target.
-#' @param windowsize. Optional. Default \code{30}. Windowsize of MSA to return. A setting of '0' will return the full length alignment. Note: if
-#' multiple positions are specified, it is no longer possible to specify a window.
-#' @param mode Optional. Default \code{'consensus'}. If there are multiple matches of a degenerate primer against a target sequence, usig strict will
-#' cause the functon to fail. If 'strict' it will only allow single matches. If "first", it will allow the first match,
-#' if 'consensus', it will choose the most abundant location.
-#' @return a \code{\link[Biostrings] DNAMultipleAlignment}
+#' @param degeprime Required. A \code{degeprimer-class} object.
+#' @param positions Required. A position (or vector of positions) in the 
+#'    DEGEPRIMER output from which degenerate primers will be picked. 
+#' @param max.mismatch Optional. Default \code{3}. Maxmimum mismatch between the 
+#'    primer and a DNA target.
+#' @param windowsize Optional. Default \code{30}. Windowsize of MSA to return. 
+#'   A setting of '0' will return the full length alignment. Note: if multiple
+#'  positions are specified, it is no longer possible to specify a window.
+#' @param mode Optional. Default \code{'consensus'}. If there are multiple 
+#'   matches of a degenerate primer against a target sequence, using strict
+#'    ill cause the functon to fail. If 'strict' it will only allow single
+#'    matches. If "first", it will allow the first match, if 'consensus', 
+#'    it will choose the most abundant location.
+#' @return a \code{\link[Biostrings]{DNAMultipleAlignment}}
 #' @importFrom purrr map
 #' @importFrom purrr by_row
 #' @importFrom purrr discard
@@ -30,6 +35,8 @@
 add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=30, mode="consensus") {
   if (is.null(degeprime@primerdata)) stop("There is not primer information associated with this object")
   
+  stopifnot(exists("positions"))
+  print(class(positions))
   # obtain the primer sequences: find the matches between the primer and several sequences in the MSA
   primerdata <- data.frame(degeprime@primerdata) %>%
     filter(Pos %in% positions) %>%
