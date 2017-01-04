@@ -26,7 +26,7 @@ calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALS
     alpha_diversity <- estimate_richness(rarified_physeq, measures = measures)
     
     # as.matrix forces the use of melt.array, which includes the Sample names (rownames)
-    molten_alpha_diversity <- melt(as.matrix(alpha_diversity), 
+    molten_alpha_diversity <- reshape2:::melt.array(as.matrix(alpha_diversity), 
                                    varnames = c('Sample', 'Measure'), 
                                    value.name = 'Alpha_diversity')
     
