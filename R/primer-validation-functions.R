@@ -155,7 +155,6 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       rarefaction_curve_data90 <- cbind(seq(1:100), rarefaction_curve_data90)
       
       colnames(rarefaction_curve_data90) <- c("idx","Depth","Diversity", "Sample", "Target")
-<<<<<<< HEAD
       
       df90 <- rbind (df90, rarefaction_curve_data90)
       Cluster90AllSeq <- append(Cluster90AllSeq, Cluster90Seqs, after=length(Cluster90AllSeq))
