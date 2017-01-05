@@ -79,8 +79,13 @@ primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
 }
 
 
+
+
+
+
+
 #' Primer analysis function to validate a set of primers for a target and plot their rarefaction curve and annotated tree.
-#' 
+#'
 #' @param target Required. target name (string)
 #' @param fileList Required. List of file locations (vector of strings)
 #' @param Ref Required. Reference sequences for the target investigated. Either file location (string) or DNAstringSet or Degeprimer RDS object.
@@ -121,10 +126,17 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       
       ###################################################################################################################################
       # Cluster filtered sequences at 90% identity
+<<<<<<< HEAD
       
       OutFasta90 <- paste0(wd, "/", sampleName, "_clustered90.fasta")
       UCFile90 <- paste0(wd, "/", sampleName, "_clustered90.uc")
       
+=======
+      
+      OutFasta90 <- paste0(wd, "/", sampleName, "_clustered90.fasta")
+      UCFile90 <- paste0(wd, "/", sampleName, "_clustered90.uc")
+      
+>>>>>>> b5bd5ca3b0d7b007b26e19c1b688690ae559ceae
       run_vsearch_cluster(FilteredSeqsFasta, id=0.90, OutFasta90, UCFile90, logfile)
       Cluster90Seqs <- readDNAStringSet(OutFasta90)
       UC90phylo <- filter_taxa(import_usearch_uc(UCFile90), function(x) x>= OTUsizeFilter, TRUE)
@@ -150,6 +162,7 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       rarefaction_curve_data90 <- cbind(seq(1:100), rarefaction_curve_data90)
       
       colnames(rarefaction_curve_data90) <- c("idx","Depth","Diversity", "Sample", "Target")
+<<<<<<< HEAD
       
       df90 <- rbind (df90, rarefaction_curve_data90)
       Cluster90AllSeq <- append(Cluster90AllSeq, Cluster90Seqs, after=length(Cluster90AllSeq))
@@ -163,6 +176,21 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       rarefaction_curve_data85 <- cbind(rarefaction_curve_data85, rep(as.character(Target),100))
       rarefaction_curve_data85 <- cbind(seq(1:100), rarefaction_curve_data85)
       
+=======
+      
+      df90 <- rbind (df90, rarefaction_curve_data90)
+      Cluster90AllSeq <- append(Cluster90AllSeq, Cluster90Seqs, after=length(Cluster90AllSeq))
+      
+      
+      ###################################################################################################################################
+      # phyloseq-tools rarefy for 85% cluster identity
+      
+      rarefaction_curve_data85 <- (calculate_rarefaction_curves(UC85phylo, c('Observed'), seq(1, max(sample_sums(UC85phylo)), length.out=100), parallel = FALSE))[c(1,4)]
+      rarefaction_curve_data85 <- cbind(rarefaction_curve_data85, rep(as.character(sampleName),100))
+      rarefaction_curve_data85 <- cbind(rarefaction_curve_data85, rep(as.character(Target),100))
+      rarefaction_curve_data85 <- cbind(seq(1:100), rarefaction_curve_data85)
+      
+>>>>>>> b5bd5ca3b0d7b007b26e19c1b688690ae559ceae
       colnames(rarefaction_curve_data85) <- c("idx","Depth","Diversity", "Sample", "Target")
       
       df85 <- rbind (df85, rarefaction_curve_data85)
@@ -277,6 +305,7 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       SampleMatrix90 <- NULL
       SampleMatrix90 <- do.call("cbind", list(LABELS90))
       SampleMatrix90 <- cbind(Tree90$tip.label, SampleMatrix90, SampleMatrix90)
+<<<<<<< HEAD
       
       SampleMatrix85[which(SampleMatrix85[,2] %in% unlist(RefIDs)),2] <- ""
       SampleMatrix85[which(!SampleMatrix85[,3] %in% unlist(RefIDs)),3] <- ""
@@ -297,6 +326,28 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       #Tree$tip.label <- TipLabels
       TREE85.laz<-ladderize(Tree85,TRUE)
       TREE90.laz<-ladderize(Tree90,TRUE)
+=======
+      
+      SampleMatrix85[which(SampleMatrix85[,2] %in% unlist(RefIDs)),2] <- ""
+      SampleMatrix85[which(!SampleMatrix85[,3] %in% unlist(RefIDs)),3] <- ""
+      SampleMatrix90[which(SampleMatrix90[,2] %in% unlist(RefIDs)),2] <- ""
+      SampleMatrix90[which(!SampleMatrix90[,3] %in% unlist(RefIDs)),3] <- ""
+      rownames(SampleMatrix85) <- Tree85$tip.label
+      colnames(SampleMatrix85) <- c("TipLab","Samples", "Reference")
+      rownames(SampleMatrix90) <- Tree90$tip.label
+      colnames(SampleMatrix90) <- c("TipLab","Samples", "Reference")
+      dd85 <- data.frame(SampleMatrix85)
+      SampleMatrix85[which(SampleMatrix85[,3] %in% unlist(RefIDs)),3] <- "Reference"
+      dd90 <- data.frame(SampleMatrix90)
+      SampleMatrix90[which(SampleMatrix90[,3] %in% unlist(RefIDs)),3] <- "Reference"
+>>>>>>> b5bd5ca3b0d7b007b26e19c1b688690ae559ceae
+      
+      
+      
+      
+      #Tree$tip.label <- TipLabels
+      TREE85.laz<-ladderize(Tree85,TRUE)
+      TREE90.laz<-ladderize(Tree90,TRUE)
       
       
       # Plot tree
@@ -307,6 +358,16 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       # Create the heatmap displaying the different 
       H85 <- gheatmap(T85, SampleMatrix85[,-1], offset = 0.5, width=0.2, colnames = FALSE) # + scale_fill_manual(values=ColourPalette)
       # Plot tree
+<<<<<<< HEAD
+      T85 <- ggtree(TREE85.laz) #, branch.length="none") +
+        T85 <- T85 %<+% dd85 + # geom_tiplab(aes(label=Reference, subset=isTip), size =2, color="darkblue") +
+          geom_text_repel(aes(label = Reference),size = 3, force = 1, nudge_x = 0.4, nudge_y=1, color="red")
+          
+      # Create the heatmap displaying the different 
+      H85 <- gheatmap(T85, SampleMatrix85[,-1], offset = 0.5, width=0.2, colnames = FALSE) # + scale_fill_manual(values=ColourPalette)
+      # Plot tree
+=======
+>>>>>>> b5bd5ca3b0d7b007b26e19c1b688690ae559ceae
       T90 <- ggtree(TREE90.laz) #, branch.length="none") +
         T90 <- T90 %<+% dd90 + #geom_tiplab(aes(label=Reference, subset=isTip), size =2, color="darkblue")
         geom_text_repel(aes(label = Reference),size = 3, force = 1, nudge_x = 0.4, nudge_y=1, color="red")

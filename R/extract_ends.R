@@ -26,11 +26,7 @@ extract_ends <- function(dnastringset, trimf=240, trimr=175, sep="N") {
   #get forward and reverse and concatenate together
   amF <- subseq(dnastringset, end=trimf)
   amR <- subseq(dnastringset, start=-trimr)
-<<<<<<< f9628d14de2cbd4f3bf03c59f349033c195ea310
   ampliconends <- xscat(amF,sep, amR)
-=======
-  ampliconends <- xscat(amF, amR)
->>>>>>> addition of Minimum size parameter instead of hard code in the vsearch sort function.
   names(ampliconends) <- names(dnastringset)
   
   #filter minimum size
