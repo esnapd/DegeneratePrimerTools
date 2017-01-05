@@ -71,7 +71,7 @@ primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
   
   
   ###################################################################################################################################
-  # Filter out the sequences from the original sorted file.
+  # Filter out the sequences from the original sorted file and subsample at size required.
   cat(paste(Sys.time(), "Filter blast results to remove unrelated sequences\n"), file=logfile, sep="", append=TRUE)
   Sampledseqs <- Seqs[(names(Seqs)) %in% SampledNames]
   SampledFile <- paste0(wd, "/", sampleName, "_sampled.fasta")
@@ -81,7 +81,7 @@ primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
   ###################################################################################################################################
   # Sort the filtered sequences
   SortedFile <- paste0(wd, "/", sampleName, "_sorted.fasta")
-  run_vsearch_sort(SampledFile, SortedFile, MinSize =1, logfile)
+  run_vsearch_sort(SampledFile, SortedFile, MinSize=1, logfile)
   
   return(SortedFile)
 }
@@ -272,7 +272,7 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
       # Now plot tree and rarefaction curve
       
       # Prepare the labels 
-      RefIDs <- colsplit(string=names(Ref), pattern=" ", names=c("1","2"))[1]
+      RefIDs <- reshape2:::colsplit(string=names(Ref), pattern=" ", names=c("1","2"))[1]
       
       LABS85 <- strsplit(Tree85$tip.label, "_M038") # How to cut this?
       LABELS85 <- do.call(rbind, LABS85)[,1]
