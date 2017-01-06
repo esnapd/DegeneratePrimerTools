@@ -94,8 +94,6 @@ primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
 #' 
 #' @import ggplot2
 #' @import phyloseq
-#' @import purrr
-#' @import dplyr
 #' @import ggtree
 #' @import gridExtra
 #' @importFrom Biostrings writeXStringSet
