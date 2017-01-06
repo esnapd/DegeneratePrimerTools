@@ -93,10 +93,12 @@ primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
 #' @param OTUsizeFilter. Required. Size of the OTUs to filter out (integer).
 #' 
 #' @import ggplot2
+#' @import phyloseq
+#' @import purrr
+#' @import dplyr
+#' @import ggtree
+#' @import gridExtra
 #' @importFrom Biostrings writeXStringSet
-#' @importFrom ggtree ggtree
-#' @importFrom ggtree gheatmap
-#' @importFrom gridExtra grid.arrange
 #' @export
 primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
   
