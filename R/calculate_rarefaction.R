@@ -13,8 +13,8 @@
 #' @importFrom plyr summarise
 #' @importFrom reshape2 melt
 #' @import foreach
-#' @import doParallel makeCluster
-#' @import doParallel registerDoParallel
+#' @importFrom parallel makeCluster
+#' @importFrom doParallel registerDoParallel
 #' 
 #' @export
 calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALSE, ncpus=1) {
