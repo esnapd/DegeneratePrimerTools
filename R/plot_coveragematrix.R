@@ -11,10 +11,11 @@
 #' @importFrom ggtree gheatmap 
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_tiplab
+#' @importFrom Biostrings DNAStringSet
 #' @export
 plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=3, tiplabelsize=3, align=TRUE, ...) {
-  if (!class(degprim) %in% c("degeprimer", "phyloseq")) {
-    stop("The first argument must be of class 'degeprimer' or 'phyloseq'")
+  if (!class(degprim) %in% c("degeprimer", "phyloseq", "DNAStringSet")) {
+    stop("The first argument must be of class 'degeprimer', 'phyloseq', or 'DNAStringSet'")
   }
   if (is.null(primerpairlist)){ 
     message("no primerpairs specified. attmepting to find primer pairs.")
@@ -24,15 +25,25 @@ plot_coveragematrix <- function(degprim, primerpairlist=NULL, max.mismatch=3, ti
   if (length(primerpairlist) == 0) stop("Primer pairs are not detected. This function requires primerpairs")
   
   try(refseq <- degprim@refseq)
+  if (class(degprim)== "DNAStringSet") refseq <- degprim
+  
   if (!exists("refseq")) {stop("There is no associated reference sequence with your input object.")}
   
   # Create Matrix of Primer-Sequence Matching
   primerdata <- lapply(primerpairlist, function(ppair){does_primer_match(dna=refseq, primerpair=ppair)})
-  
   df <- do.call("cbind", primerdata)
   
+  # get the phylogenetic tree
+  if (class(degprim) == "DNAStringSet") {
+    aln  <- run_muscle(degprim)
+    tree <- run_fasttree(aln)
+    
+  } else {
+    tree <- degprim@phy_tree
+  }
+  
   # pass the created matrix to ggtree's matrix mapping function
-  p  <- ggtree(degprim@phy_tree, ladderize = TRUE) 
+  p  <- ggtree(tree, ladderize = TRUE) 
   p  <- p + geom_tiplab(size = tiplabelsize, align = align)
   gheatmap(p, df, ...)
 }
