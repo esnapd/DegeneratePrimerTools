@@ -11,8 +11,8 @@ draw_plate_results <- function(nbWells = 96, plateData){
   #plateData <- data.frame (rown = rep (letters[1:8], 12), coln = rep (1:12, each = 8),
   #                        colorvar = rnorm (96, 0.5, 0.4))
   
-  plateData <- data.frame(rown = rep (letters[1:8], 12), coln = rep (1:12, each = 8),
-                          Molecule = c("AHBA_syntase", "AHBA_Rifamycin", rep("empty", 94)))
+  #plateData <- data.frame(rown = rep (letters[1:8], 12), coln = rep (1:12, each = 8),
+  #                        Molecule = c("AHBA_syntase", "AHBA_Rifamycin", rep("empty", 94)))
   
   ggplot(plateData, aes(y = factor(rown, rev(levels(rown))),x = factor(coln))) + 
     geom_point(aes(colour = Molecule), size =10)  +theme_bw() +
