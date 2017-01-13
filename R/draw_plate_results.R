@@ -15,7 +15,7 @@ draw_plate_results <- function(nbWells = 96, plateData){
   #                        Molecule = c("AHBA_syntase", "AHBA_Rifamycin", rep("empty", 94)))
   
   ggplot(plateData, aes(y = factor(rown, rev(levels(rown))),x = factor(coln))) + 
-    geom_point(aes(colour = Molecule), size =10)  +theme_bw() +
+    geom_point(aes(colour = Molecule), size =10)  + theme_bw() +
     labs(x=NULL, y = NULL) + ggtitle("96 well plate layout") + 
     theme(plot.title = element_text(family = "Trebuchet MS", color="#666666", size=22, hjust=.5))
   
