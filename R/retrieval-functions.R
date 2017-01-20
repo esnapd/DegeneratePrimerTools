@@ -318,7 +318,7 @@ retrieve_PFAM_nucleotide_sequences <- function(pfamids, alignmenttype = "uniprot
   # extract all of the domain sequences; save the master data.table in case of failure.
   domainsequences <- NULL
   try(domainsequences <- mcmapply(
-    FUN = function(x) {extract_sequences(id,start,end, sequences = seqs)},
+    FUN = function(id, start, end) {extract_sequences(id,start,end, sequences = seqs)},
     masterdf$EMBL_ID,
     masterdf$dnastart,
     masterdf$dnaend)
@@ -362,7 +362,7 @@ extract_sequences <-  function(seqname, start, end, sequences) {
   # multiple sequences is a problem
   if (length(targetsequence) > 1)  {
     target_names <- paste(names(targetsequence), collapse = ",")
-    warning(paste("There is apossible error in the ENA fasta headers or in the EMBL ID list. Returning the first sequence. The
+    warning(paste("There is a possible error in the ENA fasta headers or in the EMBL ID list. Returning the first sequence. The
                   accession values or this target are", target_names))
     
   }
