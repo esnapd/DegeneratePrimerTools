@@ -15,7 +15,13 @@ server <- function(input, output) {
     if (is.null(input$file1)){
       NULL
     }else {
-      readDNAStringSet(input$file1$datapath)
+      dnas <- readDNAStringSet(input$file1$datapath)
+      if (length(dnas) < 2) {
+        stop("This fastafile does not have enough sequences to align. 
+             If you believe this message is in error check your fasta file for 
+             the use of carraige returns used to demarcate line ends.")
+      }
+      dnas
     }
   )
   
