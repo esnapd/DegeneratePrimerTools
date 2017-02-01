@@ -237,7 +237,6 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
   # }
   
   # Trim the set of reference sequences with the extreme start and end positions
-  RefTrim <- extract_ends(extract_amplicons(Ref, "TTCCAGAACGGMAARCTGATG", "GGAACATSGCCATGTAGTGSG"))
   if (length(RefTrim) == 0) {
     warning("No reference sequence can be extracted with the primer data.")
   }
