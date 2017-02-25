@@ -82,8 +82,11 @@ run_blast <- function(query, target, outfile=NULL, parallel=FALSE, blast_args=""
   # read in the blast table.
   if (is.null(outfile)) {
     try(blastdt <- load_blast(blastout), silent=TRUE)
-    if (!exists("blastdt")) stop("BLAST did not return a match!")
-    
+    #if (!exists("blastdt")) stop("BLAST did not return a match!")
+    if (!exists("blastdt")) {
+      warning("BLAST did not return a match!")
+      blastdt <- NULL
+      }
     return(blastdt)
   }
 }
