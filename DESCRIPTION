@@ -41,5 +41,9 @@ Suggests:
     BiocStyle (>= 2.0.0),
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    DT,
+    dplyr,
+    shiny,
+    xtable
 VignetteBuilder: knitr
