@@ -37,7 +37,8 @@ Imports:
     zoo,
     maps,
     httr,
-    foreach
+    foreach,
+    seqinr
 RoxygenNote: 5.0.1
 Suggests:
     BiocStyle (>= 2.0.0),
