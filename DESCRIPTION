@@ -21,7 +21,7 @@ SystemRequirements:
 LazyData: TRUE
 Imports:
     Biostrings (>= 2.42.0),
-    phyloseq (>=1.19.1),
+    phyloseq (>= 1.19.1),
     msa (>= 1.6.0),
     msaR (>= 0.2.0),
     shiny (>= 0.13),
@@ -44,6 +44,5 @@ Suggests:
     rmarkdown,
     DT,
     dplyr,
-    shiny,
     xtable
 VignetteBuilder: knitr
