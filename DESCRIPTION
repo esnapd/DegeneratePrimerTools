@@ -35,6 +35,8 @@ Imports:
     gridExtra,
     parallel,
     zoo,
+    maps,
+    httr,
     foreach
 RoxygenNote: 5.0.1
 Suggests:
