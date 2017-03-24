@@ -21,6 +21,7 @@ SystemRequirements:
 LazyData: TRUE
 Imports:
     Biostrings (>= 2.42.0),
+    phyloseq (>=1.19.1),
     msa (>= 1.6.0),
     msaR (>= 0.2.0),
     shiny (>= 0.13),
@@ -33,7 +34,8 @@ Imports:
     ggrepel (>= 0.6.5),
     gridExtra,
     parallel,
-    zoo
+    zoo,
+    foreach
 RoxygenNote: 5.0.1
 Suggests:
     BiocStyle (>= 2.0.0),
