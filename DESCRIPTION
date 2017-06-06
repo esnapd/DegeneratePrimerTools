@@ -28,7 +28,8 @@ Imports:
     miniUI (>= 0.1.1),
     ggplot2 (>= 2.0),
     methods (>= 3.3.0),
-    purrr (>= 0.2.2),
+    purrr (>= 0.2.2.2),
+    purrrlyr (>= 0.0.2),
     ggtree (>= 1.4.20),
     data.table (>= 1.10.4),
     ggrepel (>= 0.6.5),
@@ -39,7 +40,7 @@ Imports:
     httr,
     foreach,
     seqinr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Suggests:
     BiocStyle (>= 2.0.0),
     testthat,
