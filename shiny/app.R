@@ -15,7 +15,13 @@ server <- function(input, output) {
     if (is.null(input$file1)){
       NULL
     }else {
-      readDNAStringSet(input$file1$datapath)
+      dnas <- readDNAStringSet(input$file1$datapath)
+      if (length(dnas) < 2) {
+        stop("This fastafile does not have enough sequences to align. 
+             If you believe this message is in error check your fasta file for 
+             the use of carriage returns used to demarcate line ends.")
+      }
+      dnas
     }
   )
   
@@ -38,7 +44,7 @@ server <- function(input, output) {
         build_tree() %>%
         design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
-     #obtain the locations of peaks and cehck for the presence of NAs
+     # obtain the locations of peaks and check for the presence of NAs
      primerlocs   <- autofind_primers(dp, keepprimers = input$numberofsites, minsequences = input$minseqs)
      primerlocNAs <- any(is.na(primerlocs))
      
@@ -67,16 +73,16 @@ server <- function(input, output) {
          
          p("This plot shows the coverage(y-axis) of primers designed at each location (x-axis)
            across your ungapped alignment using a maximum degeneracy value of (color). If you are seeing this
-           plot there was an errro in the auto choosing of good primers. The auto-detection of primers looks
+           plot there was an error in choosing primers. The auto-detection of primers looks
            for peaks in this graph. If you see very few peaks, or peaks with very low coverage use the
-           MSA and thee plot to troubleshoot. Most likely you will need to increase your maximum degeneracy."),
+           MSA and then plot to troubleshoot. Most likely you will need to increase your maximum degeneracy."),
          
-         shiny::renderPlot(plot_degeprimer(degedf = dp@primerdata)
+         shiny::renderPlot(plot_degeprimer(dp@primerdata)
          )
        )
      } else {
        
-       #create the MSA and Table and Pass them to the Main Panel
+       # create the MSA and Table and Pass them to the Main Panel
        msa1 <- add_primers_to_MSA(dp, positions = primerlocs, mode = "consensus")
        
        t1 <- data.frame(dp@primerdata) %>% 

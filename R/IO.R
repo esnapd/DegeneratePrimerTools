@@ -28,7 +28,7 @@ load_hmmmerdomtbl <- function(filename){
 #'
 #' @export
 load_blast <- function(blastfile, indexcols = c("queryID")) {
-  column_names <- c("queryID",  "subjectID", "percent.identy",
+  column_names <- c("queryID",  "subjectID", "percent.identity",
                     "alignment.length", "mismatches", "gap.openings", "qstart", "qend",
                     "sstart", "send", "evalue", "bitscore")
   

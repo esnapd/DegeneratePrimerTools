@@ -1,7 +1,7 @@
 #' Run a Multiple Sequence Alignment
 #'
 #' @param dgprimer Required. A degeprimer object.
-#' @param program Optional. Default \code{"msa"}. This option allows oyu to specify which preogrma ot use. By default
+#' @param program Optional. Default \code{"msa"}. This option allows you to specify which program to use. By default
 #' the \code{\link[msa]{msa}} program is used. Alternatively, "muscle" can be specified to use the CLI version of 
 #' muscle
 #' @param method Optional. Default \code{"ClustalW"}. The choice of alignment software to pass to \code{\link[msa]{msa}}.

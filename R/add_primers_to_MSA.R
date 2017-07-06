@@ -17,9 +17,9 @@
 #'    it will choose the most abundant location.
 #' @return a \code{\link[Biostrings]{DNAMultipleAlignment}}
 #' @importFrom purrr map
-#' @importFrom purrr by_row
 #' @importFrom purrr discard
 #' @importFrom purrr reduce
+#' @importFrom purrrlyr by_row
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
@@ -95,7 +95,7 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
   # dashes in the non-matching parts.
   # the new sequence to be added to the MSA will be
   # -----Primer-------
-  primerdata <- purrr::by_row(
+  primerdata <- purrrlyr::by_row(
     primerdata,
     function(pdata) {
       
