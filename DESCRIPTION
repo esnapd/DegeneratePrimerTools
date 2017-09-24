@@ -22,7 +22,6 @@ LazyData: TRUE
 Imports:
     Biostrings (>= 2.42.0),
     phyloseq (>= 1.19.1),
-    msa (>= 1.6.0),
     msaR (>= 0.2.0),
     shiny (>= 0.13),
     miniUI (>= 0.1.1),
@@ -36,17 +35,18 @@ Imports:
     gridExtra,
     parallel,
     zoo,
-    maps,
     httr,
     foreach,
     seqinr
 RoxygenNote: 6.0.1
 Suggests:
     BiocStyle (>= 2.0.0),
-    testthat,
-    knitr,
-    rmarkdown,
     DT,
     dplyr,
+    knitr,
+    maps,
+    msa (>= 1.6.0),
+    rmarkdown,
+    testthat,
     xtable
 VignetteBuilder: knitr
