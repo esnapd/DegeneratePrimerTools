@@ -7,21 +7,21 @@
 #' 2. The ggplot of the primer coverage
 #' 3. The dataframe of the possible degenerate primers
 #' 
-#'  @param seqs
-#'  @param outputfolder
-#'  @param aln_iters
-#'  @param max_degeneracies
-#'  @param degeprime_iterations
-#'  @param keep_locations
+#' @param seqs
+#' @param outputfolder
+#' @param aln_iters
+#' @param max_degeneracies
+#' @param degeprime_iterations
+#' @param keep_locations
 #'  
-#'  @import dplyr
-#'  @import ggplot2
-#'  @importFrom msaR msaR
-#'  @importFrom htmlwidgets saveWidget
-#'  @importFrom Biostrings DNAStringSet
-#'  @importFrom Biostrings reverseComplement
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom msaR msaR
+#' @importFrom htmlwidgets saveWidget
+#' @importFrom Biostrings DNAStringSet
+#' @importFrom Biostrings reverseComplement
 #'  
-#'  @export
+#' @export
 #'  
 primer_design <- function(seqs, outputfolder,
                           aln_iters=10,
