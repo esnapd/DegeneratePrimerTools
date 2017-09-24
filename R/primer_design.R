@@ -43,7 +43,10 @@ primer_design <- function(seqs, outputfolder,
   
   # add primers to MSA
   msa      <- add_primers_to_MSA(DP, positions = DP_positions, mode = "consensus")
-  msa_html <- msaR(msa)
+  msa_html <- msaR(msa,
+                   alignmentHeight = nrow(DP@msa)*20,
+                   leftheader = FALSE, 
+                   labelid = FALSE)
   
   df <- data.frame(DP@primerdata)
   df <- df %>% filter(Pos %in% DP_positions)
@@ -71,6 +74,6 @@ primer_design <- function(seqs, outputfolder,
   file.rename("widget.html", paste0(outputfolder, "/widget.html"))
   
   # degeprimer object
-  saveRDS(DP, file = paste0(outputfolder, "/degeprime.html"))
+  saveRDS(DP, file = paste0(outputfolder, "/degeprime.RDS"))
   
 }
