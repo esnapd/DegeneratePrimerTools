@@ -48,7 +48,7 @@ setClass("primerdata", contains = "data.frame")
 phylo <- structure(list(), class = "phylo")
 ################################################################################
 # If this ever works
-# @importClassesFrom ape phylo
+#@importClassesFrom ape phylo
 ################################################################################
 #' An S4 placeholder of the main phylogenetic tree class from the ape package.
 #'
@@ -89,62 +89,7 @@ setClassUnion("primerdataOrNULL", c("primerdata", "NULL"))
 #' \code{{primerdata-class}} (\code{"primerdata"} slot),
 #'
 #' There are several advantages to storing your primer-design data as an
-#'instance of the
-#' phyloseq class, not the least of which is that it is easy to return to the
-#' data later and feel confident that the different data types ``belong'' to
-#' one another. Furthermore, the \code{\link{phyloseq}} constructor ensures that
-#' the different data components have compatible indices (e.g. OTUs and samples),
-#' and performs the necessary trimming automatically when you create your
-#' ``experiment-level'' object. Downstream analyses are aware of which data
-#' classes they require -- and where to find them -- often making your
-#' \code{phyloseq-class} object the only data argument required for analysis and plotting
-#' functions (although there are many options and parameter arguments available
-#' to you).
-#'
-#' In the case of missing component data, the slots are set to \code{NULL}. As
-#' soon as a \code{phyloseq-class} object is to be updated with new component
-#' data (previously missing/\code{NULL} or not), the indices of all components
-#' are re-checked for compatibility and trimmed if necessary. This is to ensure
-#' by design that components describe the same taxa/samples, and also that these
-#' trimming/validity checks do not need to be repeated in downstream analyses.
-#'
-#' slots:
-#' \describe{
-#'    \item{refseq}{ a biological sequence set object of a class that
-#'         inherits from the \code{\link[Biostrings]{XStringSet-class}}, from the Biostrings package.}
-#'    \item{msa}{ a single object of the \code{\link[Biostrings]{DNAMultipleAlignment-class}}, from the Biostrings package.}
-#'    \item{phy_tree}{ a single object of the \code{\link[ape]{phylo}}-class, from the ape package.}
-#'    \item{phy_tree}{ a single object of the \code{primerdata-class}}.}
-#' }
-#' @seealso
-#'  The constructor, \code{\link{degeprimer}} and  the component
-#'  constructor/accessors \code{\link{otu_table}}, \code{\link{sample_data}},
-#'  \code{\link{tax_table}}, \code{\link{phy_tree}}, and \code{\link{refseq}}.
-#'
-#' @import BiocGenerics
-#' @importClassesFrom Biostrings XStringSet
-#' @name degeprimer-class
-#' @rdname degeprimer-class
-#' @exportClass degeprimer
-setClass(Class="degeprimer",
-         representation=representation(
-           refseq     = "DNAStringSetOrNULL",
-           msa        = "DNAMultipleAlignmentOrNULL",
-           phy_tree   = "phyloOrNULL",
-           primerdata = "primerdataOrNULL"),
-         prototype=prototype(refseq=NULL, msa=NULL,phy_tree=NULL, primerdata=NULL)
-)
-################################################################################
-#' The main experiment-level class for degprimer data
-#'
-#' Contains all currently-supported component data classes:
-#' \code{\link[Biostrings]{DNAStringSet-class}} (\code{"refseq"} slot).
-#' \code{\link[Biostrings]{DNAMultipleAlignment}} (\code{"msa"} slot).
-#' \code{\link[ape]{phylo}}-class (\code{"phy_tree"} slot),
-#' \code{{primerdata-class}} (\code{"primerdata"} slot),
-#'
-#' There are several advantages to storing your primer-design data as an
-#'instance of the
+#' instance of the
 #' phyloseq class, not the least of which is that it is easy to return to the
 #' data later and feel confident that the different data types ``belong'' to
 #' one another. Furthermore, the \code{\link{phyloseq}} constructor ensures that
