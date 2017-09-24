@@ -2,6 +2,8 @@
 #'
 #' lifted from dada2 https://github.com/benjjneb/dada2/blob/master/R/misc.R
 #'
+#' @param sqs DNA sequences
+#' 
 #' @importFrom Biostrings DNAString
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
@@ -19,6 +21,7 @@ rc <- function(sqs) {
 #' use trimaligment.pl to trim an MSA object. DEGEPRIMER is optimized for gapless alignments. This
 #' scripts will remove the gaps but mark the locations of gaps.
 #'
+#' @param msa A multiple sequence alignmenst as a DNAStringSet
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings writeXStringSet
 trimMSA <- function(msa) {
