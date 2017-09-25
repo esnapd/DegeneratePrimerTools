@@ -9,7 +9,7 @@
 #' @param maxdegeneracies Optional. Default is \code{c(1,4,100,400,1000)}. 
 #' @param minimumdepth Optional. Default is \code{1}. 
 #' @param skiplength Optional. Default is \code{20}. 
-#' @param number_iterations Optional. Default is \code{100}. The nubmer of
+#' @param number_iterations Optional. Default is \code{100}. The number of
 #'  iterations of the DEGEPRIMER algorithm.
 #' @param ncpus Optional. efault is \code{1}. The number of cpus to use.
 #' @param force Optional. Default is \code{FALSE}. Overwrite if exists?

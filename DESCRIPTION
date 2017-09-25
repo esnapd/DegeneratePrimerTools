@@ -20,7 +20,7 @@ SystemRequirements:
   muscle
 LazyData: TRUE
 Imports:
-    Biostrings (>= 2.42.0),
+    Biostrings (>= 2.44.2),
     phyloseq (>= 1.19.1),
     msaR (>= 0.2.0),
     shiny (>= 0.13),

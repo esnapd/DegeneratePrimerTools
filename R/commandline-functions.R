@@ -1,6 +1,6 @@
 #' run the DegePrime.pl script
 #'
-#' DEGEPRIME is a command-line perl program to find degernerate primers from a multiple sequence alignment. It attemps
+#' DEGEPRIME is a command-line perl program to find degenerate primers from a multiple sequence alignment. It attemps
 #' to find the maximumcoverage ofthe MSA with the minimum degeneracy where the maximum degeneracy is bounded by a user-provided input/
 #' This is a comman-line wrapper that shells ou tht ework to DEGEPRIME.
 #'
