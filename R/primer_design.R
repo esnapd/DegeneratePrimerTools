@@ -36,7 +36,7 @@ primer_design <- function(seqs, outputfolder,
   DP <- DP %>% run_alignment(maxiters = aln_iters) 
   DP <- DP %>% build_tree() 
   DP <- DP %>% design_primers(
-    maxdegeneracies=max_degeneracies, degeprime_iterations=degeprime_iterations) # this can take awhile
+    maxdegeneracies=max_degeneracies, number_iterations=degeprime_iterations) # this can take awhile
   
   # autofind primers
   DP_positions <- DP %>% autofind_primers(keepprimers = keep_locations)
