@@ -16,7 +16,10 @@
 #'  
 #' @import dplyr
 #' @import ggplot2
+#' @importFrom ape write.tree
+#' @importFrom ape ladderize
 #' @importFrom msaR msaR
+#' @importFrom phylocanvas phylocanvas
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
@@ -68,6 +71,14 @@ primer_design <- function(seqs, outputfolder,
   
   # primer plot
   ggsave(plot1, file = paste0(outputfolder, "/primerplot.png"))
+  
+  # tree
+  ape::write.tree(DP@phy_tree, file = paste0(outputfolder, "/tree.nw"))
+  
+  # interactive tree
+  phycanv <- phylocanvas(ape::ladderize(DP@phy_tree))
+  saveWidget(phycanv, "tree.html")
+  file.rename("tree.html", paste0(outputfolder, "/tree.html"))
   
   # primer msa
   saveWidget(msa_html, "widget.html")
