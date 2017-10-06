@@ -1,7 +1,7 @@
 Package: DegeneratePrimerTools
 Type: Package
 Title: Tools for Designing Degenerate Primers
-Version: 0.1.26
+Version: 0.2.0
 Authors@R: c(
     person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
     person("Christophe", "lemetre", , "clemetre@mail.rockefeller.edu", c("aut")),
@@ -21,6 +21,7 @@ SystemRequirements:
 LazyData: TRUE
 Imports:
     Biostrings (>= 2.42.1),
+    ape,
     phyloseq (>= 1.19.1),
     msaR (>= 0.2.0),
     shiny (>= 0.13),
@@ -37,7 +38,8 @@ Imports:
     zoo,
     httr,
     foreach,
-    seqinr
+    seqinr,
+    phylocanvas
 RoxygenNote: 6.0.1
 Suggests:
     BiocStyle (>= 2.0.0),
