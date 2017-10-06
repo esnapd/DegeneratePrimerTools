@@ -84,7 +84,7 @@ primer_design <- function(seqs, outputfolder,
   file.rename("widget.html", paste0(outputfolder, "/widget.html"))
   
   # write primer msa and input sequenes
-  writeXStringSet(DP@msa,  paste0(outputfolder, "/msa.fna"))
+  writeXStringSet(as(DP@msa, "DNAStringSet"),  paste0(outputfolder, "/msa.fna"))
   writeXStringSet(DP@refseq,  paste0(outputfolder, "/seqs.fna"))
   
   # degeprimer object
