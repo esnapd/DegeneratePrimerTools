@@ -23,6 +23,7 @@
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings reverseComplement
+#' @importFrom Biostrings writeXStringSet
 #'  
 #' @export
 #'  
@@ -58,10 +59,8 @@ primer_design <- function(seqs, outputfolder,
   df <- df %>% arrange(Pos)
   
   plot1 <- plot_degeprimer(DP)
-  
-  #
-  #
-  #
+
+  #####################################################################
   # create output folder/files
   dir.create(outputfolder, recursive = TRUE)
   
@@ -83,6 +82,10 @@ primer_design <- function(seqs, outputfolder,
   # primer msa
   saveWidget(msa_html, "widget.html")
   file.rename("widget.html", paste0(outputfolder, "/widget.html"))
+  
+  # write primer msa and input sequenes
+  writeXStringSet(DP@msa,  paste0(outputfolder, "/msa.fna"))
+  writeXStringSet(DP@refseq,  paste0(outputfolder, "/seqs.fna"))
   
   # degeprimer object
   saveRDS(DP, file = paste0(outputfolder, "/degeprime.RDS"))
