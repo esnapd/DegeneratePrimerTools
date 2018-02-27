@@ -20,12 +20,12 @@ design_primers <- function(dgprimer, oligolength=21, maxdegeneracies=c(1,4,100,4
                            minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1,
                            force=FALSE) {
   
-  # check if degepreime data ia associated with the class. if so, require force=TRUE
+  # check if degeprime data ia associated with the class. if so, require force=TRUE
   if (!is.null(dgprimer@primerdata) & force==FALSE) {
     stop("Degenerate primer data already exists. To overwrite please use force=TRUE")
   }
   
-  # check if degepreime data ia associated with the class. if so, require force=TRUE
+  # check if mutliple sequence alignment data ia associated with the class. if so, require force=TRUE
   if (is.null(dgprimer@msa)) {
     stop("Primer Calculation requires a multiple sequence alignment")
   }
@@ -43,7 +43,7 @@ design_primers <- function(dgprimer, oligolength=21, maxdegeneracies=c(1,4,100,4
   alignfile   <- tempfile()
   trimmedfile <- tempfile()
   writeXStringSet( as(dgprimer@msa,"DNAStringSet"), alignfile)
-  trimAlignment(infile=alignfile, outfile=trimmedfile, minoccupancy=0, refsequence = NULL, trailgap = FALSE)
+  trimAlignment(infile=alignfile, outfile=trimmedfile, minoccupancy=1, refsequence = NULL, trailgap = FALSE)
   
   degendata <- mclapply(drange, function(x) {
     #get per-run data
