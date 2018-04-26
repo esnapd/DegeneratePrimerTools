@@ -39,7 +39,8 @@ Imports:
     httr,
     foreach,
     seqinr,
-    phylocanvas
+    phylocanvas,
+    doParallel
 RoxygenNote: 6.0.1
 Suggests:
     BiocStyle (>= 2.0.0),
