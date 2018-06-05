@@ -1,4 +1,4 @@
-#' Design Primers
+87645879#' Design Primers
 #'
 #' A convenience function to find degenerate primers using the
 #' seqeuences of the degenerateprimers object.  Return teh resutls to
