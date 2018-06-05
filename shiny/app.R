@@ -40,14 +40,15 @@ server <- function(input, output) {
       return ()
     } else {
      dp <- degeprimer(inFile()) %>%
-        run_alignment() %>%
+       run_alignment() %>%
         build_tree() %>%
         design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
      # obtain the locations of peaks and check for the presence of NAs
-     primerlocs   <- autofind_primers(dp, keepprimers = input$numberofsites, minsequences = input$minseqs)
-     primerlocNAs <- any(is.na(primerlocs))
+      primerlocs   <- autofind_primers(dp, keepprimers = input$numberofsites, minsequences = input$minseqs)
+      primerlocNAs <- any(is.na(primerlocs))
      
+     #primerlocNAs <- 1
      # if autofind has difficulties, provide one output,
      # otherwise provide a main output.
      rowheight <- 15
@@ -59,7 +60,7 @@ server <- function(input, output) {
          
          br(),
          
-         h3("MSA of the input seqeunces."),
+         h3("MSA of the input sequences."),
          renderMsaR({ msaR(dp@msa, 
                            menu = F, 
                            height= nrow(dp@msa)*rowheight, 
@@ -154,7 +155,12 @@ ui <- fluidPage(
                            "Degeneracy 2000" = 2000),
             selected = c(50, 100, 200, 500)),
           
-          numericInput("numberofsites", "Number of Primer Locations to Return:", 6, min = 1, max = 20),
+          
+          sliderInput("integer", "Length of primers:",
+                      min = 5, max = 30,
+                      value = 21),
+          
+          numericInput("numberofsites", "Number of Primer Locations to Return:", 6, min = 1, max = 1000),
           numericInput("minseqs", "Minimum Sequence to Be Considered for Primer Design:", 3, min = 2, max = 10)
         ),
         

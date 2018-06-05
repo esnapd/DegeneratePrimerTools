@@ -16,6 +16,9 @@
 #' @param SampleSize. Optional. Size to sample, default is 100000. (integer)
 #' 
 #' @export
+#' 
+#' 
+#' 
 primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
   
   wd <- tempdir()
@@ -130,7 +133,6 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
     OutFasta90 <- paste0(wd, "/", sampleName, "_clustered90.fasta")
     UCFile90 <- paste0(wd, "/", sampleName, "_clustered90.uc")
     
-    run_vsearch_cluster(FilteredSeqsFasta, id=0.90, OutFasta90, UCFile90, logfile)
     Cluster90Seqs <- readDNAStringSet(OutFasta90)
     UC90phylo <- filter_taxa(import_usearch_uc(UCFile90), function(x) x>= OTUsizeFilter, TRUE)
     
@@ -237,7 +239,8 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
   # }
   
   # Trim the set of reference sequences with the extreme start and end positions
-  RefTrim <- extract_ends(extract_amplicons(Ref, "STGCGGGTGCTGCCSGACGAC", "SGCGTASAGGTACTGCAGC"))
+  RefTrim <- extract_ends(extract_amplicons(Ref, "GGCSGCYCAGCGGCTCGGCGC", "CGGGSGCGCCGRTCTCCCAGA"))#"STGCGGGTGCTGCCSGACGAC", "SGCGTASAGGTACTGCAGC"))
+  RefTrim <- Ref
   if (length(RefTrim) == 0) {
     warning("No reference sequence can be extracted with the primer data.")
   }
@@ -349,3 +352,4 @@ primer_analysis <- function(Target, fileList, Ref, Primers, OTUsizeFilter = 3){
                heights=c(1,3,1,3), layout_matrix = rbind(c(1,1), c(2,3),c(4,4), c(5,6)))
   
 }
+
