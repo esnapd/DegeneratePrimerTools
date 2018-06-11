@@ -25,9 +25,12 @@ server <- function(input, output) {
     }
   )
   
+  
   # this determines file upload status and is used for our UI to determine what to display
   output$fileUploaded <- reactive({return(is.null(inFile()))})
   outputOptions(output, 'fileUploaded', suspendWhenHidden=FALSE)
+  
+  output$fastaName <- reactive(input$file1$name)
   
   # create the IUPAC table
   output$IUPAC <- renderTable(data.frame(
@@ -174,6 +177,11 @@ ui <- fluidPage(
             of the input sequences along with the primers designed using the degeneracy values you have specified.
             Highlighting the schematic will navigate around the multiple sequence alignment.
             Below is a table of primers."),
+          
+          br(),
+          
+          p("Fasta file:"),
+          htmlOutput("fastaName"),
           
           br(),
           
