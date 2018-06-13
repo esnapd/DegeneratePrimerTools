@@ -25,9 +25,12 @@ server <- function(input, output) {
     }
   )
   
+  
   # this determines file upload status and is used for our UI to determine what to display
   output$fileUploaded <- reactive({return(is.null(inFile()))})
   outputOptions(output, 'fileUploaded', suspendWhenHidden=FALSE)
+  
+  output$fastaName <- reactive(input$file1$name)
   
   # create the IUPAC table
   output$IUPAC <- renderTable(data.frame(
@@ -39,10 +42,15 @@ server <- function(input, output) {
     if(is.null(inFile())) { 
       return ()
     } else {
+      
+     sliderLength <- as.numeric(input$sliderLength)
+      
      dp <- degeprimer(inFile()) %>%
-       run_alignment() %>%
+        run_alignment() %>%
         build_tree() %>%
-        design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
+        #design_primers(oligolengths = as.numeric(input$sliderLength), maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
+        design_primers(oligolengths = sliderLength, maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
+        #design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
      # obtain the locations of peaks and check for the presence of NAs
       primerlocs   <- autofind_primers(dp, keepprimers = input$numberofsites, minsequences = input$minseqs)
@@ -156,8 +164,8 @@ ui <- fluidPage(
             selected = c(50, 100, 200, 500)),
           
           
-          sliderInput("integer", "Length of primers:",
-                      min = 5, max = 30,
+          sliderInput("sliderLength", "Length of primers:",
+                      min = 10, max = 30,
                       value = 21),
           
           numericInput("numberofsites", "Number of Primer Locations to Return:", 6, min = 1, max = 1000),
@@ -174,6 +182,12 @@ ui <- fluidPage(
             of the input sequences along with the primers designed using the degeneracy values you have specified.
             Highlighting the schematic will navigate around the multiple sequence alignment.
             Below is a table of primers."),
+          
+          br(),
+          
+          p("Fasta file:"),
+          htmlOutput("fastaName"),
+          htmlOutput("input$length"),
           
           br(),
           

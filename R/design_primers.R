@@ -16,7 +16,7 @@
 #' 
 #' @importFrom parallel mclapply
 #' @export
-design_primers <- function(dgprimer, oligolength=21, maxdegeneracies=c(1,4,100,400,1000),
+design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,400,1000),
                            minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1,
                            force=FALSE) {
   
@@ -51,7 +51,7 @@ design_primers <- function(dgprimer, oligolength=21, maxdegeneracies=c(1,4,100,4
     maxdegeneracy <- maxdegeneracies[[x]]
     #calculate degeneracies
     degePrime(alignmentfile=trimmedfile, outfile=outputfile,
-              oligolength=oligolength, maxdegeneracy = maxdegeneracy,
+              oligolength=oligolengths, maxdegeneracy = maxdegeneracy,
               minimumdepth=minimumdepth, skiplength=skiplength, number_iterations=number_iterations)
     #load the file and return a dataframe
     df <- read.table(outputfile,header = TRUE, stringsAsFactors = FALSE)
