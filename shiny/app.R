@@ -48,9 +48,7 @@ server <- function(input, output) {
      dp <- degeprimer(inFile()) %>%
         run_alignment() %>%
         build_tree() %>%
-        #design_primers(oligolengths = as.numeric(input$sliderLength), maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
         design_primers(oligolengths = sliderLength, maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
-        #design_primers(maxdegeneracies=as.numeric(input$checkGroup), number_iterations=10, ncpus = 4)
      
      # obtain the locations of peaks and check for the presence of NAs
       primerlocs   <- autofind_primers(dp, keepprimers = input$numberofsites, minsequences = input$minseqs)

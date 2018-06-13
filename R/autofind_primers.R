@@ -17,7 +17,7 @@
 autofind_primers <- function(degeprime, keepprimers=4, minsequences=3) {
   if (is.null(degeprime@primerdata)) stop("Autopicking Primers requires primer information.")
   
-  # descard data where there are few sequences - i.e the beginning and ends of an alignmnet
+  # discard data where there are few sequences - i.e the beginning and ends of an alignmnet
   degedf <- data.frame(degeprime@primerdata) %>% filter(PrimerMatching >= minsequences)
   
   cutoff <- mean(degedf$coverage) + 2*sd(degedf$coverage)
