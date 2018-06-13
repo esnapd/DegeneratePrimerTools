@@ -12,7 +12,7 @@
 #'  avoid the  problem where primers are chosen on regions with small numbers
 #'  of sequences, typically found at the end of an alignment.
 #' 
-#' @return vector of ints denoting the top peaks
+#' @return vector of integers denoting the top peaks
 #' @export
 autofind_primers <- function(degeprime, keepprimers=4, minsequences=3) {
   if (is.null(degeprime@primerdata)) stop("Autopicking Primers requires primer information.")
