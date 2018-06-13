@@ -12,12 +12,12 @@
 #'  avoid the  problem where primers are chosen on regions with small numbers
 #'  of sequences, typically found at the end of an alignment.
 #' 
-#' @return vector of ints denoting the top peaks
+#' @return vector of integers denoting the top peaks
 #' @export
 autofind_primers <- function(degeprime, keepprimers=4, minsequences=3) {
   if (is.null(degeprime@primerdata)) stop("Autopicking Primers requires primer information.")
   
-  # descard data where there are few sequences - i.e the beginning and ends of an alignmnet
+  # discard data where there are few sequences - i.e the beginning and ends of an alignmnet
   degedf <- data.frame(degeprime@primerdata) %>% filter(PrimerMatching >= minsequences)
   
   cutoff <- mean(degedf$coverage) + 2*sd(degedf$coverage)
