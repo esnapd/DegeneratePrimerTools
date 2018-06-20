@@ -56,6 +56,8 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
     #load the file and return a dataframe
     df <- read.table(outputfile,header = TRUE, stringsAsFactors = FALSE)
     df$degeneracy <- maxdegeneracy
+    #remove intermediate file
+    rm(outputfile)
     return(df)
   }, mc.cores=ncpus)
   
