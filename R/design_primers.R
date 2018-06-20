@@ -1,4 +1,4 @@
-87645879#' Design Primers
+#' Design Primers
 #'
 #' A convenience function to find degenerate primers using the
 #' seqeuences of the degenerateprimers object.  Return teh resutls to
@@ -15,6 +15,8 @@
 #' @param force Optional. Default is \code{FALSE}. Overwrite if exists?
 #' 
 #' @importFrom parallel mclapply
+#' @importFrom seqinr s2c
+#' @importFrom seqinr GC
 #' @export
 design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,400,1000),
                            minimumdepth=1, skiplength=20, number_iterations=100, ncpus=1,
@@ -56,6 +58,8 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
     #load the file and return a dataframe
     df <- read.table(outputfile,header = TRUE, stringsAsFactors = FALSE)
     df$degeneracy <- maxdegeneracy
+    #remove intermediate file
+    rm(outputfile)
     return(df)
   }, mc.cores=ncpus)
   
@@ -65,6 +69,11 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
   #add coverage information
   aggdata$coverage <- aggdata$PrimerMatching/aggdata$TotalSeq
   
+  #add GC information
+  # aggdata$GC% <- mclapply(aggdata$PrimerSeq, function(x){
+  # seqinr::GC(seqinr::s2c(x))
+  #})
+    
   # add the primer data to the object
   dgprimer@primerdata <- new("primerdata", aggdata)
   

@@ -71,7 +71,7 @@ server <- function(input, output) {
                            menu = F, 
                            height= nrow(dp@msa)*rowheight, 
                            alignmentHeight = nrow(dp@msa)*rowheight, 
-                           leftheader = FALSE, 
+                           leftheader = FALSE,
                            labelNameLength = 160, 
                            labelid = FALSE,
                            seqlogo=F)}),
