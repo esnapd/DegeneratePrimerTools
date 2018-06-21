@@ -73,7 +73,13 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
   # aggdata$GC% <- mclapply(aggdata$PrimerSeq, function(x){
   # seqinr::GC(seqinr::s2c(x))
   #})
-    
+  
+  IUPAC_degen <- data.frame(c("A","C","G","T","M","R","W","S","Y","K","V","H","D","B","N"),c(1,1,1,1,2,2,2,2,2,2,3,3,3,3,4))
+  names(IUPAC_degen) <- c("Symbol","DoF")
+  DEG <- lapply(length
+                (unlist(strsplit(Primer, split="")))[X]
+  )
+  
   # add the primer data to the object
   dgprimer@primerdata <- new("primerdata", aggdata)
   
