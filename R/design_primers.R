@@ -15,6 +15,7 @@
 #' @param force Optional. Default is \code{FALSE}. Overwrite if exists?
 #' 
 #' @importFrom parallel mclapply
+#' @importFrom plyr revalue
 #' @importFrom seqinr s2c
 #' @importFrom seqinr GC
 #' @export
@@ -78,9 +79,16 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
   IUPAC_degen <- data.frame(c("A","C","G","T","M","R","W","S","Y","K","V","H","D","B","N"),c(1,1,1,1,2,2,2,2,2,2,3,3,3,3,4))
   names(IUPAC_degen) <- c("Symbol","DoF")
   
+  lapply(seq(length(aggdata$PrimerSeq)), function(x){
+    aggdata$DoF[x] <- sum(as.numeric(revalue(unlist(strsplit(aggdata$PrimerSeq, split="")),
+                               c("A"="1", "C"="1", "G"="1", "T"="1",
+                                 "M"="2","R"="2","W"="2","S"="2","Y"="2","K"="2",
+                                 "V"="3","H"="3","D"="3","B"="3",
+                                 "N"="4"))))
+  })
   
-  PrimerDoFsum <- 0
-  PrimerDoFsum <- mclapply(seq(length(unlist(strsplit(aggdata$PrimerSeq, split="")))), function(x){
+  
+  PrimerDoFsum <- lapply(seq(length(aggdata$PrimerSeq)), function(x){
       PrimerDoFsum <- PrimerDoFsum + as.numeric(IUPAC_degen[which(IUPAC_degen$Symbol==(unlist(strsplit(Primer, split="")))[x]),2])
     }
   )
