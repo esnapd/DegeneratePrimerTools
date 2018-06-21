@@ -74,10 +74,15 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
   # seqinr::GC(seqinr::s2c(x))
   #})
   
+  # Define the Degree of Freedom of degeneracy for the primers into a dataframe
   IUPAC_degen <- data.frame(c("A","C","G","T","M","R","W","S","Y","K","V","H","D","B","N"),c(1,1,1,1,2,2,2,2,2,2,3,3,3,3,4))
   names(IUPAC_degen) <- c("Symbol","DoF")
-  DEG <- lapply(length
-                (unlist(strsplit(Primer, split="")))[X]
+  
+  
+  PrimerDoFsum <- 0
+  PrimerDoFsum <- mclapply(seq(length(unlist(strsplit(aggdata$PrimerSeq, split="")))), function(x){
+      PrimerDoFsum <- PrimerDoFsum + as.numeric(IUPAC_degen[which(IUPAC_degen$Symbol==(unlist(strsplit(Primer, split="")))[x]),2])
+    }
   )
   
   # add the primer data to the object
