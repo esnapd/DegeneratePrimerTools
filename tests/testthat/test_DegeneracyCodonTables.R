@@ -1,5 +1,5 @@
 library(DegeneratePrimerTools)
-context('Checking the Codong Tables')
+context('Checking the Codon Tables')
 
 test_that("the 3 basic degeneracy tables work", {
   expect_equal(makedegenerateseqs("ACT"), "ACN")
