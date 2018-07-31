@@ -19,7 +19,6 @@
 #' @importFrom purrr map
 #' @importFrom purrr discard
 #' @importFrom purrr reduce
-#' @importFrom purrrlyr by_row
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union

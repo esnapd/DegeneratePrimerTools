@@ -1,7 +1,7 @@
 Package: DegeneratePrimerTools
 Type: Package
 Title: Tools for Designing Degenerate Primers
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Zachary", "Charlop-Powers", , "zcharlop@rockefeller.edu", c("aut", "cre")),
     person("Christophe", "lemetre", , "clemetre@mail.rockefeller.edu", c("aut")),
@@ -29,7 +29,6 @@ Imports:
     ggplot2 (>= 2.0),
     methods (>= 3.3.0),
     purrr (>= 0.2.2.2),
-    purrrlyr (>= 0.0.2),
     ggtree (>= 1.4.20),
     data.table (>= 1.10.4),
     ggrepel (>= 0.6.5),
@@ -41,7 +40,7 @@ Imports:
     seqinr,
     phylocanvas,
     doParallel
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Suggests:
     BiocStyle (>= 2.0.0),
     DT,
