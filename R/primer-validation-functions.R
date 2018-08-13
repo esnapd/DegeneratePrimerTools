@@ -39,7 +39,7 @@ primer_filtering <- function(file, Ref, logfile, SampleSize=100000, setwd=NULL){
   ###################################################################################################################################
   #Read the sequences into a DNAStringSet
   Seqs <- readDNAStringSet(file)
-  #names(Seqs) <- gsub(" ", "_", names(Seqs))
+  names(Seqs) <- gsub(" ", "_", names(Seqs))
   
   
   ###################################################################################################################################
