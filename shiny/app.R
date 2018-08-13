@@ -95,7 +95,8 @@ server <- function(input, output) {
        t1 <- data.frame(dp@primerdata) %>% 
          filter(Pos %in% primerlocs) %>% 
          mutate(RevComp= as.character(reverseComplement(DNAStringSet(PrimerSeq)))) %>%
-         select(Pos, PrimerSeq, RevComp, PrimerDeg, degeneracy, coverage) %>%
+         #select(Pos, PrimerSeq, RevComp, PrimerDeg, degeneracy, coverage) %>%
+         select(Pos, PrimerSeq, RevComp, Primer_Degeneracy, coverage) %>%
          arrange(Pos)
        
        mainPanel(

@@ -76,14 +76,14 @@ design_primers <- function(dgprimer, oligolengths=21, maxdegeneracies=c(1,4,100,
   #})
   
   # Define the Degree of Freedom of degeneracy for the primers into a dataframe and add it to the primerdata
-  aggdata$DoF <- mclapply(seq(length(aggdata$PrimerSeq)), function(x){
+  aggdata$Primer_Degeneracy <- mclapply(seq(length(aggdata$PrimerSeq)), function(x){
     deg <- sum(as.numeric(revalue(unlist(strsplit(aggdata$PrimerSeq[x], split="")),
-                               c("A"="1", "C"="1", "G"="1", "T"="1",
+                               c("A"="1","C"="1","G"="1","T"="1",
                                  "M"="2","R"="2","W"="2","S"="2","Y"="2","K"="2",
                                  "V"="3","H"="3","D"="3","B"="3",
                                  "N"="4"))))
     return(deg)
-  })
+  }, mc.cores=1)
 
   
   # add the primer data to the object
