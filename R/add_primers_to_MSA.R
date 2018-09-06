@@ -19,7 +19,6 @@
 #' @importFrom purrr map
 #' @importFrom purrr discard
 #' @importFrom purrr reduce
-#' @importFrom purrrlyr by_row
 #' @importFrom Biostrings DNAStringSet
 #' @importFrom Biostrings DNAMultipleAlignment
 #' @importFrom Biostrings union
@@ -95,14 +94,13 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
   # dashes in the non-matching parts.
   # the new sequence to be added to the MSA will be
   # -----Primer-------
-  primerdata <- purrrlyr::by_row(
-    primerdata,
-    function(pdata) {
-      
-      pname     <- paste("Pos", pdata$Pos[[1]],"Deg", pdata$degeneracy[[1]], "Calcdeg", pdata$PrimerDeg[[1]], sep="_")
-      fp        <- pdata$PrimerSeq[[1]]
+  primerdata <- mapply(
+      function(pos, deg, primerdeg, primerseq, msaloc){
+    
+      pname     <- paste("Pos", pos[[1]],"Deg",deg[[1]], "Calcdeg", primerdeg[[1]], sep="_")
+      fp        <- primerseq[[1]]
       fp_length <- nchar(fp)
-      start     <- pdata$msaloc[[1]]
+      start     <- msaloc[[1]]
       end       <- start + fp_length
       
       # calculate intervals: middledash is total interval minus primers
@@ -115,10 +113,17 @@ add_primers_to_MSA <- function(degeprime, positions, max.mismatch=3, windowsize=
       names(dna) <- pname
       
       dna
-    }, .to="DNA")
+    },
+    primerdata$Pos,
+    primerdata$degeneracy,
+    primerdata$PrimerDeg,
+    primerdata$PrimerSeq,
+    primerdata$msaloc
+  ) 
+    
   
   # combine the sequences together
-  primersaligned <- purrr::reduce(primerdata$DNA, Biostrings::union)
+  primersaligned <- purrr::reduce(primerdata, Biostrings::union)
   
   # add the new sequences ot the MSA
   dnacombined <- Biostrings::union(DNAStringSet(msa1), primersaligned)
